@@ -11,7 +11,7 @@ export default function Index() {
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={{ fontSize: 24, marginBottom: 20 }}>Welcome to the App!</Text>
+      <Text style={{ fontSize: 24, marginBottom: 20 }}>Welcome to the Hello!</Text>
       <TouchableOpacity 
       onPress={handleGetStarted} >
       <Text style={{ fontSize: 24, marginBottom: 20 }}>Get Started</Text>
