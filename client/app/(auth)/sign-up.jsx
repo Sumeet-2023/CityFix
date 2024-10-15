@@ -27,7 +27,7 @@ const SignUp = () => {
   
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={styles.title}>Sign up to CityFix</Text>
+        <Text style={styles.title}>Sign up to CityFix!</Text>
         <Text style={styles.subTitle}>First create your account</Text>
 
         <TextInput
@@ -124,6 +124,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   buttonText: {
     color: '#ffffff',
