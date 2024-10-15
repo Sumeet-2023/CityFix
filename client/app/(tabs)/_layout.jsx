@@ -9,6 +9,7 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -16,6 +17,7 @@ export default function TabLayout() {
         options={{
           title: 'Notification',
           tabBarIcon: ({ color }) => <FontAwesome name="inbox" size={24} color={color} />,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -23,6 +25,7 @@ export default function TabLayout() {
         options={{
           title: 'Explore',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="map" color={color} />,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -30,6 +33,7 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color }) => <FontAwesome name="user" size={24} color={color} />,
+          headerShown: false,
         }}
       />
     </Tabs>
