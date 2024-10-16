@@ -1,4 +1,5 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Tabs } from 'expo-router';
 
 export default function TabLayout() {
@@ -8,7 +9,7 @@ export default function TabLayout() {
         name="home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons name="home" size={32} color={color} />,
           headerShown: false,
         }}
       />
@@ -16,7 +17,7 @@ export default function TabLayout() {
         name="notification"
         options={{
           title: 'Notification',
-          tabBarIcon: ({ color }) => <FontAwesome name="inbox" size={24} color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons name="notifications-on" size={28} color={color} />,
           headerShown: false,
         }}
       />
@@ -24,7 +25,7 @@ export default function TabLayout() {
         name="explore"
         options={{
           title: 'Explore',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="map" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons name="explore" size={24} color={color} />,
           headerShown: false,
         }}
       />
