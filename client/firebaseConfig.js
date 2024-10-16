@@ -1,29 +1,56 @@
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import {initializeAuth, getReactNativePersistence} from "firebase/auth"
+// Only import getAnalytics when in a web environment
+let getAnalytics;
+if (typeof window !== "undefined") {
+  getAnalytics = require("firebase/analytics").getAnalytics;
+}
+
+import { initializeAuth } from "firebase/auth"; 
+//@ts-ignore
+import { getReactNativePersistence } from '@firebase/auth/dist/rn/index.js'; 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { config } from "./envConfig";
 
-// TODO: Add SDKs for Firebase products that you want to use
+const apiKey = process.env.EXPO_PUBLIC_FIREBASE_API_KEY
+const authDomain = process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN
+const projectId = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID
+const storageBucket = process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET
+const messagingSenderId = process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+const appId = process.env.EXPO_PUBLIC_FIREBASE_APP_ID
+const measurementId = process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Firebase configuration
 const firebaseConfig = {
-  apiKey: config.apiKey,
-  authDomain: config.authDomain,
-  projectId: config.projectId,
-  storageBucket: config.storageBucket,
-  messagingSenderId: config.messagingSenderId,
-  appId: config.appId,
-  measurementId: config.measurementId
+  apiKey: apiKey,
+  authDomain: authDomain,
+  projectId: projectId,
+  storageBucket: storageBucket,
+  messagingSenderId: messagingSenderId,
+  appId: appId,
+  measurementId: measurementId
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-//InitializeAuth persistence
-const auth = initializeAuth(app, {
-    persistence: getReactNativePersistence(AsyncStorage)
-})
-const analytics = getAnalytics(app);
 
-export { auth };
+// Initialize Auth with React Native persistence
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage),
+});
+
+// Conditionally initialize Analytics
+let analytics;
+if (getAnalytics) {
+  const { isSupported } = require("firebase/analytics"); // Ensure this is imported when using in a web environment
+
+  isSupported().then((supported) => {
+    if (supported) {
+      analytics = getAnalytics(app);
+    } else {
+      console.warn("Firebase Analytics is not supported in this environment.");
+    }
+  }).catch((error) => {
+    console.error("Error checking analytics support:", error);
+  });
+}
+
+export { auth, analytics };
