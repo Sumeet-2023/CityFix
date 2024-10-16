@@ -143,7 +143,6 @@ const Profile = () => {
           </Text>
         </View>
 
-        {/*follower section*/}
         <View
           style={{
             paddingVertical: 8,
