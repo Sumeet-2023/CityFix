@@ -1,8 +1,28 @@
 import { Text, View, TouchableOpacity, StyleSheet,ImageBackground } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from "expo-router";
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebaseConfig';
+import React, { useEffect, useState } from 'react';
 
 export default function Index() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log(user);
+      
+      setIsLoading(false);
+      if (user) {
+        // User is signed in, navigate to home
+        router.push('/home');
+      }
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, []);
+
 
   const handleGetStarted = () => {
     // Navigate to the signup screen
