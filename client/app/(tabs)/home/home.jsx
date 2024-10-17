@@ -10,8 +10,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 
-
-
 const Home = () => {
   const menuItems = [
     { title: "Report Issue", icon: "report-problem", route: "/home/report/feeds" },
