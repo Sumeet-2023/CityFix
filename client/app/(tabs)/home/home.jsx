@@ -10,6 +10,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 
+
+
 const Home = () => {
   const menuItems = [
     { title: "Report Issue", icon: "report-problem", route: "/home/report/feeds" },
@@ -36,7 +38,7 @@ const Home = () => {
           <Text className="text-4xl font-bold">Home</Text>
           <TouchableOpacity onPress={handleSettingsPress}>
             <MaterialIcons name="settings" size={28} color="black" />
-          </TouchableOpacity>
+          </TouchableOpacity> 
         </View>
 
         <View className="flex-row items-center bg-gray-200 rounded-lg px-4 py-3 mb-5">
