@@ -13,7 +13,7 @@ export default function Index() {
       setIsLoading(false);
       if (user) {
         // User is signed in, navigate to home
-        router.push('/home');
+        router.push('/home/home');
       }
     });
 

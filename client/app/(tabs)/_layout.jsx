@@ -1,12 +1,13 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Tabs } from 'expo-router';
+import { router, Tabs } from 'expo-router';
+import { TouchableOpacity } from 'react-native';
 
 export default function TabLayout() {
   return (
     <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }}>
       <Tabs.Screen
-        name="home"
+        name="home/home"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <MaterialIcons name="home" size={32} color={color} />,
@@ -35,6 +36,23 @@ export default function TabLayout() {
           title: 'Profile',
           tabBarIcon: ({ color }) => <FontAwesome name="user" size={24} color={color} />,
           headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="home/report"
+        options={{
+          headerTitle: 'Report Issue',
+          tabBarButton: () => null,
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 10 }}>
+              <MaterialIcons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <TouchableOpacity onPress={() => router.push('/settings')} style={{ marginRight: 10 }}>
+              <MaterialIcons name="settings" size={24} color="black" />
+            </TouchableOpacity>
+          ),
         }}
       />
     </Tabs>
