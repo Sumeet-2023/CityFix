@@ -13,7 +13,7 @@ export default function SignIn() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       // Navigate to Home Screen after successful sign-in
-      router.push('/home');
+      router.push('home/home');
     } catch (error) {
       console.error('Error signing in: ', error.message);
     }
