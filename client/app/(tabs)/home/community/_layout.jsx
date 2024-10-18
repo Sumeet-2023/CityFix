@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
   export default function TabLayout() {
     return (
    
-      <MaterialTopTabs 
+        <MaterialTopTabs 
         screenOptions={{
           tabBarLabelStyle: { fontSize: 14,fontWeight: 'bold', textTransform: 'capitalize'},
           tabBarScrollEnabled: true,
@@ -19,14 +19,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
             backgroundColor: 'blue',
           },
           tabBarItemStyle: {
-            width: 100,
+            width: 'auto',
           },
         }}
-      >
+       >
         <MaterialTopTabs.Screen name="feeds" options={{ title: "Feeds" }} />
-        <MaterialTopTabs.Screen name="createIssue" options={{ title: "Create" }} />
-        <MaterialTopTabs.Screen name="myIssue" options={{ title: "My issue" }} />
-        <MaterialTopTabs.Screen name="solvedIssue" options={{ title: "Solved" }} />
+        <MaterialTopTabs.Screen name="createProject" options={{ title: "Create Issues" }} />
+        <MaterialTopTabs.Screen name="myProjects" options={{ title: "My issues" }} />
+        <MaterialTopTabs.Screen name="volunteer" options={{ title: "Volunteer" }} />
+        <MaterialTopTabs.Screen name="exploreMap" options={{ title: "Explore" }} />
      
       </MaterialTopTabs>
    
