@@ -5,7 +5,7 @@ if (typeof window !== "undefined") {
   getAnalytics = require("firebase/analytics").getAnalytics;
 }
 
-import { initializeAuth } from "firebase/auth"; 
+import { initializeAuth } from "firebase/auth";
 //@ts-ignore
 import { getReactNativePersistence } from '@firebase/auth/dist/rn/index.js'; 
 import AsyncStorage from "@react-native-async-storage/async-storage";
