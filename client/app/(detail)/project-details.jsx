@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from 'expo-router';
-import { auth } from '../firebaseConfig';
+import { auth } from '../../firebaseConfig';
 import { StatusBar } from 'expo-status-bar';
 
 const FeedDetails = () => {
