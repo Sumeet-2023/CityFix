@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, TouchableOpacity, ImageBackground } from "react-native";
+import { Text, View, TouchableOpacity, ImageBackground, StatusBar } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from "expo-router";
 import { onAuthStateChanged } from 'firebase/auth';
@@ -32,7 +32,7 @@ export default function Index() {
       className="flex-1 w-full h-full justify-center"
     >
       <SafeAreaView className="flex-1 justify-end items-center p-5">
-        
+        <StatusBar barStyle={'dark-content'} />
         <Text className="text-4xl font-bold text-center mb-2 text-black">
           Welcome to CityFix!
         </Text>
