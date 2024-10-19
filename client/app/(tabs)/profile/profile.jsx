@@ -7,9 +7,9 @@ import {
   useWindowDimensions,
   StyleSheet,
   ScrollView,
+  Share
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StatusBar } from "expo-status-bar";
 import { MaterialIcons } from "@expo/vector-icons";
 import { TabView, TabBar } from "react-native-tab-view";
 import { COLORS, images, FONTS, SIZES } from "../../../constants";
@@ -45,16 +45,36 @@ const ProfileHeader = ({ user }) => (
 );
 
 // Component for profile action buttons
-const ProfileActions = () => (
-  <View style={styles.buttons}>
-    <TouchableOpacity style={styles.button} onPress={() => router.push('profile/editProfile')}>
-      <Text style={styles.buttonText}>Edit Profile</Text>
-    </TouchableOpacity>
-    <TouchableOpacity style={styles.button}>
-      <Text style={styles.buttonText}>Share Profile</Text>
-    </TouchableOpacity>
-  </View>
-);
+const ProfileActions = ({user}) => {
+  const handleShare = async () => {
+    try {
+      const result = await Share.share({
+        message: `Check out ${user.name}'s profile on our platform!`,
+      });
+
+      if (result && result.action) {
+        if (result.action === Share.sharedAction) {
+          console.log('Shared successfully!');
+        } else if (result.action === Share.dismissedAction) {
+          console.log('Share dismissed');
+        }
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  return (
+    <View style={styles.buttons}>
+      <TouchableOpacity style={styles.button} onPress={() => router.push('profile/editProfile')}>
+        <Text style={styles.buttonText}>Edit Profile</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={handleShare}>
+        <Text style={styles.buttonText}>Share Profile</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
 
 // Component for TabView
 const TabViewContainer = ({ index, setIndex, layout }) => {
@@ -139,13 +159,12 @@ const Profile = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor={COLORS.black} />
       <ScrollView>
         <View style={styles.header}>
           <Image source={images.cover} resizeMode="cover" style={styles.coverImage} />
         </View>
         <ProfileHeader user={user} />
-        <ProfileActions />
+        <ProfileActions user={user}/>
         <View style={styles.tabsContainer}>
           <TabViewContainer index={index} setIndex={setIndex} layout={layout} />
         </View>

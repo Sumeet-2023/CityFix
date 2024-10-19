@@ -3,7 +3,6 @@ import { View, Text, Image, TouchableOpacity, ScrollView, SafeAreaView } from 'r
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from 'expo-router';
 import { auth } from '../../firebaseConfig';
-import { StatusBar } from 'expo-status-bar';
 
 const FeedDetails = () => {
   const { itemno } = useLocalSearchParams();
@@ -43,7 +42,6 @@ const FeedDetails = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
-      <StatusBar style="dark" />
       <ScrollView contentContainerStyle={{ padding: 16 }}>
         <View className="py-4">
           {/* Organizer Info */}
