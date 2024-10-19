@@ -38,7 +38,7 @@ const IssueDetails = () => {
 
       <View className="mb-5">
         <Text className="text-lg text-gray-800 mb-3">{issueDetails.details}</Text>
-        <Image source={require('../assets/images/pothole.jpg')} className="w-full h-40 rounded-xl mb-5" />
+        <Image source={require('../../assets/images/pothole.jpg')} className="w-full h-40 rounded-xl mb-5" />
       </View>
 
       {/* Separator Line */}
@@ -64,14 +64,14 @@ const IssueDetails = () => {
           {/* Hardcoded comments for demonstration */}
           <View className="mb-4 p-4 bg-gray-100 rounded-lg">
             <View className="flex-row items-center mb-2">
-              <Image source={require('../assets/images/pothole.jpg')} className="w-8 h-8 rounded-full mr-3" />
+              <Image source={require('../../assets/images/pothole.jpg')} className="w-8 h-8 rounded-full mr-3" />
               <Text className="font-bold text-black">User1</Text>
             </View>
             <Text className="text-gray-600">Thanks for reporting this issue! We are looking into it.</Text>
           </View>
           <View className="mb-4 p-4 bg-gray-100 rounded-lg">
             <View className="flex-row items-center mb-2">
-              <Image source={require('../assets/images/pothole.jpg')} className="w-8 h-8 rounded-full mr-3" />
+              <Image source={require('../../assets/images/pothole.jpg')} className="w-8 h-8 rounded-full mr-3" />
               <Text className="font-bold text-black">User2</Text>
             </View>
             <Text className="text-gray-600">I noticed this as well. It’s really causing a lot of trouble.</Text>
