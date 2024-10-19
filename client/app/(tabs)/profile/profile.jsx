@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   StyleSheet,
-  ScrollView
+  ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
@@ -105,6 +105,7 @@ const TabViewContainer = ({ index, setIndex, layout }) => {
               {route.title}
             </Text>
           )}
+          tabStyle={styles.tabStyle} // Add custom tabStyle
         />
       )}
     />
@@ -164,12 +165,24 @@ const styles = StyleSheet.create({
   coverImage: {
     height: 228,
     width: "100%",
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    overflow: "hidden",
   },
   profileInfo: {
     alignItems: "center",
     paddingHorizontal: SIZES.padding,
     width: '100%',
     maxWidth: 600,
+    marginTop: -50,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Slightly translucent background
+    borderRadius: 15,
+    elevation: 2, // Add shadow for Android
+    shadowColor: '#000', // iOS shadow
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    alignSelf: 'center', // Center the profile info
   },
   profileImage: {
     height: 155,
@@ -230,6 +243,11 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     borderRadius: 10,
     marginHorizontal: SIZES.padding,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   buttonText: {
     ...FONTS.body4,
@@ -239,10 +257,16 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 800,
     height: 500,
+    alignSelf: 'center', // Center the TabView container
   },
   tabBar: {
     backgroundColor: COLORS.white,
     height: 44,
+    elevation: 2,
+  },
+  tabStyle: {
+    flex: 1, // Allow tabs to take up equal space
+    justifyContent: 'center', // Center the label vertically
   },
   tabIndicator: {
     backgroundColor: COLORS.primary,
@@ -250,9 +274,12 @@ const styles = StyleSheet.create({
   tabLabel: {
     color: '#4A4A4A',
     ...FONTS.body4,
+    textAlign: 'center', // Center align text
+    width: 50,
   },
   tabLabelFocused: {
     color: COLORS.black,
+    fontWeight: 'bold', // Emphasize the focused tab
   },
   photoScrollContainer: {
     padding: 10,
@@ -263,13 +290,14 @@ const styles = StyleSheet.create({
   },
   photoItem: {
     width: '33.3%', // Adjust width based on the number of columns
-    padding: 2,
+    padding: 5, // Adjust padding for spacing between photos
   },
   photo: {
     width: "100%",
-    height: undefined,
-    aspectRatio: 1,
+    height: 100, // Set a fixed height to make it square
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.lightGray, // Optional border color for aesthetics
   },
   likeItem: {
     // Style for like item
