@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  StatusBar
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -30,6 +31,7 @@ const Home = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white p-4">
+      <StatusBar barStyle={'dark-content'} />
       <ScrollView>
         
         <View className="flex-row justify-between items-center mb-4">

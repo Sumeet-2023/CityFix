@@ -28,7 +28,7 @@ export default function Index() {
 
   return (
     <ImageBackground
-      source={require('../assets/images/SDG-11.webp')} // Replace with the path to your generated image
+      source={require('../assets/images/SDG-11.webp')}
       className="flex-1 w-full h-full justify-center"
     >
       <SafeAreaView className="flex-1 justify-end items-center p-5">
