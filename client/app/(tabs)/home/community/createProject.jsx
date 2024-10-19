@@ -15,11 +15,9 @@ export default function CreateProject() {
   const [location,setLocation] = useState('');
   const [volunteers,setVolunteers] = useState('');
   const [contactInfo,setContactInfo] = useState('');
-
   const handleSubmit = () => {
     console.log({projectTitle,projectDescription,date,time,location,volunteers,contactInfo});
     alert("Project created successfully");
-
     setProjectTitle('');
     setProjectDescription('');
     setDate(new Date()); 
@@ -27,11 +25,8 @@ export default function CreateProject() {
     setLocation('');
     setVolunteers('');
     setContactInfo('');
-
     router.push('home/community/myProjects');
-
   };
-
   const onChangeDate = (event,selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDatePicker(false);
@@ -44,14 +39,10 @@ export default function CreateProject() {
     }
     setShowTimePicker(false);  
   };
-
   const showTimepicker = () => {
     setShowTimePicker(true);  
   };
-
-
  
-
   return (
     <ScrollView>
         <View className="flex-1 bg-white p-4">
@@ -132,7 +123,6 @@ export default function CreateProject() {
           keyboardType="numeric"
           placeholderTextColor="#999"  
         />
-
         <Text className="text-xl font-bold mb-2">Contact Info</Text>
         <TextInput className="border border-gray-300 p-3 mb-4 rounded"
           value={contactInfo}
@@ -148,7 +138,6 @@ export default function CreateProject() {
       >
         <Text className="text-white text-center font-bold">SUBMIT</Text>
       </TouchableOpacity>
-
       </View>
     </ScrollView>
     
