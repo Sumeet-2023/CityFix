@@ -16,7 +16,7 @@ const SettingsOption = ({ icon, text, onPress }) => (
 
 const Setting = () => {
     const handleEditProfile = () => {
-        router.push("/editprofile");
+        router.push("/profile/editProfile");
     };
 
     const handleNotification = () => {
