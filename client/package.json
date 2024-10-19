@@ -41,10 +41,14 @@
     "react-native-tab-view": "^3.5.2",
     "react-native-web": "~0.19.10",
     "expo-image-picker": "~15.0.7",
+<<<<<<< HEAD
     "expo-linear-gradient": "~13.0.2",
     "@react-native-community/datetimepicker": "8.0.1",
     "expo-location": "~17.0.1",
     "react-native-maps": "1.14.0"
+=======
+    "@react-native-community/datetimepicker": "8.0.1"
+>>>>>>> 0ebac6886463c4e2b15b31132da9cb61a95a4482
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
