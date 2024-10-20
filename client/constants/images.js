@@ -6,6 +6,9 @@ const photo3 = require("../assets/images/ProfileImages/photo3.jpg");
 const photo4 = require("../assets/images/ProfileImages/photo4.jpg");
 const photo5 = require("../assets/images/ProfileImages/photo5.jpg");
 const photo6 = require("../assets/images/ProfileImages/photo6.jpg");
+const ngo1 = require("../assets/images/gn.png");
+const ngo2 = require("../assets/images/ngo.png");
+const ngo3 = require("../assets/images/ngo2.png");
 
 export default {
     profile,
@@ -15,5 +18,8 @@ export default {
     photo3,
     photo4,
     photo5,
-    photo6
+    photo6,
+    ngo1,
+    ngo2,
+    ngo3
 }
