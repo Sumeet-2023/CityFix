@@ -21,7 +21,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
        >
         <MaterialTopTabs.Screen name="myClan" options={{ title: "My clan" }} />
         <MaterialTopTabs.Screen name="search" options={{ title: "Search" }} />
-        <MaterialTopTabs.Screen name="createClan" options={{ title: "Create" }} />
+        <MaterialTopTabs.Screen name="createClan" options={{ title: "Create clan" }} />
         <MaterialTopTabs.Screen name="ngo" options={{ title: "NGO's" }} />
      
       </MaterialTopTabs>
