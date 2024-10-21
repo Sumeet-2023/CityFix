@@ -92,6 +92,24 @@ export default function TabLayout() {
           
         }}
       />
+      <Tabs.Screen
+        name="home/crowd"
+        options={{
+          headerTitle: 'Crowdsourced Fund',
+          tabBarButton: () => null,
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 10 }}>
+              <MaterialIcons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <TouchableOpacity onPress={() => router.push('/settings')} style={{ marginRight: 10 }}>
+              <MaterialIcons name="settings" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+          
+        }}
+      />
     </Tabs>
   );
 }
