@@ -25,7 +25,7 @@ model User {
   projectsCreated  Community[]  @relation("UserProjects")
   projectsJoined   UserProject[]
   joinedClan       Crowd?       @relation("JoinedClan", fields: [joinedClanId], references: [id])  // User can join only one clan
-  joinedClanId     String?      @unique @db.ObjectId  // Ensure the user can only join one clan at a time
+  joinedClanId     String?      @db.ObjectId  // Ensure the user can only join one clan at a time
   paid             Boolean
 }
 
@@ -75,7 +75,7 @@ model Crowd {
   peopleJoined     User[]       @relation("JoinedClan")  // Stores list of joined users
 }
 
-model NGO {
+model Ngo {
   id               String       @id @default(auto()) @map("_id") @db.ObjectId
   ngoName          String
   ngoType          String
