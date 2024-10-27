@@ -1,118 +1,83 @@
 import { PrismaClient } from "@prisma/client";
+import { crowds } from "./seedData/crowds";
+import { users } from "./seedData/users";
+import { ngos } from "./seedData/ngos";
+import { projects } from "./seedData/projects";
+import { userProjects } from "./seedData/userProjects";
+import { issues } from "./seedData/issues"; // Import issues data
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Seed Users
-  const user1 = await prisma.user.create({
-    data: {
-      username: "john_doe",
-      location: "New York",
-      followerCount: 100,
-      followingCount: 150,
-      points: 200,
-      paid: true,
-    },
-  });
+  try {
+    // Seed Crowds (Clans)
+    for (const crowdData of crowds) {
+      await prisma.crowd.create({
+        data: {
+          ...crowdData,
+        },
+      });
+    }
+    console.log("Crowds seeded!");
 
-  const user2 = await prisma.user.create({
-    data: {
-      username: "jane_smith",
-      location: "Los Angeles",
-      followerCount: 50,
-      followingCount: 75,
-      points: 120,
-      paid: false,
-    },
-  });
+    // Seed Users
+    for (const userData of users) {
+      await prisma.user.create({
+        data: {
+          ...userData,
+        },
+      });
+    }
+    console.log("Users seeded!");
 
-  // Seed Crowd (Clan)
-  const clan = await prisma.crowd.create({
-    data: {
-      clanName: "Green Warriors",
-      badge: null,
-      description: "A clan for nature lovers",
-      clanType: "Open",
-      peopleJoinedNumber: 1,
-      location: "California",
-      clanTag: "GW1234",
-      peopleJoined: {
-        connect: [{ id: user1.id }],
-      },
-    },
-  });
+    // Seed NGOs
+    for (const ngoData of ngos) {
+      await prisma.ngo.create({
+        data: {
+          ...ngoData,
+        },
+      });
+    }
+    console.log("NGOs seeded!");
 
-  // Seed Issues
-  const issue1 = await prisma.issue.create({
-    data: {
-      issueTag: "Environmental",
-      issueNumber: 101,
-      issueName: "Trash on Beach",
-      user: {
-        connect: { id: user1.id },
-      },
-      issueDescription: "Trash is piling up on Santa Monica Beach.",
-      reportedDate: new Date(),
-      location: "Santa Monica Beach",
-      lastUpdated: new Date(),
-    },
-  });
+    // Seed Projects
+    for (const projectData of projects) {
+      await prisma.community.create({
+        data: {
+          ...projectData,
+        },
+      });
+    }
+    console.log("Projects seeded!");
 
-  // Seed Community Projects
-  const project1 = await prisma.community.create({
-    data: {
-      projectTag: "Cleanup",
-      projectNumber: 1,
-      projectName: "Beach Cleanup",
-      createdBy: {
-        connect: { id: user1.id },
-      },
-      projectDescription: "A community project to clean up the beach.",
-      reportedDate: new Date(),
-      reportedTime: new Date(),
-      executionDate: new Date(),
-      executionTime: new Date(),
-      location: "Santa Monica Beach",
-      lastUpdated: new Date(),
-      volunteerNumber: 10,
-      contactInfo: {
-        email: "contact@beachcleanup.com",
-        number: 1234567890,
-      },
-    },
-  });
+    // Seed User Projects Relationships
+    for (const userProjectData of userProjects) {
+      await prisma.userProject.create({
+        data: {
+          id: userProjectData.id,
+          userId: userProjectData.userId,
+          projectId: userProjectData.projectId,
+        },
+      });
+    }
+    console.log("User Projects relationships seeded!");
 
-  // Seed NGO
-  const ngo1 = await prisma.ngo.create({
-    data: {
-      ngoName: "Nature's Helpers",
-      ngoType: "Environmental",
-      ngoPhotoUrl: null,
-      ngoDescription: "NGO dedicated to keeping nature clean.",
-      contact: {
-        email: "info@natureshelpers.org",
-        number: 9876543210,
-      },
-      raisedMoney: 5000,
-    },
-  });
+    // Seed Issues
+    for (const issueData of issues) {
+      await prisma.issue.create({
+        data: {
+          ...issueData,
+        },
+      });
+    }
+    console.log("Issues seeded!");
 
-  // Seed UserProject (Many-to-Many Relationship between User and Community)
-  await prisma.userProject.create({
-    data: {
-      userId: user1.id,
-      projectId: project1.id,
-    },
-  });
-
-  await prisma.userProject.create({
-    data: {
-      userId: user2.id,
-      projectId: project1.id,
-    },
-  });
-
-  console.log("Seeding completed!");
+    console.log("Seeding completed!");
+  } catch (error) {
+    console.error("Error during seeding:", error);
+  } finally {
+    await prisma.$disconnect();
+  }
 }
 
 main()
