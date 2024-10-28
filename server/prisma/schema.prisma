@@ -94,9 +94,16 @@ model UserProject {                                                   // for man
 }
 
 model Counter {
-  id         String @id @default(auto()) @map("_id") @db.ObjectId
-  modelName  String @unique
-  count      Int
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  modelName ModelType @unique
+  count     Int       @default(0)
+}
+
+enum ModelType {
+  Issue
+  Community
+  Crowd
+  Ngo
 }
 
 type ContactInfo {

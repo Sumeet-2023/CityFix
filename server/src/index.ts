@@ -4,9 +4,10 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 
-import issueRoutes from "./routes/issueRoutes";
-
 /* ROUTE IMPORTS */
+
+import issueRoutes from "./routes/issueRoutes";
+import projectRoutes from "./routes/projectRoutes";
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -24,6 +25,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/issues", issueRoutes);
+app.use("/project", projectRoutes);
 
 /* SERVER */
 const port = process.env.PORT || 3000;

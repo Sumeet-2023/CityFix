@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { crowds } from "./seedData/crowds";
 import { users } from "./seedData/users";
 import { ngos } from "./seedData/ngos";
@@ -12,6 +12,7 @@ async function main() {
   try {
 
     // Delete all documents from each collection before seeding
+    await prisma.counter.deleteMany({});
     await prisma.userProject.deleteMany({});
     await prisma.issue.deleteMany({});
     await prisma.community.deleteMany({});
@@ -19,6 +20,23 @@ async function main() {
     await prisma.crowd.deleteMany({});
     await prisma.user.deleteMany({});
     console.log("Previous documents deleted successfully.");
+
+    const counters = [
+      { modelName: Prisma.ModelName.Issue, count: 2 },
+      { modelName: Prisma.ModelName.Community, count: 1 },
+      { modelName: Prisma.ModelName.Crowd, count: 0 },
+      { modelName: Prisma.ModelName.Ngo, count: 0 },
+    ];
+
+    for (const counterData of counters) {
+      await prisma.counter.upsert({
+        where: { modelName: counterData.modelName },
+        update: {},
+        create: counterData,
+      });
+    }
+
+    console.log("Counters seeded successfully.");
 
     // Seed Crowds (Clans)
     for (const crowdData of crowds) {
@@ -49,13 +67,6 @@ async function main() {
       });
     }
     console.log("NGOs seeded!");
-
-    await prisma.counter.create({
-      data: {
-        modelName: "Issue",
-        count: 2,
-      },
-    });
 
     // Seed Projects
     for (const projectData of projects) {
