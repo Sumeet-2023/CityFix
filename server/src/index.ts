@@ -4,6 +4,8 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 
+import issueRoutes from "./routes/issueRoutes";
+
 /* ROUTE IMPORTS */
 
 /* CONFIGURATIONS */
@@ -20,6 +22,8 @@ app.use(cors());
 app.get("/", (req, res) => {
   res.send("This is home route");
 });
+
+app.use("/issues", issueRoutes);
 
 /* SERVER */
 const port = process.env.PORT || 3000;

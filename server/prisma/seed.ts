@@ -10,6 +10,16 @@ const prisma = new PrismaClient();
 
 async function main() {
   try {
+
+    // Delete all documents from each collection before seeding
+    await prisma.userProject.deleteMany({});
+    await prisma.issue.deleteMany({});
+    await prisma.community.deleteMany({});
+    await prisma.ngo.deleteMany({});
+    await prisma.crowd.deleteMany({});
+    await prisma.user.deleteMany({});
+    console.log("Previous documents deleted successfully.");
+
     // Seed Crowds (Clans)
     for (const crowdData of crowds) {
       await prisma.crowd.create({
@@ -39,6 +49,13 @@ async function main() {
       });
     }
     console.log("NGOs seeded!");
+
+    await prisma.counter.create({
+      data: {
+        modelName: "Issue",
+        count: 2,
+      },
+    });
 
     // Seed Projects
     for (const projectData of projects) {
