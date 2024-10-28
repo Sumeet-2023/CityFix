@@ -8,6 +8,8 @@ import morgan from "morgan";
 
 import issueRoutes from "./routes/issueRoutes";
 import projectRoutes from "./routes/projectRoutes";
+import ngoRouters from "./routes/ngoRoutes";
+import crowdRoutes from "./routes/crowdRoutes";
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -26,6 +28,8 @@ app.get("/", (req, res) => {
 
 app.use("/issues", issueRoutes);
 app.use("/project", projectRoutes);
+app.use("/ngo", ngoRouters);
+app.use("/crowd", crowdRoutes);
 
 /* SERVER */
 const port = process.env.PORT || 3000;
