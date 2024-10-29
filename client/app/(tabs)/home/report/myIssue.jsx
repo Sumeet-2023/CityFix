@@ -38,7 +38,7 @@ const MyIssue = () => {
     <ScrollView>
       <View className="flex-1 px-5 py-3">
         {myIssues.map((issue, index) => (
-          <View key={index} className="bg-white p-4 rounded-xl mb-4 shadow-md">
+          <View key={index} className="bg-white p-4 rounded-xl mb-4">
             <View className="flex-row justify-between mb-2">
               <Text className="text-lg font-bold text-gray-800">#{issue.id}</Text>
               <Text className="text-sm text-blue-500 uppercase">{issue.status}</Text>
