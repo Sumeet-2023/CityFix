@@ -18,6 +18,7 @@ model User {
   id               String       @id @default(auto()) @map("_id") @db.ObjectId
   username         String
   location         String
+  locationGeoJson  Json?        @db.Json
   followerCount    Int
   followingCount   Int
   points           Int
@@ -40,6 +41,7 @@ model Issue {
   issuePhoto       String?
   reportedDate     DateTime
   location         String
+  locationGeoJson  Json?        @db.Json
   lastUpdated      DateTime
 }
 
@@ -58,6 +60,7 @@ model Community {
   executionDate    DateTime
   executionTime    DateTime
   location         String
+  locationGeoJson  Json?        @db.Json
   lastUpdated      DateTime
   volunteerNumber  Int
   contactInfo      ContactInfo
@@ -71,8 +74,9 @@ model Crowd {
   clanType         String
   peopleJoinedNumber Int
   location         String
+  locationGeoJson  Json?        @db.Json
   clanTag          String
-  peopleJoined     User[]       @relation("JoinedClan")  // Stores list of joined users
+  peopleJoined     User[]       @relation("JoinedClan")
 }
 
 model Ngo {

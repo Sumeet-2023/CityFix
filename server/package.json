@@ -23,7 +23,6 @@
     "helmet": "^8.0.0",
     "mongoose": "^8.7.2",
     "morgan": "^1.10.0",
-    "prisma": "^5.21.1",
     "zustand": "^5.0.0"
   },
   "devDependencies": {
@@ -33,6 +32,7 @@
     "@types/node": "^22.8.1",
     "concurrently": "^9.0.1",
     "nodemon": "^3.1.7",
+    "prisma": "^5.21.1",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
