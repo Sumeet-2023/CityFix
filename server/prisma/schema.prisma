@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id               String       @id @default(auto()) @map("_id") @db.ObjectId
+  username         String
+  location         String
+  followerCount    Int
+  followingCount   Int
+  points           Int
+  issuesCreated    Issue[]      @relation("UserIssues")
+  projectsCreated  Community[]  @relation("UserProjects")
+  projectsJoined   UserProject[]
+  joinedClan       Crowd?       @relation("JoinedClan", fields: [joinedClanId], references: [id])  // User can join only one clan
+  joinedClanId     String?      @db.ObjectId  // Ensure the user can only join one clan at a time
+  paid             Boolean
+}
+
+model Issue {
+  id               String       @id @default(auto()) @map("_id") @db.ObjectId
+  issueTag         String
+  issueNumber      Int
+  issueName        String
+  user             User         @relation("UserIssues", fields: [userId], references: [id])
+  userId           String       @db.ObjectId
+  issueDescription String
+  issuePhoto       String?
+  reportedDate     DateTime
+  location         String
+  lastUpdated      DateTime
+}
+
+model Community {
+  id               String       @id @default(auto()) @map("_id") @db.ObjectId
+  projectTag       String
+  projectNumber    Int
+  projectName      String
+  createdBy        User         @relation("UserProjects", fields: [createdById], references: [id])
+  createdById      String       @db.ObjectId
+  members          UserProject[]
+  projectDescription String
+  projectPhoto     String?
+  reportedDate     DateTime
+  reportedTime     DateTime
+  executionDate    DateTime
+  executionTime    DateTime
+  location         String
+  lastUpdated      DateTime
+  volunteerNumber  Int
+  contactInfo      ContactInfo
+}
+
+model Crowd {
+  id               String       @id @default(auto()) @map("_id") @db.ObjectId
+  clanName         String
+  badge            String?
+  description      String
+  clanType         String
+  peopleJoinedNumber Int
+  location         String
+  clanTag          String
+  peopleJoined     User[]       @relation("JoinedClan")  // Stores list of joined users
+}
+
+model Ngo {
+  id               String       @id @default(auto()) @map("_id") @db.ObjectId
+  ngoName          String
+  ngoType          String
+  ngoPhotoUrl      String?
+  ngoDescription   String
+  contact          ContactInfo
+  raisedMoney      Int
+}
+
+model UserProject {                                                   // for many-to-many relation between project n user 
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String    @db.ObjectId
+  projectId   String    @db.ObjectId
+  User        User      @relation(fields: [userId], references: [id])
+  Project     Community @relation(fields: [projectId], references: [id])
+}
+
+model Counter {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  modelName ModelType @unique
+  count     Int       @default(0)
+}
+
+enum ModelType {
+  Issue
+  Community
+  Crowd
+  Ngo
+}
+
+type ContactInfo {
+  email            String
+  number           Int
+}
