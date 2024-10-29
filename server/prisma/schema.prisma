@@ -93,6 +93,19 @@ model UserProject {                                                   // for man
   Project     Community @relation(fields: [projectId], references: [id])
 }
 
+model Counter {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  modelName ModelType @unique
+  count     Int       @default(0)
+}
+
+enum ModelType {
+  Issue
+  Community
+  Crowd
+  Ngo
+}
+
 type ContactInfo {
   email            String
   number           Int

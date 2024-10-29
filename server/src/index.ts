@@ -6,6 +6,11 @@ import morgan from "morgan";
 
 /* ROUTE IMPORTS */
 
+import issueRoutes from "./routes/issueRoutes";
+import projectRoutes from "./routes/projectRoutes";
+import ngoRouters from "./routes/ngoRoutes";
+import crowdRoutes from "./routes/crowdRoutes";
+
 /* CONFIGURATIONS */
 dotenv.config();
 const app = express();
@@ -20,6 +25,11 @@ app.use(cors());
 app.get("/", (req, res) => {
   res.send("This is home route");
 });
+
+app.use("/issues", issueRoutes);
+app.use("/project", projectRoutes);
+app.use("/ngo", ngoRouters);
+app.use("/crowd", crowdRoutes);
 
 /* SERVER */
 const port = process.env.PORT || 3000;
