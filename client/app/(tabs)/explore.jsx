@@ -1,51 +1,112 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, Linking, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Linking } from 'react-native';
 import MapView, { Marker, Circle } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { LocationAccuracy } from 'expo-location';
 import { Button, FAB, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const FoodBankMarker = () => {
-  return (
-    <View>
-      <Image
-        source={require('../../assets/icons/food-bank-icon.png')}
-        style={{ width: 30, height: 30 }}
-      />
-    </View>
-  );
-};
+// Custom marker components remain the same
+const IssueMarker = () => (
+  <View>
+    <MaterialCommunityIcons name="alert-circle" size={30} color="red" />
+  </View>
+);
+
+const CrowdfundingMarker = () => (
+  <View>
+    <MaterialCommunityIcons name="hand-heart" size={30} color="green" />
+  </View>
+);
+
+const CommunityMarker = () => (
+  <View>
+    <MaterialCommunityIcons name="account-group" size={30} color="blue" />
+  </View>
+);
 
 export default function Explore() {
+  // State declarations remain the same
   const [mapRegion, setMapRegion] = useState({
-    latitude: 40.3006927,
-    longitude: 72.8462192,
+    latitude: 19.304790,
+    longitude: 72.848490,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
+  
+  const [currentLocation, setCurrentLocation] = useState({
+    latitude: 19.304790,
+    longitude: 72.848490,
+    accuracy: null,
+    timestamp: null
+  });
+  
+  const [radius, setRadius] = useState(2000);
   const [errorMsg, setErrorMsg] = useState('');
+  const [nearbyLocations, setNearbyLocations] = useState({
+    issues: [],
+    crowd: [],
+    communities: []
+  });
+  const [showUserLocation, setShowUserLocation] = useState(false);
   const theme = useTheme();
 
-  const userLocation = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      setErrorMsg('Permission Denied to access location');
-      return;
+  // fetchNearbyLocations function remains the same
+  const fetchNearbyLocations = async (latitude, longitude) => {
+    try {
+      const response = await fetch(
+        `https://30rm3zfj-3000.inc1.devtunnels.ms/explore?latitude=${latitude}&longitude=${longitude}&radius=${radius}`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setNearbyLocations(data);
+    } catch (error) {
+      console.error('Error fetching nearby locations:', error);
+      setErrorMsg('Failed to fetch nearby locations');
     }
-    let location = await Location.getCurrentPositionAsync({ accuracy: LocationAccuracy.BestForNavigation });
-    setMapRegion((prevRegion) => ({
-      ...prevRegion,
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-    }));
   };
 
-  useEffect(() => {
-    userLocation();
-  }, []);
+  // userLocation function remains the same
+  const userLocation = async () => {
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission Denied to access location');
+        return;
+      }
+      
+      let location = await Location.getCurrentPositionAsync({ 
+        accuracy: LocationAccuracy.Balanced
+      });
+      
+      setCurrentLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        accuracy: location.coords.accuracy,
+        timestamp: location.timestamp
+      });
+      
+      const newRegion = {
+        ...mapRegion,
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+      
+      setMapRegion(newRegion);
+      setShowUserLocation(true);
+      fetchNearbyLocations(location.coords.latitude, location.coords.longitude);
+    } catch (error) {
+      console.error('Error getting location:', error);
+      setErrorMsg('Failed to get location');
+    }
+  };
 
+  // Zoom functions remain the same
   const zoomIn = () => {
     setMapRegion((prevRegion) => ({
       ...prevRegion,
@@ -62,59 +123,110 @@ export default function Explore() {
     }));
   };
 
-  // Memoize projectLocations based on mapRegion
-  const projectLocations = useMemo(() => [
-    { id: 1, latitude: mapRegion.latitude + 0.001, longitude: mapRegion.longitude - 0.002, title: 'Project 1' },
-    { id: 2, latitude: mapRegion.latitude + 0.002, longitude: mapRegion.longitude + 0.003, title: 'Project 2' },
-    { id: 3, latitude: mapRegion.latitude - 0.001, longitude: mapRegion.longitude - 0.001, title: 'Project 3' },
-    { id: 4, latitude: mapRegion.latitude + 0.003, longitude: mapRegion.longitude - 0.001, title: 'Project 4' },
-    { id: 5, latitude: mapRegion.latitude - 0.002, longitude: mapRegion.longitude + 0.002, title: 'Project 5' },
-  ], [mapRegion]); // Only re-compute when mapRegion changes
-
+  // Updated openNavigation function
   const openNavigation = (latitude, longitude) => {
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
-    Linking.openURL(url);
+    let urlParams = new URLSearchParams({
+      api: '1',
+      destination: `${latitude},${longitude}`
+    });
+
+    if (currentLocation.latitude && currentLocation.longitude) {
+      urlParams.append('origin', `${currentLocation.latitude},${currentLocation.longitude}`);
+    }
+
+    const url = `https://www.google.com/maps/dir/?${urlParams.toString()}`;
+    Linking.openURL(url).catch(err => console.error('Error opening navigation:', err));
   };
+
   return (
     <SafeAreaView style={{flex: 1}}>
-      <MapView style={{ flex: 1 }} region={mapRegion}>
-        {/* Display the circular region around the user's location */}
-        <Circle
-          center={{ latitude: mapRegion.latitude, longitude: mapRegion.longitude }}
-          radius={800} // Radius in meters
-          strokeColor="rgba(255, 0, 0, 0.5)" // Border color
-          fillColor="rgba(255, 0, 0, 0.2)" // Fill color
-        />
+      <MapView 
+        style={{ flex: 1 }} 
+        region={mapRegion}
+      >
+        {showUserLocation && currentLocation.latitude && (
+          <Circle
+            center={{ 
+              latitude: currentLocation.latitude, 
+              longitude: currentLocation.longitude 
+            }}
+            radius={radius || 800}
+            strokeColor="rgba(255, 0, 0, 0.5)"
+            fillColor="rgba(255, 0, 0, 0.2)"
+          />
+        )}
 
-        {projectLocations.map((location) => (
+        {nearbyLocations.issues[0] && nearbyLocations.issues.map((location) => (
           <Marker
-            key={location.id}
-            coordinate={{ latitude: location.latitude, longitude: location.longitude }}
-            title={location.title}
-            onPress={() => openNavigation(location.latitude, location.longitude)}
+            key={`issue-${location.issueNumber}`}
+            coordinate={{ 
+              latitude: location.location.coordinates[1], 
+              longitude: location.location.coordinates[0] 
+            }}
+            title={location.issueName}
+            description={location.issueDescription}
+            onPress={() => openNavigation(
+              location.location.coordinates[1], 
+              location.location.coordinates[0]
+            )}
           >
-            <FoodBankMarker />
+            <IssueMarker />
+          </Marker>
+        ))}
+
+        {nearbyLocations.crowd[0] && nearbyLocations.crowd.map((location) => (
+          <Marker
+            key={`crowd-${location.clanTag}`}
+            coordinate={{ 
+              latitude: location.location.coordinates[1], 
+              longitude: location.location.coordinates[0] 
+            }}
+            title={location.clanName}
+            description={location.description}
+            onPress={() => openNavigation(
+              location.location.coordinates[1], 
+              location.location.coordinates[0]
+            )}
+          >
+            <CrowdfundingMarker />
+          </Marker>
+        ))}
+
+        {nearbyLocations.communities[0] && nearbyLocations.communities.map((location) => (
+          <Marker
+            key={`community-${location.projectNumber}`}
+            coordinate={{ 
+              latitude: location.location?.latitude || 0, 
+              longitude: location.location?.longitude || 0 
+            }}
+            title={location.projectName}
+            description={location.projectDescription}
+            onPress={() => openNavigation(
+              location.location?.latitude, 
+              location.location?.longitude
+            )}
+          >
+            <CommunityMarker />
           </Marker>
         ))}
       </MapView>
 
-      {/* Buttons for zoom control and getting location */}
       <View style={{ position: 'absolute', bottom: 16, left: 16, right: 16, flexDirection: 'row', justifyContent: 'space-around' }}>
         <FAB
-          style={{ backgroundColor: 'blue' }}
+          style={{ backgroundColor: theme.colors.primary }}
           small
           icon={() => <MaterialCommunityIcons name="plus" size={24} color="white" />}
           onPress={zoomIn}
         />
         <FAB
-          style={{ backgroundColor: 'blue' }}
+          style={{ backgroundColor: theme.colors.primary }}
           small
           icon={() => <MaterialCommunityIcons name="minus" size={24} color="white" />}
           onPress={zoomOut}
         />
         <Button
           mode="contained"
-          style={{ backgroundColor: 'green', borderRadius: 8 }}
+          style={{ backgroundColor: theme.colors.primary, borderRadius: 8 }}
           onPress={userLocation}
           icon={() => <MaterialCommunityIcons name="crosshairs-gps" size={24} color="white" />}
         >
@@ -122,5 +234,5 @@ export default function Explore() {
         </Button>
       </View>
     </SafeAreaView>
-  )
+  );
 }

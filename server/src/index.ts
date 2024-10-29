@@ -11,6 +11,7 @@ import projectRoutes from "./routes/projectRoutes";
 import ngoRouters from "./routes/ngoRoutes";
 import crowdRoutes from "./routes/crowdRoutes";
 import userRoutes from "./routes/userRoutes";
+import exploreRoutes from "./routes/exploreRoutes";
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -32,6 +33,7 @@ app.use("/project", projectRoutes);
 app.use("/ngo", ngoRouters);
 app.use("/crowd", crowdRoutes);
 app.use("/user", userRoutes);
+app.use("/explore", exploreRoutes);
 
 /* SERVER */
 const port = process.env.PORT || 3000;

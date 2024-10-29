@@ -17,8 +17,7 @@ datasource db {
 model User {
   id               String       @id @default(auto()) @map("_id") @db.ObjectId
   username         String
-  location         String
-  locationGeoJson  Json?        @db.Json
+  location         Json?        @db.Json
   followerCount    Int
   followingCount   Int
   points           Int
@@ -40,8 +39,7 @@ model Issue {
   issueDescription String
   issuePhoto       String?
   reportedDate     DateTime
-  location         String
-  locationGeoJson  Json?        @db.Json
+  location         Json?        @db.Json
   lastUpdated      DateTime
 }
 
@@ -59,8 +57,7 @@ model Community {
   reportedTime     DateTime
   executionDate    DateTime
   executionTime    DateTime
-  location         String
-  locationGeoJson  Json?        @db.Json
+  location         Json?        @db.Json
   lastUpdated      DateTime
   volunteerNumber  Int
   contactInfo      ContactInfo
@@ -73,8 +70,7 @@ model Crowd {
   description      String
   clanType         String
   peopleJoinedNumber Int
-  location         String
-  locationGeoJson  Json?        @db.Json
+  location         Json?        @db.Json
   clanTag          String
   peopleJoined     User[]       @relation("JoinedClan")
 }

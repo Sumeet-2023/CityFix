@@ -10,8 +10,7 @@ export const users = [
   {
     id: new ObjectId().toHexString(),
     username: "john_doe",
-    location: "New York",
-    locationGeoJson: {
+    location: {
       type: "Point",
       coordinates: [-74.0060, 40.7128]
     },
@@ -24,8 +23,7 @@ export const users = [
   {
     id: new ObjectId().toHexString(),
     username: "jane_smith",
-    location: "Los Angeles",
-    locationGeoJson: {
+    location: {
       type: "Point",
       coordinates: [-118.2437, 34.0522]
     },
@@ -38,8 +36,7 @@ export const users = [
   {
     id: new ObjectId().toHexString(),
     username: "alice_jones",
-    location: "Chicago",
-    locationGeoJson: {
+    location: {
       type: "Point",
       coordinates: [-87.6298, 41.8781]
     },
@@ -52,8 +49,7 @@ export const users = [
   {
     id: new ObjectId().toHexString(),
     username: "bob_brown",
-    location: "Houston",
-    locationGeoJson: {
+    location: {
       type: "Point",
       coordinates: [-95.3698, 29.7604]
     },
@@ -66,8 +62,7 @@ export const users = [
   {
     id: new ObjectId().toHexString(),
     username: "carol_white",
-    location: "Phoenix",
-    locationGeoJson: {
+    location: {
       type: "Point",
       coordinates: [-112.074, 33.4484]
     },
@@ -80,8 +75,7 @@ export const users = [
   {
     id: new ObjectId().toHexString(),
     username: "david_green",
-    location: "Philadelphia",
-    locationGeoJson: {
+    location: {
       type: "Point",
       coordinates: [-75.1652, 39.9526]
     },
@@ -94,8 +88,7 @@ export const users = [
   {
     id: new ObjectId().toHexString(),
     username: "emily_young",
-    location: "San Antonio",
-    locationGeoJson: {
+    location: {
       type: "Point",
       coordinates: [-98.4936, 29.4241]
     },
@@ -108,8 +101,7 @@ export const users = [
   {
     id: new ObjectId().toHexString(),
     username: "frank_johnson",
-    location: "Seattle",
-    locationGeoJson: {
+    location: {
       type: "Point",
       coordinates: [-122.3321, 47.6062]
     },
@@ -122,8 +114,7 @@ export const users = [
   {
     id: new ObjectId().toHexString(),
     username: "grace_davis",
-    location: "Denver",
-    locationGeoJson: {
+    location: {
       type: "Point",
       coordinates: [-104.9903, 39.7392]
     },
@@ -136,8 +127,7 @@ export const users = [
   {
     id: new ObjectId().toHexString(),
     username: "henry_wilson",
-    location: "Miami",
-    locationGeoJson: {
+    location: {
       type: "Point",
       coordinates: [-80.1918, 25.7617]
     },
