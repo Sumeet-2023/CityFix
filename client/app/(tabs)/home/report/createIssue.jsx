@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Button, Image,ScrollView } fro
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
+import axios from "axios";
 
 const CreateIssue = () => {
   const [title, setTitle] = useState('');
@@ -23,11 +24,36 @@ const CreateIssue = () => {
     }
   };
 
-  const handleSubmit = () => {
-    // handle issue submission, you can use a backend API to save the issue
-    console.log({ title, body, location, image });
-    alert('Issue Created Successfully!');
-    router.push('home/report/myIssue');
+  const handleSubmit = async () => {
+    try {
+      const issueData = {
+        issueTag: 'General',
+        issueName: 'title',
+        userId: "64f1d36e1c9e4234f4d9a1b7",
+        issueDescription:body,
+        reportedDate:new Date().toISOString(),
+        location:location,
+        lastUpdated: new Date().toISOString(),
+      };
+
+      const response = await axios.post("https://nfjmfmrf-3000.inc1.devtunnels.ms/issues", issueData);
+      console.log(response.data);
+
+      //check is issue creation was successfull
+
+      if(response.status === 201){
+        alert("Issue Created Succesfully!");
+        router.push("home/report/myIssue");
+      }
+    } catch(error) {
+      console.log('Error creating issue', error.message);
+      alert("Failed to creat an issue");
+    }
+    
+    // // handle issue submission, you can use a backend API to save the issue
+    // console.log({ title, body, location, image });
+    // alert('Issue Created Successfully!');
+    // router.push('home/report/myIssue');
   };
 
   return (

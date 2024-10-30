@@ -1,27 +1,44 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import axios from 'axios';
 
 const MyIssue = () => {
+
+  const [myIssues,setMyIssues] = useState([]);
+
+  const fetchIssues = async () => {
+      try{
+        const response = await axios.get("https://nfjmfmrf-3000.inc1.devtunnels.ms/issues");
+        setMyIssues(response.data);
+      }catch(error){
+        console.error("Error fetching issues:", error);
+        Alert.alert("Error","Failed to fetch issues.");
+      }
+  };
+
+  useEffect(() => {
+    fetchIssues();
+  },[]);
   // Hardcoded issue data
-  const myIssues = [
-    {
-      id: 69,
-      status: 'Open',
-      title: 'Pothole on Main Street',
-      dateReported: 'October 5, 2024',
-      location: 'Near City Hall',
-      lastUpdated: 'October 10, 2024',
-    },
-    {
-      id: 96,
-      status: 'Resolved',
-      title: 'Overflowing Trash Bin',
-      dateReported: 'October 3, 2024',
-      location: 'Park Area',
-      lastUpdated: 'October 9, 2024',
-    },
-  ];
+  // const myIssues = [
+  //   {
+  //     id: 69,
+  //     status: 'Open',
+  //     title: 'Pothole on Main Street',
+  //     dateReported: 'October 5, 2024',
+  //     location: 'Near City Hall',
+  //     lastUpdated: 'October 10, 2024',
+  //   },
+  //   {
+  //     id: 96,
+  //     status: 'Resolved',
+  //     title: 'Overflowing Trash Bin',
+  //     dateReported: 'October 3, 2024',
+  //     location: 'Park Area',
+  //     lastUpdated: 'October 9, 2024',
+  //   },
+  // ];
 
   const handleEdit = (id) => {
     console.log(`Edit issue with ID: ${id}`);
