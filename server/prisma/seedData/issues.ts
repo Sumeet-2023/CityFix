@@ -163,7 +163,7 @@ export const issues = [
   {
     id: new ObjectId().toHexString(),
     issueTag: "Pothole",
-    issueNumber: 1,
+    issueNumber: 11,
     issueName: "Pothole near Maxus Mall",
     userId: janeSmithId,
     issueDescription: "Large pothole near Maxus Mall entrance, affecting traffic flow.",
@@ -178,7 +178,7 @@ export const issues = [
   {
     id: new ObjectId().toHexString(),
     issueTag: "Garbage",
-    issueNumber: 2,
+    issueNumber: 12,
     issueName: "Overflowing Trash Bin near Mira Road Station",
     userId: johnDoeId,
     issueDescription: "Overflowing trash bin near Mira Road railway station, causing foul smell.",
@@ -193,7 +193,7 @@ export const issues = [
   {
     id: new ObjectId().toHexString(),
     issueTag: "Streetlight",
-    issueNumber: 3,
+    issueNumber: 13,
     issueName: "Broken Streetlight near Silver Park",
     userId: janeSmithId,
     issueDescription: "Streetlight malfunction near Silver Park, making the area unsafe at night.",
@@ -208,7 +208,7 @@ export const issues = [
   {
     id: new ObjectId().toHexString(),
     issueTag: "Road Damage",
-    issueNumber: 4,
+    issueNumber: 14,
     issueName: "Damaged Road at Bhayandar Phatak",
     userId: johnDoeId,
     issueDescription: "Multiple cracks and potholes on the road at Bhayandar Phatak.",
@@ -223,7 +223,7 @@ export const issues = [
   {
     id: new ObjectId().toHexString(),
     issueTag: "Waterlogging",
-    issueNumber: 5,
+    issueNumber: 15,
     issueName: "Waterlogging at Mira Bhayandar Road",
     userId: janeSmithId,
     issueDescription: "Frequent waterlogging on Mira Bhayandar Road during monsoon.",

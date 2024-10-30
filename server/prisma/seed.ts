@@ -22,7 +22,7 @@ async function main() {
     console.log("Previous documents deleted successfully.");
 
     const counters = [
-      { modelName: Prisma.ModelName.Issue, count: 2 },
+      { modelName: Prisma.ModelName.Issue, count: 16 },
       { modelName: Prisma.ModelName.Community, count: 1 },
       { modelName: Prisma.ModelName.Crowd, count: 0 },
       { modelName: Prisma.ModelName.Ngo, count: 0 },
