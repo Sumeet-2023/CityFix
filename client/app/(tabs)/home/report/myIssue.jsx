@@ -20,6 +20,8 @@ const formatCoordinates = (coordinates) => {
   return `${coordinates[1].toFixed(4)}°N, ${coordinates[0].toFixed(4)}°W`;
 };
 
+const serverurl = process.env.EXPO_PUBLIC_SERVER_URL;
+
 const MyIssue = () => {
   const params = useLocalSearchParams();
   const [myIssues, setMyIssues] = useState([]);
@@ -30,7 +32,7 @@ const MyIssue = () => {
   const fetchIssues = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("https://30rm3zfj-3000.inc1.devtunnels.ms/issues");
+      const response = await axios.get(`${serverurl}/issues`);
       setMyIssues(response.data);
       setError(null);
       setUpdate(false);
@@ -43,13 +45,6 @@ const MyIssue = () => {
       setLoading(false);
     }
   };
-
-  // // Effect to handle screen focus
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     fetchIssues();
-  //   }, [])
-  // );
 
   useEffect(() => {
     fetchIssues();

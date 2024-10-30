@@ -14,6 +14,9 @@ import {
   IconButton,
 } from 'react-native-paper';
 
+const openroutekey = process.env.EXPO_PUBLIC_OPEN_ROUTER_API_KEY;
+const serverurl = process.env.EXPO_PUBLIC_SERVER_URL;
+
 const enhancedTheme = {
   ...DefaultTheme,
   colors: {
@@ -67,7 +70,7 @@ const CreateIssue = () => {
         location,
         lastUpdated: new Date().toISOString(),
       };
-      const response = await axios.post('https://30rm3zfj-3000.inc1.devtunnels.ms/issues', issueData);
+      const response = await axios.post(`${serverurl}/issues`, issueData);
       if (response.status === 201) {
         Alert.alert('Success', 'Issue Created Successfully!');
         router.push({
@@ -108,7 +111,7 @@ const CreateIssue = () => {
     }
     try {
       const response = await axios.get(
-        `https://api.openrouteservice.org/geocode/autocomplete?api_key=5b3ce3597851110001cf6248b5c28893cd7d4feb8536ae7f28200260&text=${locationQuery}`
+        `https://api.openrouteservice.org/geocode/autocomplete?api_key=${openroutekey}&text=${locationQuery}`
       );
       setLocationSuggestions(response.data.features || []);
     } catch (error) {
