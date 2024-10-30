@@ -7,15 +7,12 @@ import { LocationAccuracy } from 'expo-location';
 import { 
   FAB, 
   useTheme, 
-  Portal, 
-  Surface,
-  IconButton,
   Text,
   Card,
-  Button
 } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import FoldableLegend from '../../components/map/foldableLegend';
+import ClanSearch from '../../components/map/clanSearch';
 
 const MARKER_COLORS = {
   issue: '#1565C0',      // Darker blue
@@ -66,6 +63,9 @@ export default function Explore() {
     accuracy: null,
     timestamp: null
   });
+
+  const [searchLocation, setSearchLocation] = useState(null);
+  const [searchLocationDetails, setSearchLocationDetails] = useState(null);
   
   const [radius, setRadius] = useState(2000);
   const [errorMsg, setErrorMsg] = useState('');
@@ -76,6 +76,18 @@ export default function Explore() {
   });
   const [showUserLocation, setShowUserLocation] = useState(false);
   const [selectedIssue, setSelectedIssue] = useState(null);
+
+  const handleClanSelect = ({ latitude, longitude, name, description }) => {
+    const newRegion = {
+      latitude,
+      longitude,
+      latitudeDelta: 0.02, // Zoom in closer when selecting a clan
+      longitudeDelta: 0.02,
+    };
+    setMapRegion(newRegion);
+    setSearchLocation({ latitude, longitude });
+    setSearchLocationDetails({ name, description });
+  };
 
   const fetchNearbyLocations = async (latitude, longitude) => {
     try {
@@ -165,6 +177,7 @@ export default function Explore() {
 
   return (
     <SafeAreaView className="flex-1">
+      <ClanSearch onClanSelect={handleClanSelect} />
       <MapView 
         className="flex-1" 
         region={mapRegion}
@@ -180,6 +193,16 @@ export default function Explore() {
             strokeColor="rgba(33, 150, 243, 0.5)"
             fillColor="rgba(33, 150, 243, 0.1)"
           />
+        )}
+
+        {searchLocation && searchLocationDetails &&  (
+          <Marker
+            coordinate={searchLocation}
+            title={searchLocationDetails.name}
+            description={searchLocationDetails.description}
+          >
+            <CustomMarker type="community" />
+          </Marker>
         )}
 
         {nearbyLocations.issues.map((location) => (
