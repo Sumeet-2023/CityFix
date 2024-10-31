@@ -42,7 +42,7 @@ export default function Explore() {
     timestamp: null
   });
   
-  const [radius, setRadius] = useState(2000);
+  const [radius, setRadius] = useState(4000);
   const [errorMsg, setErrorMsg] = useState('');
   const [nearbyLocations, setNearbyLocations] = useState({
     issues: [],
@@ -56,7 +56,7 @@ export default function Explore() {
   const fetchNearbyLocations = async (latitude, longitude) => {
     try {
       const response = await fetch(
-        `https://30rm3zfj-3000.inc1.devtunnels.ms/explore?latitude=${latitude}&longitude=${longitude}&radius=${radius}`
+        `https://nfjmfmrf-3000.inc1.devtunnels.ms/explore?latitude=${latitude}&longitude=${longitude}&radius=${radius}`
       );
       
       if (!response.ok) {

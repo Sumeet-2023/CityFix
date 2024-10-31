@@ -14,7 +14,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 const Home = () => {
   const menuItems = [
     { title: "Report Issue", icon: "report-problem", route: "/home/report/feeds" },
-    { title: "Community Project", icon: "group-work", route: "/home/community/feeds" },
+    { title: "Community Project", icon: "group-work", route: "/selectCommunity" },
     { title: "Crowdsourced Funding", icon: "attach-money", route: "home/crowd/myClan" },
     { title: "Data Dashboard", icon: "bar-chart", route: "/data-dashboard" },
     { title: "Leaderboard", icon: "emoji-events", route: "/leaderboard" },
