@@ -1,99 +1,187 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
+// import { useFocusEffect } from '@react-navigation/native';
+import { useLocalSearchParams, useFocusEffect } from 'expo-router';
+
+const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
+const formatCoordinates = (coordinates) => {
+  if (!coordinates || coordinates.length !== 2) return 'Location unavailable';
+  return `${coordinates[1].toFixed(4)}°N, ${coordinates[0].toFixed(4)}°W`;
+};
+
+const serverurl = process.env.EXPO_PUBLIC_SERVER_URL;
 
 const MyIssue = () => {
-
-  const [myIssues,setMyIssues] = useState([]);
+  const params = useLocalSearchParams();
+  const [myIssues, setMyIssues] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [update, setUpdate] = useState(params.update === 'true' || false);
 
   const fetchIssues = async () => {
-      try{
-        const response = await axios.get("https://nfjmfmrf-3000.inc1.devtunnels.ms/issues");
-        setMyIssues(response.data);
-      }catch(error){
-        console.error("Error fetching issues:", error);
-        Alert.alert("Error","Failed to fetch issues.");
-      }
+    try {
+      setLoading(true);
+      const response = await axios.get(`${serverurl}/issues`);
+      setMyIssues(response.data);
+      setError(null);
+      setUpdate(false);
+      params.update = false;
+    } catch (error) {
+      console.error("Error fetching issues:", error);
+      setError("Failed to fetch issues");
+      Alert.alert("Error", "Failed to fetch issues.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchIssues();
-  },[]);
-  // Hardcoded issue data
-  // const myIssues = [
-  //   {
-  //     id: 69,
-  //     status: 'Open',
-  //     title: 'Pothole on Main Street',
-  //     dateReported: 'October 5, 2024',
-  //     location: 'Near City Hall',
-  //     lastUpdated: 'October 10, 2024',
-  //   },
-  //   {
-  //     id: 96,
-  //     status: 'Resolved',
-  //     title: 'Overflowing Trash Bin',
-  //     dateReported: 'October 3, 2024',
-  //     location: 'Park Area',
-  //     lastUpdated: 'October 9, 2024',
-  //   },
-  // ];
+  }, []);
+
+  // Effect to handle update prop changes
+  useFocusEffect(
+    React.useCallback(() => {
+      if (params.update === 'true') {
+        fetchIssues();
+      }
+    }, [params.update])
+  );
 
   const handleEdit = (id) => {
     console.log(`Edit issue with ID: ${id}`);
-    // Handle edit action, perhaps navigating to an edit screen
+    // Handle edit action
   };
 
-  const handleDelete = (id) => {
-    console.log(`Delete issue with ID: ${id}`);
-    // Handle delete action, showing a confirmation dialog maybe
-    alert(`Issue ${id} deleted successfully`);
+  const handleDelete = async (id) => {
+    Alert.alert(
+      "Delete Issue",
+      "Are you sure you want to delete this issue?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await axios.delete(`https://30rm3zfj-3000.inc1.devtunnels.ms/issues/${id}`);
+              Alert.alert("Success", "Issue deleted successfully");
+              // Refresh the issues list after successful deletion
+              fetchIssues();
+            } catch (error) {
+              console.error("Error deleting issue:", error);
+              Alert.alert("Error", "Failed to delete issue");
+            }
+          }
+        }
+      ]
+    );
   };
+
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 justify-center items-center p-4">
+        <Text className="text-red-500 text-center">{error}</Text>
+        <TouchableOpacity 
+          onPress={fetchIssues}
+          className="mt-4 bg-blue-500 px-4 py-2 rounded-md"
+        >
+          <Text className="text-white">Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
-    <ScrollView>
-      <View className="flex-1 px-5 py-3">
-        {myIssues.map((issue, index) => (
-          <View key={index} className="bg-white p-4 rounded-xl mb-4">
-            <View className="flex-row justify-between mb-2">
-              <Text className="text-lg font-bold text-gray-800">#{issue.id}</Text>
-              <Text className="text-sm text-blue-500 uppercase">{issue.status}</Text>
+    <ScrollView className="flex-1 bg-gray-100">
+      {myIssues && myIssues.length > 0 ? (
+        myIssues.map((issue) => (
+          <View key={issue.id} className="bg-white m-2 p-4 rounded-lg shadow">
+            <View className="flex-row justify-between items-center mb-2">
+              <View className="flex-row items-center">
+                <Text className="font-bold">#{issue.issueNumber}</Text>
+                <Text className="ml-2 px-2 py-1 bg-gray-200 rounded">
+                  {issue.issueTag}
+                </Text>
+              </View>
+              <MaterialIcons 
+                name="fiber-manual-record" 
+                size={16} 
+                color={issue.status === 'resolved' ? '#22c55e' : '#eab308'} 
+              />
             </View>
-            <Text className="text-xl font-semibold text-black mb-3">{issue.title}</Text>
-            <View className="flex-row items-center mb-2">
-              <MaterialIcons name="event" size={16} color="#555" />
-              <Text className="ml-2 text-base text-gray-600">Date Reported: {issue.dateReported}</Text>
-            </View>
-            <View className="flex-row items-center mb-2">
-              <MaterialIcons name="location-on" size={16} color="#555" />
-              <Text className="ml-2 text-base text-gray-600">Location: {issue.location}</Text>
-            </View>
-            <View className="flex-row items-center mb-3">
-              <MaterialIcons name="update" size={16} color="#555" />
-              <Text className="ml-2 text-base text-gray-600">Last Updated: {issue.lastUpdated}</Text>
+            
+            <Text className="text-lg font-semibold mb-2">{issue.issueName}</Text>
+            
+            <View className="space-y-2">
+              <Text className="text-gray-600">{issue.issueDescription}</Text>
+              
+              <View className="bg-gray-50 p-2 rounded">
+                <Text className="text-sm font-medium">Location:</Text>
+                <Text className="text-sm text-gray-600">
+                  {formatCoordinates(issue.location?.coordinates)}
+                </Text>
+              </View>
+
+              <View className="flex-row justify-between text-sm text-gray-500">
+                <Text>Reported: {formatDate(issue.reportedDate)}</Text>
+                <Text>Updated: {formatDate(issue.lastUpdated)}</Text>
+              </View>
             </View>
 
-            {/* Action Buttons for Edit and Delete */}
-            <View className="flex-row justify-between mt-3">
-              <TouchableOpacity
-                className="flex-row items-center bg-blue-500 py-2 px-4 rounded"
+            {issue.issuePhoto && (
+              <View className="mt-2 bg-gray-100 rounded-md p-2">
+                <Text className="text-sm text-gray-500 mb-1">Photo attached</Text>
+                {/* Add Image component here if needed */}
+              </View>
+            )}
+
+            <View className="flex-row justify-end mt-4 space-x-2">
+              <TouchableOpacity 
                 onPress={() => handleEdit(issue.id)}
+                className="bg-blue-500 px-4 py-2 rounded-md flex-row items-center"
               >
-                <MaterialIcons name="edit" size={20} color="white" />
-                <Text className="text-white ml-2">Edit</Text>
+                <MaterialIcons name="edit" size={16} color="white" />
+                <Text className="text-white ml-1">Edit</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                className="flex-row items-center bg-red-500 py-2 px-4 rounded"
+              
+              <TouchableOpacity 
                 onPress={() => handleDelete(issue.id)}
+                className="bg-red-500 px-4 py-2 rounded-md flex-row items-center"
               >
-                <MaterialIcons name="delete" size={20} color="white" />
-                <Text className="text-white ml-2">Delete</Text>
+                <MaterialIcons name="delete" size={16} color="white" />
+                <Text className="text-white ml-1">Delete</Text>
               </TouchableOpacity>
             </View>
           </View>
-        ))}
-      </View>
+        ))
+      ) : (
+        <View className="flex-1 justify-center items-center p-4">
+          <Text className="text-gray-500">No issues found</Text>
+        </View>
+      )}
     </ScrollView>
   );
 };

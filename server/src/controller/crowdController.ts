@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export const getCrowds = async (req: Request, res: Response): Promise<void> => {
   try {
-    const crowds = await prisma.crowd.findMany();
+    const crowds = await prisma.clan.findMany();
     res.json(crowds);
   } catch (error: any) {
     res
@@ -14,25 +14,38 @@ export const getCrowds = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+export const getCrowdById = async (req: Request, res: Response): Promise<void> => {
+  const id = String(req.query.id);
+  try {
+    const crowd = await prisma.clan.findUnique({
+      where: {
+        id: id,
+      }
+    });
+    res.json(crowd);
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: `Error retrieving crowds: ${error.message}` });
+  }
+}
 
 export const createClan = async (req: Request, res: Response): Promise<void> => {
-    const {               
+    const {
+        creator,               
         clanName,         
         description,      
-        clanType,         
-        peopleJoinedNumber,
         location,         
         clanTag,          
     } = req.body;
   
     try {
   
-      const newClan = await prisma.crowd.create({
+      const newClan = await prisma.clan.create({
         data: {
+            creator,
             clanName,         
             description,      
-            clanType,         
-            peopleJoinedNumber,
             location,         
             clanTag,
         },

@@ -4,30 +4,26 @@ import { dataStore } from './dataStore'; // Import the shared data store
 // Assume that "john_doe" and "jane_smith" are joining "Beach Cleanup"
 const johnDoeId = dataStore.users.get("john_doe");
 const janeSmithId = dataStore.users.get("jane_smith");
-const beachCleanupId = dataStore.projects.get("Beach Restoration Project");
+const communityId = dataStore.community.get("Beach Cleaners United");
 
-if (!johnDoeId || !janeSmithId) {
-  throw new Error("User or project not found in dataStore.");
+if (!johnDoeId || !janeSmithId || !communityId) {
+  throw new Error("User or community not found in dataStore.");
 }
 
-if(!beachCleanupId){
-  throw new Error("Project not found")
-}
-
-export const userProjects = [
+export const userCommunities = [
   {
     id: new ObjectId().toHexString(),
     userId: johnDoeId,
-    projectId: beachCleanupId,
+    communityId: communityId,
   },
   {
     id: new ObjectId().toHexString(),
     userId: janeSmithId,
-    projectId: beachCleanupId,
+    communityId: communityId,
   },
 ];
 
 // Store the generated UserProject IDs in dataStore for later reference if needed
-userProjects.forEach(userProject => {
-  dataStore.userProjects.set(userProject.userId, userProject.projectId);
+userCommunities.forEach(userCommunity => {
+  dataStore.userProjects.set(userCommunity.userId, userCommunity.communityId);
 });

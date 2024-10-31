@@ -4,30 +4,52 @@ import { View, Linking } from 'react-native';
 import MapView, { Marker, Circle } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { LocationAccuracy } from 'expo-location';
-import { Button, FAB, useTheme } from 'react-native-paper';
+import { 
+  FAB, 
+  useTheme, 
+  Text,
+  Card,
+} from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import FoldableLegend from '../../components/map/foldableLegend';
+import ClanSearch from '../../components/map/clanSearch';
 
-// Custom marker components remain the same
-const IssueMarker = () => (
-  <View>
-    <MaterialCommunityIcons name="alert-circle" size={30} color="red" />
-  </View>
-);
+const MARKER_COLORS = {
+  issue: '#1565C0',      // Darker blue
+  crowdfunding: '#2196F3', // Medium blue
+  community: '#64B5F6'    // Light blue
+};
 
-const CrowdfundingMarker = () => (
-  <View>
-    <MaterialCommunityIcons name="hand-heart" size={30} color="green" />
-  </View>
-);
+const CustomMarker = ({ type, size = 30 }) => {
+  const icons = {
+    issue: 'alert-circle',
+    crowdfunding: 'hand-heart',
+    community: 'account-group'
+  };
 
-const CommunityMarker = () => (
-  <View>
-    <MaterialCommunityIcons name="account-group" size={30} color="blue" />
-  </View>
-);
+  return (
+    <View className="items-center">
+      <View className="bg-white rounded-full p-1 shadow-lg">
+        <MaterialCommunityIcons 
+          name={icons[type]} 
+          size={size} 
+          color={MARKER_COLORS[type]} 
+        />
+      </View>
+      {/* Pointed triangle below the marker */}
+      <View 
+        className="w-0 h-0 border-l-[8px] border-r-[8px] border-t-[12px] border-l-transparent border-r-transparent"
+        style={{ 
+          borderTopColor: 'white',
+          marginTop: -1 // Overlap slightly with the circle above
+        }} 
+      />
+    </View>
+  );
+};
 
 export default function Explore() {
-  // State declarations remain the same
+  const theme = useTheme();
   const [mapRegion, setMapRegion] = useState({
     latitude: 19.304790,
     longitude: 72.848490,
@@ -41,6 +63,9 @@ export default function Explore() {
     accuracy: null,
     timestamp: null
   });
+
+  const [searchLocation, setSearchLocation] = useState(null);
+  const [searchLocationDetails, setSearchLocationDetails] = useState(null);
   
   const [radius, setRadius] = useState(4000);
   const [errorMsg, setErrorMsg] = useState('');
@@ -50,9 +75,20 @@ export default function Explore() {
     communities: []
   });
   const [showUserLocation, setShowUserLocation] = useState(false);
-  const theme = useTheme();
+  const [selectedIssue, setSelectedIssue] = useState(null);
 
-  // fetchNearbyLocations function remains the same
+  const handleClanSelect = ({ latitude, longitude, name, description }) => {
+    const newRegion = {
+      latitude,
+      longitude,
+      latitudeDelta: 0.02, // Zoom in closer when selecting a clan
+      longitudeDelta: 0.02,
+    };
+    setMapRegion(newRegion);
+    setSearchLocation({ latitude, longitude });
+    setSearchLocationDetails({ name, description });
+  };
+
   const fetchNearbyLocations = async (latitude, longitude) => {
     try {
       const response = await fetch(
@@ -71,7 +107,6 @@ export default function Explore() {
     }
   };
 
-  // userLocation function remains the same
   const userLocation = async () => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -106,7 +141,6 @@ export default function Explore() {
     }
   };
 
-  // Zoom functions remain the same
   const zoomIn = () => {
     setMapRegion((prevRegion) => ({
       ...prevRegion,
@@ -123,7 +157,6 @@ export default function Explore() {
     }));
   };
 
-  // Updated openNavigation function
   const openNavigation = (latitude, longitude) => {
     let urlParams = new URLSearchParams({
       api: '1',
@@ -138,11 +171,17 @@ export default function Explore() {
     Linking.openURL(url).catch(err => console.error('Error opening navigation:', err));
   };
 
+  const handleMarkerPress = (issue) => {
+    setSelectedIssue(issue.issueNumber === selectedIssue ? null : issue.issueNumber);
+  };
+
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView className="flex-1">
+      <ClanSearch onClanSelect={handleClanSelect} />
       <MapView 
-        style={{ flex: 1 }} 
+        className="flex-1" 
         region={mapRegion}
+        customMapStyle={mapStyle}
       >
         {showUserLocation && currentLocation.latitude && (
           <Circle
@@ -150,89 +189,125 @@ export default function Explore() {
               latitude: currentLocation.latitude, 
               longitude: currentLocation.longitude 
             }}
-            radius={radius || 800}
-            strokeColor="rgba(255, 0, 0, 0.5)"
-            fillColor="rgba(255, 0, 0, 0.2)"
+            radius={radius}
+            strokeColor="rgba(33, 150, 243, 0.5)"
+            fillColor="rgba(33, 150, 243, 0.1)"
           />
         )}
 
-        {nearbyLocations.issues[0] && nearbyLocations.issues.map((location) => (
+        {searchLocation && searchLocationDetails &&  (
+          <Marker
+            coordinate={searchLocation}
+            title={searchLocationDetails.name}
+            description={searchLocationDetails.description}
+          >
+            <CustomMarker type="community" />
+          </Marker>
+        )}
+
+        {nearbyLocations.issues.map((location) => (
           <Marker
             key={`issue-${location.issueNumber}`}
             coordinate={{ 
               latitude: location.location.coordinates[1], 
               longitude: location.location.coordinates[0] 
             }}
+            onPress={() => handleMarkerPress(location)}
             title={location.issueName}
-            description={location.issueDescription}
-            onPress={() => openNavigation(
-              location.location.coordinates[1], 
-              location.location.coordinates[0]
-            )}
           >
-            <IssueMarker />
+            <CustomMarker type="issue" />
           </Marker>
         ))}
 
-        {nearbyLocations.crowd[0] && nearbyLocations.crowd.map((location) => (
+        {nearbyLocations.crowd.map((location) => (
           <Marker
             key={`crowd-${location.clanTag}`}
             coordinate={{ 
               latitude: location.location.coordinates[1], 
               longitude: location.location.coordinates[0] 
             }}
+            onPress={() => handleMarkerPress(location)}
             title={location.clanName}
-            description={location.description}
-            onPress={() => openNavigation(
-              location.location.coordinates[1], 
-              location.location.coordinates[0]
-            )}
           >
-            <CrowdfundingMarker />
+            <CustomMarker type="crowdfunding" />
           </Marker>
         ))}
 
-        {nearbyLocations.communities[0] && nearbyLocations.communities.map((location) => (
+        {nearbyLocations.communities.map((location) => (
           <Marker
             key={`community-${location.projectNumber}`}
             coordinate={{ 
               latitude: location.location?.latitude || 0, 
               longitude: location.location?.longitude || 0 
             }}
+            onPress={() => handleMarkerPress(location)}
             title={location.projectName}
-            description={location.projectDescription}
-            onPress={() => openNavigation(
-              location.location?.latitude, 
-              location.location?.longitude
-            )}
           >
-            <CommunityMarker />
+            <CustomMarker type="community" />
           </Marker>
         ))}
       </MapView>
 
-      <View style={{ position: 'absolute', bottom: 16, left: 16, right: 16, flexDirection: 'row', justifyContent: 'space-around' }}>
+      {/* Location FAB */}
+      <FAB
+        icon="crosshairs-gps"
+        size='small'
+        className="absolute bottom-16 right-4 bg-blue-600"
+        onPress={userLocation}
+        color="white"
+      />
+
+      {/* Control Panel */}
+      <View className="absolute bottom-28 right-4 flex flex-col items-center gap-2">
         <FAB
-          style={{ backgroundColor: theme.colors.primary }}
-          small
-          icon={() => <MaterialCommunityIcons name="plus" size={24} color="white" />}
+          icon="plus"
+          size="small"
+          className="bg-blue-600 h-10 w-10"
           onPress={zoomIn}
+          color="white"
         />
         <FAB
-          style={{ backgroundColor: theme.colors.primary }}
-          small
-          icon={() => <MaterialCommunityIcons name="minus" size={24} color="white" />}
+          icon="minus"
+          size="small"
+          className="bg-blue-600 h-10 w-10"
           onPress={zoomOut}
+          color="white"
         />
-        <Button
-          mode="contained"
-          style={{ backgroundColor: theme.colors.primary, borderRadius: 8 }}
-          onPress={userLocation}
-          icon={() => <MaterialCommunityIcons name="crosshairs-gps" size={24} color="white" />}
-        >
-          Get Location
-        </Button>
       </View>
+
+      {/* Legend */}
+      <View className="absolute right-3 bottom-52">
+        <FoldableLegend />
+      </View>
+
+      {errorMsg ? (
+        <Card className="absolute bottom-20 left-4 right-4 bg-red-50">
+          <Card.Content>
+            <Text className="text-red-800">{errorMsg}</Text>
+          </Card.Content>
+        </Card>
+      ) : null}
     </SafeAreaView>
   );
 }
+
+const mapStyle = [
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#e9e9e9"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#9e9e9e"
+      }
+    ]
+  }
+];
