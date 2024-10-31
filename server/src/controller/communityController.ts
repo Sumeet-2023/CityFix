@@ -9,25 +9,55 @@ interface StatusMessage {
 }
 
 export const communityErrorHandling = async (
-  userId: string | null = null,
-  communityId: string | null = null,
-  ngoId: string | null = null
-): Promise<StatusMessage> => {
-  const queries = [
-    userId ? prisma.user.findUnique({ where: { id: userId } }) : null,
-    ngoId ? prisma.ngo.findUnique({ where: { id: ngoId } }) : null,
-    communityId ? prisma.community.findUnique({ where: { id: communityId } }) : null,
-  ];
+    userId: string | null = null,
+    communityId: string | null = null,
+    ngoId: string | null = null
+  ): Promise<StatusMessage> => {
+    const queries = [
+      userId ? prisma.user.findUnique({ where: { id: userId } }) : null,
+      ngoId ? prisma.ngo.findUnique({ where: { id: ngoId } }) : null,
+      communityId ? prisma.community.findUnique({ where: { id: communityId } }) : null,
+    ];
+  
+    const [user, ngo, community] = await Promise.all(queries);
+  
+    // Error handling for not found entities
+    if (userId && !user) return { code: 404, message: "User not found." };
+    if (ngoId && !ngo) return { code: 404, message: "NGO not found." };
+    if (communityId && !community) return { code: 404, message: "Community not found." };
+  
+    // Check if user is already present in the community
+    let userCommunityRecord;
+    if (userId && community) {
+      userCommunityRecord = await prisma.userCommunities.findUnique({
+        where: { userId_communityId: { userId, communityId: community.id } }
+      });
+    }
+  
+    // Check if the community belongs to the NGO
+    let isCommunityBelongsToNgo, Ngopresent;
+    if (communityId && ngoId) {
+      isCommunityBelongsToNgo = await prisma.community.findUnique({
+        where: { id: communityId, ngoId }
+      });
+      Ngopresent = await prisma.community.findUnique({
+        where: { id: communityId },
+        select: {ngoId: true}
+      });
+    }
+  
+    // Check if user already in community
+    if (userCommunityRecord) return { code: 409, message: "User already in the community." };
+  
+    // Check if the community belongs to the NGO
+    if (isCommunityBelongsToNgo) return { code: 403, message: "Community already belongs to the NGO." };
 
-  const [user, ngo, community] = await Promise.all(queries);
-
-  if (userId && !user) return { code: 404, message: "User not found." };
-  if (ngoId && !ngo) return { code: 404, message: "NGO not found." };
-  if (communityId && !community) return { code: 404, message: "Community not found." };
-
-  return { code: 200, message: "Eligible for community actions." };
+    if (Ngopresent && Ngopresent.ngoId !== null) return {code: 403, message: "This community already has another NGO."}
+  
+    return { code: 200, message: "Eligible for community actions." };
 };
-
+  
+  
 // Create Community
 export const createCommunity = async (req: Request, res: Response): Promise<void> => {
   const { creatorId, ngoId, communityName, description, location, creatorType } = req.body;
@@ -117,6 +147,30 @@ export const joinCommunity = async (req: Request, res: Response): Promise<void> 
   }
 };
 
+export const joinCommunityNGO = async (req: Request, res: Response): Promise<void> => {
+    const { ngoId, communityId } = req.body;
+  
+    try {
+      const statusCheck = await communityErrorHandling(null, communityId, ngoId);
+      if (statusCheck.code !== 200) {
+        res.status(statusCheck.code).json(statusCheck);
+        return;
+      }
+  
+      await prisma.community.update({
+        where: {
+            id: communityId
+        },
+        data: { ngoId: ngoId },
+      });
+  
+      res.status(201).json({ message: "User successfully joined the community." });
+    } catch (error: any) {
+      console.error("Error joining community:", error);
+      res.status(500).json({ message: "Internal server error." });
+    }
+};
+
 export const leaveCommunity = async (req: Request, res: Response): Promise<void> => {
     const { userId, communityId } = req.body;
   
@@ -129,8 +183,10 @@ export const leaveCommunity = async (req: Request, res: Response): Promise<void>
   
       await prisma.userCommunities.delete({
         where: {
-            userId: userId,
-            communityId: communityId
+            userId_communityId: {
+                userId: userId,
+                communityId: communityId
+            }
         }
       });
   
@@ -146,11 +202,11 @@ export const deleteCommunity = async (req: Request, res: Response): Promise<void
 
     try {
         // Step 1: Delete any memberships related to the community
-        await prisma.userCommunities.deleteMany({
-            where: {
-                communityId: communityId,
-            },
-        });
+        // await prisma.userCommunities.deleteMany({
+        //     where: {
+        //         communityId: communityId,
+        //     },
+        // });
 
         // Step 2: Delete the community itself
         await prisma.community.delete({

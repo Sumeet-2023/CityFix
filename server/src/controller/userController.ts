@@ -62,8 +62,6 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
           points,
           followerCount,
           followingCount,
-          eventsIDs,
-          ngoIDs,
           updatedAt: new Date(), // Automatically update the timestamp
         },
       });
@@ -73,6 +71,20 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
       res.status(500).json({ message: `Error updating user: ${error.message}` });
     }
 };
+
+export const deleteUser = async (req: Request, res: Response): Promise<void> => {
+    const {id} = req.body;
+    try{
+        await prisma.user.delete({
+            where: {
+                id: id
+            }
+        })
+        res.status(200).json({message: "Deleted user successfully!"});
+    } catch (error) {
+        res.status(500).json({message: "Couldn' delete user"});
+    }
+}
 
 export const getNearbyUsers = async (req: Request, res: Response): Promise<void> => {
     const {

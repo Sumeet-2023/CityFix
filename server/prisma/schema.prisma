@@ -27,11 +27,17 @@ model User {
 
   // ngo
   ngosCreated         Ngo[]            @relation("NgoFounder")
+
+  // NGOs joined
+  // ngoIDs              String[]        @db.ObjectId
+  // ngosJoined          Ngo[]           @relation("ngoMembers", fields: [ngoIDs], references: [id])
+  ngosJoined          UserNgo[]
   
   // events
   eventsCreated       Event[]          @relation("UserEvents")
-  eventsIDs           String[]         @db.ObjectId
-  events              Event[]          @relation(fields: [eventsIDs], references: [id])
+  // eventsIDs           String[]         @db.ObjectId
+  // events              Event[]          @relation(fields: [eventsIDs], references: [id])
+  eventsJoined        UserEvent[]
   
   // clans
   clanCreated         Clan?             @relation("ClanCreated")
@@ -40,10 +46,6 @@ model User {
   // communities
   communitiesJoined   UserCommunities[]
   communitiesCreated  Community[]      @relation("UserProjects")
-
-  // NGOs joined
-  ngoIDs              String[]        @db.ObjectId
-  ngosJoined          Ngo[]           @relation("ngoMembers", fields: [ngoIDs], references: [id])
 
   // proposed issue resolutions
   proposedRes         ResolutionProposal[]  @relation("UserProposals")
@@ -69,7 +71,7 @@ model Issue {
 
   // user
   userId              String           @db.ObjectId
-  user                User             @relation("UserIssues", fields: [userId], references: [id])
+  user                User             @relation("UserIssues", fields: [userId], references: [id], onDelete: Cascade)
   
   resolution          AcceptedIssueResolution?
 
@@ -85,14 +87,14 @@ model ResolutionProposal {
 
   // Proposal resolver can be either a user or a community
   userId              String?          @db.ObjectId
-  user                User?            @relation("UserProposals", fields: [userId], references: [id])
+  user                User?            @relation("UserProposals", fields: [userId], references: [id], onDelete: Cascade)
 
   communityId         String?          @db.ObjectId
-  community           Community?       @relation("CommunityProposals", fields: [communityId], references: [id])
+  community           Community?       @relation("CommunityProposals", fields: [communityId], references: [id], onDelete: Cascade)
 
   // Related Issue
   issueId             String           @db.ObjectId
-  issue               Issue            @relation(fields: [issueId], references: [id])
+  issue               Issue            @relation(fields: [issueId], references: [id], onDelete: Cascade)
 }
 
 // accepted resolution
@@ -104,14 +106,14 @@ model AcceptedIssueResolution {
 
   // Accepted resolver details
   userId              String?          @db.ObjectId
-  user                User?            @relation("UserResolutions", fields: [userId], references: [id])
+  user                User?            @relation("UserResolutions", fields: [userId], references: [id], onDelete: Cascade)
 
   communityId         String?          @db.ObjectId
-  community           Community?       @relation(fields: [communityId], references: [id])
+  community           Community?       @relation(fields: [communityId], references: [id], onDelete: Cascade)
 
   // Issue
   issueId             String           @db.ObjectId @unique
-  issue               Issue            @relation(fields: [issueId], references: [id])
+  issue               Issue            @relation(fields: [issueId], references: [id], onDelete: Cascade)
 }
 
 model Community {
@@ -124,14 +126,14 @@ model Community {
   
   // creator
   creatorId           String?           @db.ObjectId
-  creator             User?             @relation("UserProjects", fields: [creatorId], references: [id])
+  creator             User?             @relation("UserProjects", fields: [creatorId], references: [id], onDelete: Cascade)
 
   // members
   members             UserCommunities[]
 
   // ngo
   ngoId               String?          @db.ObjectId
-  ngo                 Ngo?             @relation(fields: [ngoId], references: [id])
+  ngo                 Ngo?             @relation(fields: [ngoId], references: [id], onDelete: Cascade)
   
   // issues
   resolutionAccepted  AcceptedIssueResolution[]
@@ -155,11 +157,11 @@ model Project {
 
   // community
   communityId         String?          @db.ObjectId
-  community           Community?       @relation(fields: [communityId], references: [id])
+  community           Community?       @relation(fields: [communityId], references: [id], onDelete: Cascade)
 
   // creator (just for showing who proposed this project)
   creatorID           String?          @db.ObjectId
-  creator             User?            @relation(fields: [creatorID], references: [id])
+  creator             User?            @relation(fields: [creatorID], references: [id], onDelete: Cascade)
   
   // members (voting logic can also be applied here or we can create another model for voting in future)
   members             UserProject[]
@@ -183,11 +185,12 @@ model Ngo {
 
   // creator (founder)
   creatorId           String           @db.ObjectId
-  creator             User             @relation("NgoFounder", fields: [creatorId], references: [id])
+  creator             User             @relation("NgoFounder", fields: [creatorId], references: [id], onDelete: Cascade)
 
   // members (something like board members)
-  memberId            String[]         @db.ObjectId
-  members             User[]           @relation("ngoMembers", fields: [memberId], references: [id])
+  // memberId            String[]         @db.ObjectId
+  // members             User[]           @relation("ngoMembers", fields: [memberId], references: [id])
+  members             UserNgo[]
 
   // commmunity
   community           Community[]
@@ -204,19 +207,20 @@ model Event {
 
   // creator
   creatorId           String           @db.ObjectId
-  creator             User             @relation("UserEvents", fields: [creatorId], references: [id])
+  creator             User             @relation("UserEvents", fields: [creatorId], references: [id], onDelete: Cascade)
   
   // clan
   clanId              String?           @db.ObjectId
-  clan                Clan?             @relation(fields: [clanId], references: [id])
+  clan                Clan?             @relation(fields: [clanId], references: [id], onDelete: Cascade)
 
   // project
   projectId           String?           @db.ObjectId
-  project             Project?          @relation(fields: [projectId], references: [id])
+  project             Project?          @relation(fields: [projectId], references: [id], onDelete: Cascade)
   
   // participants
-  participantIDs      String[]         @db.ObjectId
-  participants        User[]           @relation(fields: [participantIDs], references: [id])
+  // participantIDs      String[]         @db.ObjectId
+  // participants        User[]           @relation(fields: [participantIDs], references: [id])
+  participants        UserEvent[]
 }
 
 model Clan {
@@ -230,7 +234,7 @@ model Clan {
   
   // creator
   creatorId           String           @db.ObjectId @unique
-  creator             User             @relation("ClanCreated", fields: [creatorId], references: [id])
+  creator             User             @relation("ClanCreated", fields: [creatorId], references: [id], onDelete: Cascade)
   
   // members
   members             UserClan[]
@@ -255,33 +259,53 @@ model CrowdsourceFunding {
 
   // project/clan
   clanId              String?           @db.ObjectId
-  clan                Clan?             @relation(fields: [clanId], references: [id])
+  clan                Clan?             @relation(fields: [clanId], references: [id], onDelete: Cascade)
   projectId           String?           @db.ObjectId
-  project             Project?          @relation(fields: [projectId], references: [id])
+  project             Project?          @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model UserProject {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String    @db.ObjectId  @unique
+  userId      String    @db.ObjectId
   projectId   String    @db.ObjectId
-  User        User      @relation(fields: [userId], references: [id])
-  Project     Project   @relation(fields: [projectId], references: [id])
+  User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  @@unique([userId, projectId])
 }
 
 model UserClan {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   userId      String   @db.ObjectId @unique
   clanId      String   @db.ObjectId
-  user        User     @relation(fields: [userId], references: [id])
-  clan        Clan     @relation(fields: [clanId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clan        Clan     @relation(fields: [clanId], references: [id], onDelete: Cascade)
 }
 
 model UserCommunities {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @db.ObjectId @unique
-  communityId String   @db.ObjectId
-  user        User     @relation(fields: [userId], references: [id])
-  community   Community     @relation(fields: [communityId], references: [id])
+  userId      String   @db.ObjectId
+  communityId String   @db.ObjectId 
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  community   Community     @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  @@unique([userId, communityId])
+}
+
+model UserNgo {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String @db.ObjectId
+  ngoId     String @db.ObjectId
+
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ngo       Ngo    @relation(fields: [ngoId], references: [id], onDelete: Cascade)
+}
+
+model UserEvent {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String @db.ObjectId
+  eventId   String @db.ObjectId
+
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model Counter {
