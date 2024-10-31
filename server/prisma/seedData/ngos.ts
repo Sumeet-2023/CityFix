@@ -1,6 +1,13 @@
 import { ObjectId } from 'bson';
 import { dataStore } from './dataStore'; // Import the shared data store
 
+const johnDoeId = dataStore.users.get("john_doe");
+const janeSmitId = dataStore.users.get("jane_smith");
+
+if (!johnDoeId || !janeSmitId) {
+  throw new Error("User 'john_doe' not found in dataStore.");
+}
+
 export const ngos = [
   {
     id: new ObjectId().toHexString(), // Generate a unique ID without hyphens
@@ -13,7 +20,7 @@ export const ngos = [
     raisedAmount: 50000,
     authorized: true,
     createdAt: new Date(),
-    creatorId: dataStore.users.get("john_doe"),
+    creatorId: johnDoeId,
   },
   {
     id: new ObjectId().toHexString(),
@@ -26,7 +33,7 @@ export const ngos = [
     raisedAmount: 75000,
     authorized: true,
     createdAt: new Date(),
-    creatorId: dataStore.users.get("jane_smith"),
+    creatorId: janeSmitId,
   },
 ];
 
