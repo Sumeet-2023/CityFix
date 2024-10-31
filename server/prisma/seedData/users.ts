@@ -1,11 +1,6 @@
 import { ObjectId } from 'bson';
 import { dataStore } from './dataStore';
 
-const forestClanId = dataStore.crowds.get("GOTHEARTH");
-if (!forestClanId) {
-    throw new Error("Clan not found in dataStore.");
-}
-
 export const users = [
   {
     id: new ObjectId().toHexString(),
@@ -17,8 +12,7 @@ export const users = [
     followerCount: 100,
     followingCount: 150,
     points: 200,
-    paid: true,
-    joinedClanId: forestClanId,
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -30,8 +24,7 @@ export const users = [
     followerCount: 50,
     followingCount: 75,
     points: 120,
-    paid: false,
-    joinedClanId: forestClanId,
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -43,8 +36,7 @@ export const users = [
     followerCount: 200,
     followingCount: 180,
     points: 300,
-    paid: true,
-    joinedClanId: forestClanId,
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -56,8 +48,6 @@ export const users = [
     followerCount: 80,
     followingCount: 90,
     points: 140,
-    paid: false,
-    joinedClanId: forestClanId,
   },
   {
     id: new ObjectId().toHexString(),
@@ -69,8 +59,7 @@ export const users = [
     followerCount: 60,
     followingCount: 70,
     points: 110,
-    paid: true,
-    joinedClanId: forestClanId,
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -82,8 +71,7 @@ export const users = [
     followerCount: 95,
     followingCount: 110,
     points: 130,
-    paid: false,
-    joinedClanId: forestClanId,
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -95,8 +83,7 @@ export const users = [
     followerCount: 150,
     followingCount: 140,
     points: 210,
-    paid: true,
-    joinedClanId: forestClanId,
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -108,8 +95,7 @@ export const users = [
     followerCount: 120,
     followingCount: 130,
     points: 180,
-    paid: false,
-    joinedClanId: forestClanId,
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -121,8 +107,7 @@ export const users = [
     followerCount: 90,
     followingCount: 100,
     points: 150,
-    paid: true,
-    joinedClanId: forestClanId,
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -134,8 +119,7 @@ export const users = [
     followerCount: 140,
     followingCount: 160,
     points: 190,
-    paid: false,
-    joinedClanId: forestClanId,
+    
   }
 ];
 

@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,84 +7,278 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id               String       @id @default(auto()) @map("_id") @db.ObjectId
-  username         String
-  location         Json?        @db.Json
-  followerCount    Int
-  followingCount   Int
-  points           Int
-  issuesCreated    Issue[]      @relation("UserIssues")
-  projectsCreated  Community[]  @relation("UserProjects")
-  projectsJoined   UserProject[]
-  joinedClan       Crowd?       @relation("JoinedClan", fields: [joinedClanId], references: [id])  // User can join only one clan
-  joinedClanId     String?      @db.ObjectId  // Ensure the user can only join one clan at a time
-  paid             Boolean
+  id                  String           @id @default(auto()) @map("_id") @db.ObjectId
+  username            String
+  location            Json?            @db.Json
+  points              Int
+  followerCount       Int
+  followingCount      Int
+
+  // issue
+  issuesCreated       Issue[]          @relation("UserIssues")
+
+  // projects
+  projectsCreated     Project[]
+  projectsJoined      UserProject[]
+
+  // ngo
+  ngosCreated         Ngo[]            @relation("NgoFounder")
+  
+  // events
+  eventsCreated       Event[]          @relation("UserEvents")
+  eventsIDs           String[]         @db.ObjectId
+  events              Event[]          @relation(fields: [eventsIDs], references: [id])
+  
+  // clans
+  clanCreatedID       String?           @db.ObjectId
+  clanCreated         Clan?            @relation("ClanCreated")
+  userClan            UserClan?        
+  
+  // communities
+  communitiesJoined   UserCommunities[]
+  communitiesCreated  Community[]      @relation("UserProjects")
+
+  // NGOs joined
+  ngoIDs              String[]        @db.ObjectId
+  ngosJoined          Ngo[]           @relation("ngoMembers", fields: [ngoIDs], references: [id])
+
+  // proposed issue resolutions
+  proposedRes         ResolutionProposal[]  @relation("UserProposals")
+
+  // accepted resolutions
+  resolvedIssues      AcceptedIssueResolution[] @relation("UserResolutions")
+
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @default(now())
 }
 
 model Issue {
-  id               String       @id @default(auto()) @map("_id") @db.ObjectId
-  issueTag         String
-  issueNumber      Int
-  issueName        String
-  user             User         @relation("UserIssues", fields: [userId], references: [id])
-  userId           String       @db.ObjectId
-  issueDescription String
-  issuePhoto       String?
-  reportedDate     DateTime
-  location         Json?        @db.Json
-  lastUpdated      DateTime
+  id                  String           @id @default(auto()) @map("_id") @db.ObjectId
+  issueTag            String
+  issueNumber         Int
+  issueName           String
+  issueDescription    String
+  issuePhoto          String?
+  reportedDate        DateTime
+  location            Json?            @db.Json
+  lastUpdated         DateTime
+  status              Status
+
+  // user
+  userId              String           @db.ObjectId
+  user                User             @relation("UserIssues", fields: [userId], references: [id])
+  
+  resolution          AcceptedIssueResolution?
+
+  // proposed resolution
+  proposals           ResolutionProposal[]
+}
+
+model ResolutionProposal {
+  id                  String           @id @default(auto()) @map("_id") @db.ObjectId
+  proposalDescription String
+  proposedDate        DateTime         @default(now())
+  resolverType        ResolverType
+
+  // Proposal resolver can be either a user or a community
+  userId              String?          @db.ObjectId
+  user                User?            @relation("UserProposals", fields: [userId], references: [id])
+
+  communityId         String?          @db.ObjectId
+  community           Community?       @relation("CommunityProposals", fields: [communityId], references: [id])
+
+  // Related Issue
+  issueId             String           @db.ObjectId
+  issue               Issue            @relation(fields: [issueId], references: [id])
+}
+
+// accepted resolution
+model AcceptedIssueResolution {
+  id                  String           @id @default(auto()) @map("_id") @db.ObjectId
+  dateAccepted        DateTime         @default(now())
+  resolverType        ResolverType
+  description         String
+
+  // Accepted resolver details
+  userId              String?          @db.ObjectId
+  user                User?            @relation("UserResolutions", fields: [userId], references: [id])
+
+  communityId         String?          @db.ObjectId
+  community           Community?       @relation(fields: [communityId], references: [id])
+
+  // Issue
+  issueId             String           @db.ObjectId @unique
+  issue               Issue            @relation(fields: [issueId], references: [id])
 }
 
 model Community {
-  id               String       @id @default(auto()) @map("_id") @db.ObjectId
-  projectTag       String
-  projectNumber    Int
-  projectName      String
-  createdBy        User         @relation("UserProjects", fields: [createdById], references: [id])
-  createdById      String       @db.ObjectId
-  members          UserProject[]
-  projectDescription String
-  projectPhoto     String?
-  reportedDate     DateTime
-  reportedTime     DateTime
-  executionDate    DateTime
-  executionTime    DateTime
-  location         Json?        @db.Json
-  lastUpdated      DateTime
-  volunteerNumber  Int
-  contactInfo      ContactInfo
+  id                  String           @id @default(auto()) @map("_id") @db.ObjectId
+  communityName       String
+  communityNumber     Int
+  description         String
+  location            Json?            @db.Json
+  creatorType         communityCreatorType
+  
+  // creator
+  creatorId           String?           @db.ObjectId
+  creator             User?             @relation("UserProjects", fields: [creatorId], references: [id])
+
+  // members
+  members             UserCommunities[]
+
+  // ngo
+  ngoId               String?          @db.ObjectId
+  ngo                 Ngo?             @relation(fields: [ngoId], references: [id])
+  
+  // issues
+  resolutionAccepted  AcceptedIssueResolution[]
+
+  // issue resolution proposals
+  proposedRes         ResolutionProposal[]  @relation("CommunityProposals")
+
+  // project
+  projects            Project[]
 }
 
-model Crowd {
-  id               String       @id @default(auto()) @map("_id") @db.ObjectId
-  clanName         String
-  badge            String?
-  description      String
-  clanType         String
-  peopleJoinedNumber Int
-  location         Json?        @db.Json
-  clanTag          String
-  peopleJoined     User[]       @relation("JoinedClan")
+model Project {
+  id                  String           @id @default(auto()) @map("_id") @db.ObjectId
+  projectName         String
+  description         String
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @default(now())
+  contactInfo         ContactInfo
+  status              ProjectStatus
+
+  // community
+  communityId         String?          @db.ObjectId
+  community           Community?       @relation(fields: [communityId], references: [id])
+
+  // creator (just for showing who proposed this project)
+  creatorID           String?          @db.ObjectId
+  creator             User?            @relation(fields: [creatorID], references: [id])
+  
+  // members (voting logic can also be applied here or we can create another model for voting in future)
+  members             UserProject[]
+  
+  // event
+  event               Event[]
+
+  // fund
+  fund                CrowdsourceFunding[]
 }
 
 model Ngo {
-  id               String       @id @default(auto()) @map("_id") @db.ObjectId
-  ngoName          String
-  ngoType          String
-  ngoPhotoUrl      String?
-  ngoDescription   String
-  contact          ContactInfo
-  raisedMoney      Int
+  id                  String           @id @default(auto()) @map("_id") @db.ObjectId
+  ngoName             String
+  // ngoNumber           Int
+  description         String
+  contact             ContactInfo
+  raisedAmount        Int
+  authorized          Boolean
+  createdAt           DateTime
+
+  // creator (founder)
+  creatorId           String           @db.ObjectId
+  creator             User             @relation("NgoFounder", fields: [creatorId], references: [id])
+
+  // members (something like board members)
+  memberId            String[]         @db.ObjectId
+  members             User[]           @relation("ngoMembers", fields: [memberId], references: [id])
+
+  // commmunity
+  community           Community[]
 }
 
-model UserProject {                                                   // for many-to-many relation between project n user 
+model Event {
+  id                  String           @id @default(auto()) @map("_id") @db.ObjectId
+  eventName                String
+  description         String
+  startDateTime       DateTime
+  endDateTime         DateTime
+  location            Json?            @db.Json
+  status              EventStatus
+
+  // creator
+  creatorId           String           @db.ObjectId
+  creator             User             @relation("UserEvents", fields: [creatorId], references: [id])
+  
+  // clan
+  clanId              String?           @db.ObjectId
+  clan                Clan?             @relation(fields: [clanId], references: [id])
+
+  // project
+  projectId           String?           @db.ObjectId
+  project             Project?          @relation(fields: [projectId], references: [id])
+  
+  // participants
+  participantIDs      String[]         @db.ObjectId
+  participants        User[]           @relation(fields: [participantIDs], references: [id])
+}
+
+model Clan {
+  id                  String           @id @default(auto()) @map("_id") @db.ObjectId
+  clanName            String
+  // clanNumber          Int
+  description         String
+  location            Json?            @db.Json
+  clanTag             String
+  badge               String?
+  
+  // creator
+  creatorId           String           @db.ObjectId @unique
+  creator             User             @relation("ClanCreated", fields: [creatorId], references: [id])
+  
+  // members
+  members             UserClan[]
+
+  // funding
+  funds               CrowdsourceFunding[]
+  
+  // event
+  event               Event[]
+}
+
+model CrowdsourceFunding {
+  id                  String           @id @default(auto()) @map("_id") @db.ObjectId
+  type                FundingType
+  amountRaised        Int
+  amountRequired      Int
+  dateCreated         DateTime        @default(now())
+  lastUpdated         DateTime        @default(now())
+
+  // creator type
+  creatorType         FundingType
+
+  // project/clan
+  clanId              String?           @db.ObjectId
+  clan                Clan?             @relation(fields: [clanId], references: [id])
+  projectId           String?           @db.ObjectId
+  project             Project?          @relation(fields: [projectId], references: [id])
+}
+
+model UserProject {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String    @db.ObjectId
+  userId      String    @db.ObjectId  @unique
   projectId   String    @db.ObjectId
   User        User      @relation(fields: [userId], references: [id])
-  Project     Community @relation(fields: [projectId], references: [id])
+  Project     Project   @relation(fields: [projectId], references: [id])
+}
+
+model UserClan {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId @unique
+  clanId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id])
+  clan        Clan     @relation(fields: [clanId], references: [id])
+}
+
+model UserCommunities {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  communityId String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id])
+  community   Community     @relation(fields: [communityId], references: [id])
 }
 
 model Counter {
@@ -102,11 +290,50 @@ model Counter {
 enum ModelType {
   Issue
   Community
-  Crowd
+  Clan
   Ngo
 }
 
+enum ResolverType {
+  COMMUNITY
+  USER
+}
+
+// enum ProjectCreatorType {
+//   COMMUNITY
+//   CLAN
+// }
+
+enum communityCreatorType {
+  USER
+  NGO
+}
+
+enum Status {
+  OPEN
+  CLOSED
+  IN_PROGRESS
+}
+
+enum ProjectStatus {
+  ACTIVE
+  INACTIVE
+  ONGOING
+  COMPLETED
+}
+
+enum EventStatus {
+  SCHEDULED
+  ONGOING
+  COMPLETED
+}
+
+enum FundingType {
+  PROJECT
+  CLAN
+}
+
 type ContactInfo {
-  email            String
-  number           Int
+  email  String
+  number String
 }

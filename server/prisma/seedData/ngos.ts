@@ -5,30 +5,32 @@ export const ngos = [
   {
     id: new ObjectId().toHexString(), // Generate a unique ID without hyphens
     ngoName: "Green Earth Initiative",
-    ngoType: "Environment",
-    ngoPhotoUrl: null,
-    ngoDescription: "An NGO focused on reducing pollution and promoting sustainability.",
+    description: "An NGO focused on reducing pollution and promoting sustainability.",
     contact: {
       email: "contact@greenearth.org",
-      number: 1234567890,
+      number: "1234567890",
     },
-    raisedMoney: 50000,
+    raisedAmount: 50000,
+    authorized: true,
+    createdAt: new Date(),
+    creatorId: dataStore.users.get("john_doe"),
   },
   {
     id: new ObjectId().toHexString(),
     ngoName: "Animal Welfare Society",
-    ngoType: "Animal Rights",
-    ngoPhotoUrl: null,
-    ngoDescription: "A non-profit organization working to protect animal rights and welfare.",
+    description: "A non-profit organization working to protect animal rights and welfare.",
     contact: {
       email: "info@animalwelfare.org",
-      number: 9876543210,
+      number: "9876543210",
     },
-    raisedMoney: 75000,
+    raisedAmount: 75000,
+    authorized: true,
+    createdAt: new Date(),
+    creatorId: dataStore.users.get("jane_smith"),
   },
 ];
 
 // Store the generated NGO IDs in dataStore for later reference
-ngos.forEach(ngo => {
+ngos.forEach((ngo) => {
   dataStore.ngos.set(ngo.ngoName, ngo.id);
 });

@@ -71,7 +71,7 @@ export const getNearbyCrowdFundings = async (req: Request, res: Response): Promi
     const radiusInRadians = radius / 6371;
 
     try {
-        const crowd = await prisma.crowd.findRaw({
+        const crowd = await prisma.clan.findRaw({
             filter: {
                 location: {
                     $geoWithin: {
@@ -136,7 +136,6 @@ export const getNearbyIssues = async (req: Request, res: Response): Promise<void
 }
 
 export const getNearbyAll = async (req: Request, res: Response): Promise<void> => {
-    // Get parameters from query string instead of request body
     const latitude = Number(req.query.latitude);
     const longitude = Number(req.query.longitude);
     const radius = Number(req.query.radius) || 1000;
@@ -215,3 +214,96 @@ export const getNearbyAll = async (req: Request, res: Response): Promise<void> =
         });
     }
 };
+
+export const searchCrowd = async (req: Request, res: Response): Promise<void> => {
+    const id = String(req.query.id);
+    try {
+        const crowd = await prisma.crowd.findUnique({
+        where: {
+            id: id,
+        }
+        });
+        res.json(crowd);
+    } catch (error: any) {
+        res
+        .status(500)
+        .json({ message: `Error retrieving crowds: ${error.message}` });
+    }
+}
+
+// Autocomplete endpoint for clanName
+export const getClanAutocomplete = async (req: Request, res: Response): Promise<void> => {
+    const query = String(req.query.q || ""); // `q` is the query parameter
+  
+    try {
+      const clans = await prisma.crowd.findMany({
+        where: {
+          clanName: {
+            contains: query, // Search for partial matches
+            mode: 'insensitive', // Makes the search case-insensitive
+          },
+        },
+        select: {
+          clanName: true,
+          location: true,
+          description: true
+        },
+        take: 10, // Limit results to avoid sending too much data
+      });
+  
+      res.json(clans.map(clan => ({ name: clan.clanName, location: clan.location, description: clan.description })));
+    } catch (error: any) {
+      res.status(500).json({ message: `Error retrieving clan names: ${error.message}` });
+    }
+};
+
+// Autocomplete endpoint for community
+// export const getCommunityAutocomplete = async (req: Request, res: Response): Promise<void> => {
+//     const query = String(req.query.q || ""); // `q` is the query parameter
+  
+//     try {
+//       const clans = await prisma.community.findMany({
+//         where: {
+//           projectName: {
+//             contains: query, // Search for partial matches
+//             mode: 'insensitive', // Makes the search case-insensitive
+//           },
+//         },
+//         select: {
+//           clanName: true,
+//           location: true,
+//           description: true
+//         },
+//         take: 10, // Limit results to avoid sending too much data
+//       });
+  
+//       res.json(clans.map(clan => ({ name: clan.clanName, location: clan.location, description: clan.description })));
+//     } catch (error: any) {
+//       res.status(500).json({ message: `Error retrieving clan names: ${error.message}` });
+//     }
+// };
+
+export const getCrowdByName = async (req: Request, res: Response): Promise<void> => {
+    const clanName = req.query.clanName ? String(req.query.clanName) : "";
+    if (!clanName) {
+      res.status(400).json({ message: "Missing clan name in query" });
+      return;
+    }
+    try {
+      const crowd = await prisma.crowd.findMany({
+        where: {
+          clanName: clanName,
+        }
+      });
+      res.json(crowd);
+    } catch (error: any) {
+      res
+        .status(500)
+        .json({ message: `Error retrieving crowds: ${error.message}` });
+    }
+}
+  
+
+export const searchAll = async (req: Request, res: Response): Promise<void> => {
+
+}

@@ -5,8 +5,11 @@ import { dataStore } from './dataStore';
 const johnDoeId = dataStore.users.get("john_doe");
 const janeSmithId = dataStore.users.get("jane_smith");
 
-if (!johnDoeId || !janeSmithId) {
-  throw new Error("User not found in dataStore.");
+// Example community ID; adjust this based on your dataStore
+const communityId = dataStore.community.get("Beach Cleaners United");
+
+if (!johnDoeId || !janeSmithId || !communityId) {
+  throw new Error("User or Community not found in dataStore.");
 }
 
 export const issues = [
@@ -24,6 +27,7 @@ export const issues = [
       coordinates: [-74.0060, 40.7128] // Main Street, NY
     },
     lastUpdated: new Date(),
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -39,6 +43,7 @@ export const issues = [
       coordinates: [-118.2437, 34.0522] // Central Park, LA
     },
     lastUpdated: new Date(),
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -54,6 +59,7 @@ export const issues = [
       coordinates: [-87.6298, 41.8781] // 5th Ave, Chicago, IL
     },
     lastUpdated: new Date(),
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -69,6 +75,7 @@ export const issues = [
       coordinates: [-95.3698, 29.7604] // City Hall, Houston, TX
     },
     lastUpdated: new Date(),
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -84,6 +91,7 @@ export const issues = [
       coordinates: [-112.074, 33.4484] // Elm Street, Phoenix, AZ
     },
     lastUpdated: new Date(),
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -99,6 +107,7 @@ export const issues = [
       coordinates: [-75.1652, 39.9526] // Riverside Park, Philadelphia, PA
     },
     lastUpdated: new Date(),
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -114,6 +123,7 @@ export const issues = [
       coordinates: [-98.4936, 29.4241] // Maple Ave, San Antonio, TX
     },
     lastUpdated: new Date(),
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -129,6 +139,7 @@ export const issues = [
       coordinates: [-122.3321, 47.6062] // Local Playground, Seattle, WA
     },
     lastUpdated: new Date(),
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -144,6 +155,7 @@ export const issues = [
       coordinates: [-104.9903, 39.7392] // Main and 2nd, Denver, CO
     },
     lastUpdated: new Date(),
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -159,6 +171,7 @@ export const issues = [
       coordinates: [-80.1918, 25.7617] // 3rd St, Miami, FL
     },
     lastUpdated: new Date(),
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -174,6 +187,7 @@ export const issues = [
       coordinates: [72.8537, 19.3002] // Maxus Mall, Mira Bhayandar
     },
     lastUpdated: new Date(),
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -189,6 +203,7 @@ export const issues = [
       coordinates: [72.8540, 19.2813] // Mira Road Station, Mira Bhayandar
     },
     lastUpdated: new Date(),
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -204,6 +219,7 @@ export const issues = [
       coordinates: [72.8465, 19.2943] // Silver Park, Mira Bhayandar
     },
     lastUpdated: new Date(),
+    
   },
   {
     id: new ObjectId().toHexString(),
@@ -219,22 +235,24 @@ export const issues = [
       coordinates: [72.8592, 19.2934] // Bhayandar Phatak, Mira Bhayandar
     },
     lastUpdated: new Date(),
+    
   },
   {
     id: new ObjectId().toHexString(),
-    issueTag: "Waterlogging",
+    issueTag: "Graffiti",
     issueNumber: 15,
-    issueName: "Waterlogging at Mira Bhayandar Road",
+    issueName: "Graffiti on Public Wall at Versova",
     userId: janeSmithId,
-    issueDescription: "Frequent waterlogging on Mira Bhayandar Road during monsoon.",
+    issueDescription: "Graffiti spotted on the public wall at Versova beach.",
     issuePhoto: null,
     reportedDate: new Date(),
     location: {
       type: "Point",
-      coordinates: [72.8502, 19.2950] // Mira Bhayandar Road, Mira Bhayandar
+      coordinates: [72.8105, 19.0824] // Versova Beach, Mumbai
     },
     lastUpdated: new Date(),
-  }
+    
+  },
 ];
 
 // Store the generated issue IDs in dataStore for later reference (if needed)
