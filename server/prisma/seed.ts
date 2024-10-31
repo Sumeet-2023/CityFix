@@ -15,14 +15,17 @@ const prisma = new PrismaClient();
 async function main() {
   try {
 
-    // Delete all documents from each collection before seeding
+    await prisma.userCommunities.deleteMany({}); // Delete community memberships
+    await prisma.userProject.deleteMany({}); // Delete project memberships
+    await prisma.userClan.deleteMany({}); // Delete clan memberships
+    
     await prisma.counter.deleteMany({});
-    await prisma.userProject.deleteMany({});
     await prisma.issue.deleteMany({});
     await prisma.community.deleteMany({});
     await prisma.ngo.deleteMany({});
     await prisma.clan.deleteMany({});
     await prisma.user.deleteMany({});
+    
     console.log("Previous documents deleted successfully.");
 
     const counters = [
