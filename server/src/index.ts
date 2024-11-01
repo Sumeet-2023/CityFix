@@ -9,9 +9,10 @@ import morgan from "morgan";
 import issueRoutes from "./routes/issueRoutes";
 import projectRoutes from "./routes/projectRoutes";
 import ngoRouters from "./routes/ngoRoutes";
-import crowdRoutes from "./routes/crowdRoutes";
+import clanRoutes from "./routes/clanRoutes";
 import userRoutes from "./routes/userRoutes";
 import exploreRoutes from "./routes/exploreRoutes";
+import communityRoutes from "./routes/communityRoutes";
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -31,9 +32,10 @@ app.get("/", (req, res) => {
 app.use("/issues", issueRoutes);
 app.use("/project", projectRoutes);
 app.use("/ngo", ngoRouters);
-app.use("/crowd", crowdRoutes);
+app.use("/clan", clanRoutes);
 app.use("/user", userRoutes);
 app.use("/explore", exploreRoutes);
+app.use("/community", communityRoutes);
 
 /* SERVER */
 const port = process.env.PORT || 3000;

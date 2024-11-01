@@ -71,7 +71,7 @@ export const getNearbyCrowdFundings = async (req: Request, res: Response): Promi
     const radiusInRadians = radius / 6371;
 
     try {
-        const crowd = await prisma.clan.findRaw({
+        const clan = await prisma.clan.findRaw({
             filter: {
                 location: {
                     $geoWithin: {
@@ -83,7 +83,7 @@ export const getNearbyCrowdFundings = async (req: Request, res: Response): Promi
                 }
             }
         });
-        res.json(crowd);
+        res.json(clan);
     } catch (error: any) {
     res
         .status(500)
@@ -162,7 +162,7 @@ export const getNearbyAll = async (req: Request, res: Response): Promise<void> =
         // To convert km to radians, divide by Earth's radius (6371 km)
         const radiusInRadians = radius / 6371000;
 
-        const [issues, crowd, communities] = await Promise.all([
+        const [issues, clan, communities] = await Promise.all([
             prisma.issue.findRaw({
                 filter: {
                     location: {
@@ -175,7 +175,7 @@ export const getNearbyAll = async (req: Request, res: Response): Promise<void> =
                     }
                 }
             }),
-            prisma.crowd.findRaw({
+            prisma.clan.findRaw({
                 filter: {
                     location: {
                         $geoWithin: {
@@ -203,7 +203,7 @@ export const getNearbyAll = async (req: Request, res: Response): Promise<void> =
 
         res.json({
             issues,
-            crowd,
+            clan,
             communities,
         });
     } catch (error: any) {
@@ -215,19 +215,19 @@ export const getNearbyAll = async (req: Request, res: Response): Promise<void> =
     }
 };
 
-export const searchCrowd = async (req: Request, res: Response): Promise<void> => {
+export const searchClan = async (req: Request, res: Response): Promise<void> => {
     const id = String(req.query.id);
     try {
-        const crowd = await prisma.crowd.findUnique({
+        const clan = await prisma.clan.findUnique({
         where: {
             id: id,
         }
         });
-        res.json(crowd);
+        res.json(clan);
     } catch (error: any) {
         res
         .status(500)
-        .json({ message: `Error retrieving crowds: ${error.message}` });
+        .json({ message: `Error retrieving clans: ${error.message}` });
     }
 }
 
@@ -236,7 +236,7 @@ export const getClanAutocomplete = async (req: Request, res: Response): Promise<
     const query = String(req.query.q || ""); // `q` is the query parameter
   
     try {
-      const clans = await prisma.crowd.findMany({
+      const clans = await prisma.clan.findMany({
         where: {
           clanName: {
             contains: query, // Search for partial matches
@@ -283,23 +283,23 @@ export const getClanAutocomplete = async (req: Request, res: Response): Promise<
 //     }
 // };
 
-export const getCrowdByName = async (req: Request, res: Response): Promise<void> => {
+export const getClanByName = async (req: Request, res: Response): Promise<void> => {
     const clanName = req.query.clanName ? String(req.query.clanName) : "";
     if (!clanName) {
       res.status(400).json({ message: "Missing clan name in query" });
       return;
     }
     try {
-      const crowd = await prisma.crowd.findMany({
+      const clan = await prisma.clan.findMany({
         where: {
           clanName: clanName,
         }
       });
-      res.json(crowd);
+      res.json(clan);
     } catch (error: any) {
       res
         .status(500)
-        .json({ message: `Error retrieving crowds: ${error.message}` });
+        .json({ message: `Error retrieving clans: ${error.message}` });
     }
 }
   

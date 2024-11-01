@@ -16,46 +16,26 @@ export const getProjects = async (req: Request, res: Response): Promise<void> =>
 
 export const createProject = async (req: Request, res: Response): Promise<void> => {
     const {
-        projectTag,           
-        projectName,
-        createdById,      
-        projectDescription,
-        reportedDate,     
-        reportedTime,     
-        executionDate,    
-        executionTime,    
-        location,         
-        lastUpdated,      
-        volunteerNumber,  
-        contactInfo,      
+      projectTag,
+      projectName,
+      creatorID,
+      description,
+      contactInfo,
+      communityId,
     } = req.body;
   
     try {
-      // Get and increment the latest count for Issue model
-      const updatedCounter = await prisma.counter.update({
-        where: { modelName: "Community" },
-        data: { count: { increment: 1 } },
-      });
-  
-      // Use the updated count as the issueNumber
-      const projectNumber = updatedCounter.count;
-  
-      // Create the issue with the generated issueNumber
-      const newProject = await prisma.community.create({
+      const newProject = await prisma.project.create({
         data: {
-        projectTag,       
-        projectNumber,    
-        projectName,
-        createdById,      
-        projectDescription,
-        reportedDate,     
-        reportedTime,     
-        executionDate,    
-        executionTime,    
-        location,         
-        lastUpdated,      
-        volunteerNumber,  
-        contactInfo,
+          projectTag,
+          projectName,
+          creatorID,
+          description,
+          contactInfo,
+          communityId,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          status: "ACTIVE",
         },
       });
       res.status(201).json(newProject);

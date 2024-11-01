@@ -18,6 +18,7 @@ async function main() {
     await prisma.userCommunities.deleteMany({}); // Delete community memberships
     await prisma.userProject.deleteMany({}); // Delete project memberships
     await prisma.userClan.deleteMany({}); // Delete clan memberships
+    await prisma.userNgo.deleteMany({});
     
     await prisma.counter.deleteMany({});
     await prisma.issue.deleteMany({});
@@ -25,11 +26,12 @@ async function main() {
     await prisma.ngo.deleteMany({});
     await prisma.clan.deleteMany({});
     await prisma.user.deleteMany({});
+    await prisma.project.deleteMany({});
     
     console.log("Previous documents deleted successfully.");
 
     const counters = [
-      { modelName: Prisma.ModelName.Issue, count: 16 },
+      { modelName: Prisma.ModelName.Issue, count: 15 },
       { modelName: Prisma.ModelName.Community, count: 1 },
       { modelName: Prisma.ModelName.Clan, count: 0 },
       { modelName: Prisma.ModelName.Ngo, count: 0 },
@@ -69,17 +71,7 @@ async function main() {
     for (const ngoData of ngos) {
       await prisma.ngo.create({
         data: {
-          id: ngoData.id,
-          ngoName: ngoData.ngoName,
-          description: ngoData.description,
-          contact: {
-            email: ngoData.contact.email,
-            number: ngoData.contact.number,
-          },
-          raisedAmount: ngoData.raisedAmount,
-          authorized: ngoData.authorized,
-          createdAt: ngoData.createdAt,
-          creatorId: ngoData.creatorId ?? "", // Fallback in case creatorId is undefined
+          ...ngoData
         },
       });
     }
@@ -89,13 +81,7 @@ async function main() {
     for (const communityData of communities) {
       await prisma.community.create({
         data: {
-          id: communityData.id,
-          communityName: communityData.communityName,
-          communityNumber: communityData.communityNumber,
-          description: communityData.description,
-          location: communityData.location,
-          creatorType: communityData.creatorType,
-          creatorId: communityData.creatorId
+          ...communityData
         },
       });
     }
@@ -124,16 +110,7 @@ async function main() {
     for (const issueData of issues) {
       await prisma.issue.create({
         data: {
-          id: issueData.id,
-          issueName: issueData.issueName,
-          issueNumber: issueData.issueNumber,
-          issueDescription: issueData.issueDescription,
-          location: issueData.location,
-          issueTag: issueData.issueTag,
-          reportedDate: issueData.reportedDate,
-          lastUpdated: issueData.lastUpdated,
-          status: Status.OPEN,
-          userId: issueData.userId
+          ...issueData
         },
       });
     }

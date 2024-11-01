@@ -1,5 +1,6 @@
 import { ObjectId } from 'bson';
 import { dataStore } from './dataStore';
+import { Status } from '@prisma/client';
 
 // Assuming user IDs for reporting users
 const johnDoeId = dataStore.users.get("john_doe");
@@ -27,7 +28,7 @@ export const issues = [
       coordinates: [-74.0060, 40.7128] // Main Street, NY
     },
     lastUpdated: new Date(),
-    
+    status: Status.OPEN
   },
   {
     id: new ObjectId().toHexString(),
@@ -43,7 +44,7 @@ export const issues = [
       coordinates: [-118.2437, 34.0522] // Central Park, LA
     },
     lastUpdated: new Date(),
-    
+    status: Status.OPEN
   },
   {
     id: new ObjectId().toHexString(),
@@ -59,7 +60,7 @@ export const issues = [
       coordinates: [-87.6298, 41.8781] // 5th Ave, Chicago, IL
     },
     lastUpdated: new Date(),
-    
+    status: Status.OPEN
   },
   {
     id: new ObjectId().toHexString(),
@@ -75,7 +76,7 @@ export const issues = [
       coordinates: [-95.3698, 29.7604] // City Hall, Houston, TX
     },
     lastUpdated: new Date(),
-    
+    status: Status.OPEN
   },
   {
     id: new ObjectId().toHexString(),
@@ -91,7 +92,7 @@ export const issues = [
       coordinates: [-112.074, 33.4484] // Elm Street, Phoenix, AZ
     },
     lastUpdated: new Date(),
-    
+    status: Status.OPEN
   },
   {
     id: new ObjectId().toHexString(),
@@ -107,7 +108,7 @@ export const issues = [
       coordinates: [-75.1652, 39.9526] // Riverside Park, Philadelphia, PA
     },
     lastUpdated: new Date(),
-    
+    status: Status.OPEN
   },
   {
     id: new ObjectId().toHexString(),
@@ -123,7 +124,7 @@ export const issues = [
       coordinates: [-98.4936, 29.4241] // Maple Ave, San Antonio, TX
     },
     lastUpdated: new Date(),
-    
+    status: Status.OPEN
   },
   {
     id: new ObjectId().toHexString(),
@@ -139,7 +140,7 @@ export const issues = [
       coordinates: [-122.3321, 47.6062] // Local Playground, Seattle, WA
     },
     lastUpdated: new Date(),
-    
+    status: Status.OPEN
   },
   {
     id: new ObjectId().toHexString(),
@@ -155,7 +156,7 @@ export const issues = [
       coordinates: [-104.9903, 39.7392] // Main and 2nd, Denver, CO
     },
     lastUpdated: new Date(),
-    
+    status: Status.OPEN
   },
   {
     id: new ObjectId().toHexString(),
@@ -171,7 +172,7 @@ export const issues = [
       coordinates: [-80.1918, 25.7617] // 3rd St, Miami, FL
     },
     lastUpdated: new Date(),
-    
+    status: Status.OPEN
   },
   {
     id: new ObjectId().toHexString(),
@@ -187,7 +188,7 @@ export const issues = [
       coordinates: [72.8537, 19.3002] // Maxus Mall, Mira Bhayandar
     },
     lastUpdated: new Date(),
-    
+    status: Status.OPEN
   },
   {
     id: new ObjectId().toHexString(),
@@ -203,7 +204,7 @@ export const issues = [
       coordinates: [72.8540, 19.2813] // Mira Road Station, Mira Bhayandar
     },
     lastUpdated: new Date(),
-    
+    status: Status.OPEN
   },
   {
     id: new ObjectId().toHexString(),
@@ -219,7 +220,7 @@ export const issues = [
       coordinates: [72.8465, 19.2943] // Silver Park, Mira Bhayandar
     },
     lastUpdated: new Date(),
-    
+    status: Status.OPEN
   },
   {
     id: new ObjectId().toHexString(),
@@ -235,7 +236,7 @@ export const issues = [
       coordinates: [72.8592, 19.2934] // Bhayandar Phatak, Mira Bhayandar
     },
     lastUpdated: new Date(),
-    
+    status: Status.OPEN
   },
   {
     id: new ObjectId().toHexString(),
@@ -251,7 +252,7 @@ export const issues = [
       coordinates: [72.8105, 19.0824] // Versova Beach, Mumbai
     },
     lastUpdated: new Date(),
-    
+    status: Status.OPEN
   },
 ];
 
