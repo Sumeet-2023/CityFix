@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -10,8 +10,26 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
+import { auth, serverurl } from "../../../firebaseConfig";
+import useStore from "../../store";
+import axios from 'axios';
 
 const Home = () => {
+  const { setUserdata } = useStore();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const email = auth.currentUser.email;
+      try {
+        const res = await axios.get(`${serverurl}/user/email/${email}`);
+        setUserdata(res.data.username, email, res.data.id);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };    
+    getUser();
+  }, []);
+
   const menuItems = [
     { title: "Report Issue", icon: "report-problem", route: "/home/report/feeds" },
     { title: "Community Project", icon: "group-work", route: "/home/community/communitypages/myCommunity" },

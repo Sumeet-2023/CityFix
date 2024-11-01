@@ -47,7 +47,7 @@ const CreateIssue = () => {
   const [locationQuery, setLocationQuery] = useState('');
   const [locationSuggestions, setLocationSuggestions] = useState([]);
 
-  const user = auth.currentUser;
+  // const user = auth.currentUser;
 
   const handleChoosePhoto = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -131,8 +131,29 @@ const CreateIssue = () => {
       type: 'Point',
       coordinates: [longitude, latitude],
     });
-    setLocationQuery(''); // Clear the location query when marker is dragged
+    setLocationQuery('');
   };
+
+  const handleMapClose = async () => {
+    setShowMap(false);
+  
+    try {
+      const res = await axios.get(
+        `https://api.openrouteservice.org/geocode/reverse?api_key=${openroutekey}&point.lon=${location.coordinates[0]}&point.lat=${location.coordinates[1]}`
+      );
+  
+      const locationData = res.data.features[0].properties;
+      setLocation({
+        type: 'Point',
+        coordinates: location.coordinates,
+        country: locationData.country || '',
+        city: locationData.locality || '',
+        state: locationData.region || '',
+      });
+    } catch (error) {
+      console.error('Error fetching reverse geocode:', error.message);
+    }
+  }; 
 
   const fetchLocationSuggestions = async () => {
     if (locationQuery.trim().length === 0) {
@@ -253,7 +274,7 @@ const CreateIssue = () => {
                   Select Location
                 </Button>
                 <Text className="text-center text-gray-600">
-                  {locationQuery || `${location.coordinates[1].toFixed(4)}, ${location.coordinates[0].toFixed(4)}`}
+                  {`${location.city}, ${location.country}` || `${location.coordinates[1].toFixed(4)}, ${location.coordinates[0].toFixed(4)}`}
                 </Text>
               </Card.Content>
             </Card>
@@ -375,7 +396,7 @@ const CreateIssue = () => {
 
             <Button
               mode="contained"
-              onPress={() => setShowMap(false)}
+              onPress={handleMapClose}
               className="m-4"
             >
               Confirm Location

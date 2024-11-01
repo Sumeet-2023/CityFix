@@ -4,37 +4,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
 import { router } from 'expo-router';
-import axios from 'axios';
-import useStore from '../store';
-import { serverurl } from '../../firebaseConfig';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { userdata, setUserdata } = useStore();
 
   const handleSignIn = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      
-      // Check if email is present in Zustand store
-      if (!userdata || userdata.email !== email) {
-        const username = auth.currentUser.displayName;
-
-        // Prepare user data for POST request
-        const currentUserData = {
-          email: email,
-          username: username,
-        };
-        
-        // Await the POST request explicitly
-        const response = await axios.post(`${serverurl}/user`, currentUserData);
-        const { id } = response.data;
-        
-        // Update Zustand store with the new user data after successful POST
-        setUserdata(username, email, id);
-      }
-
       // Navigate to Home Screen after successful sign-in
       router.push('home/home');
     } catch (error) {

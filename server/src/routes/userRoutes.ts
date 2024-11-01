@@ -2,6 +2,7 @@ import { Router } from "express";
 import { 
     getUsers, 
     getUserById,
+    getUserByEmail,
     getNearbyUsers, 
     createUser, 
     updateUser, 
@@ -10,9 +11,9 @@ import {
 
 const router = Router();
 
-// Get all users
 router.get("/", getUsers);
 router.get("/:id", getUserById);
+router.get("/email/:email", getUserByEmail);
 router.get("/nearby", getNearbyUsers);
 
 router.post("/", createUser);
