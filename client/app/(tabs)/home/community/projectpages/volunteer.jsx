@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, Text,TouchableOpacity, ScrollView,Image } from 'react-native'
-import { MaterialIcons } from '@expo/vector-icons'
-import { images } from '../../../../constants'
+import { MaterialIcons } from '@expo/vector-icons';
+import { images } from '../../../../../constants';
 
 
 const Volunteers = () => {

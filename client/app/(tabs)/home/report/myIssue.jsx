@@ -78,7 +78,7 @@ const MyIssue = () => {
           style: "destructive",
           onPress: async () => {
             try {
-              await axios.delete(`https://30rm3zfj-3000.inc1.devtunnels.ms/issues/${id}`);
+              await axios.delete(`${serverurl}/issues/${id}`);
               Alert.alert("Success", "Issue deleted successfully");
               // Refresh the issues list after successful deletion
               fetchIssues();

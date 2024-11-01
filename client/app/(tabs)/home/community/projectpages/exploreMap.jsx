@@ -10,7 +10,7 @@ const FoodBankMarker = () => {
   return (
     <View>
       <Image
-        source={require('../../../../assets/icons/food-bank-icon.png')}
+        source={require('../../../../../assets/icons/food-bank-icon.png')}
         style={{ width: 30, height: 30 }}
       />
     </View>
