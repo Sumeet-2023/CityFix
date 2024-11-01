@@ -4,6 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 // import { useFocusEffect } from '@react-navigation/native';
 import { useLocalSearchParams, useFocusEffect } from 'expo-router';
+import { serverurl } from '../../../../firebaseConfig';
 
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -19,8 +20,6 @@ const formatCoordinates = (coordinates) => {
   if (!coordinates || coordinates.length !== 2) return 'Location unavailable';
   return `${coordinates[1].toFixed(4)}°N, ${coordinates[0].toFixed(4)}°W`;
 };
-
-const serverurl = process.env.EXPO_PUBLIC_SERVER_URL;
 
 const MyIssue = () => {
   const params = useLocalSearchParams();

@@ -46,9 +46,9 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
         const user = await prisma.user.create({
             data: {
                 username,
-                location,
-                firstname,
-                lastname,
+                location: location || null,
+                firstname: firstname || null,
+                lastname: lastname || null,
                 email,
                 createdAt: new Date(),
                 updatedAt: new Date()
@@ -63,34 +63,40 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
 
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
-    const {
-        username,
-        location,
-        points,
-        followerCount,
-        followingCount,
-        firstname,
-        lastname,
-        email
-    } = req.body;
+    
+    const updateData: {
+        username?: string;
+        location?: string;
+        points?: number;
+        followerCount?: number;
+        followingCount?: number;
+        firstname?: string;
+        lastname?: string;
+        email?: string;
+        updatedAt?: Date;
+    } = {};
+
+    if (req.body.username !== undefined) updateData.username = req.body.username;
+    if (req.body.location !== undefined) updateData.location = req.body.location;
+    if (req.body.points !== undefined) updateData.points = req.body.points;
+    if (req.body.followerCount !== undefined) updateData.followerCount = req.body.followerCount;
+    if (req.body.followingCount !== undefined) updateData.followingCount = req.body.followingCount;
+    if (req.body.firstname !== undefined) updateData.firstname = req.body.firstname;
+    if (req.body.lastname !== undefined) updateData.lastname = req.body.lastname;
+    if (req.body.email !== undefined) updateData.email = req.body.email;
+
+    updateData.updatedAt = new Date();
 
     try {
-        const updatedUser = await prisma.user.update({
-            where: { id },
-            data: {
-                username,
-                location,
-                points,
-                followerCount,
-                followingCount,
-                firstname,
-                lastname,
-                email,
-                updatedAt: new Date()
-            }
-        });
-
-        res.status(200).json(updatedUser);
+        if (Object.keys(updateData).length > 1) { // > 1 because updatedAt is always present
+            const updatedUser = await prisma.user.update({
+                where: { id },
+                data: updateData
+            });
+            res.status(200).json(updatedUser);
+        } else {
+            res.status(400).json({ message: "No update fields provided" });
+        }
     } catch (error: any) {
         if (error.code === 'P2025') {
             res.status(404).json({ message: "User not found" });

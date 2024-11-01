@@ -19,7 +19,7 @@ router.post("/", createIssue);
 
 // Single issue routes
 router.get("/:id", getIssueById);
-router.put("/:id", updateIssue);
+router.patch("/:id", updateIssue);
 router.delete("/:id", deleteIssue);
 
 // Filter routes

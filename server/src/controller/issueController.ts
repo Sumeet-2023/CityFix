@@ -26,7 +26,6 @@ export const createIssue = async (req: Request, res: Response): Promise<void> =>
     issueDescription,
     reportedDate,
     location,
-    lastUpdated,
   } = req.body;
 
   try {
@@ -49,7 +48,6 @@ export const createIssue = async (req: Request, res: Response): Promise<void> =>
         issueDescription,
         reportedDate,
         location,
-        lastUpdated,
       },
       include: {
         user: true,
@@ -104,19 +102,23 @@ export const updateIssue = async (req: Request, res: Response): Promise<void> =>
     location,
     status,
     lastUpdated,
+    issuePhotos
   } = req.body;
+
+  const updateData: any = {};
+  
+  if (issueTag) updateData.issueTag = issueTag;
+  if (issueName) updateData.issueName = issueName;
+  if (issueDescription) updateData.issueDescription = issueDescription;
+  if (location) updateData.location = location;
+  if (status) updateData.status = status;
+  if (lastUpdated) updateData.lastUpdated = lastUpdated;
+  if (issuePhotos) updateData.issuePhotos = { push: issuePhotos };
 
   try {
     const updatedIssue = await prisma.issue.update({
       where: { id },
-      data: {
-        issueTag,
-        issueName,
-        issueDescription,
-        location,
-        status,
-        lastUpdated,
-      },
+      data: updateData,
       include: {
         user: true,
         proposals: true,

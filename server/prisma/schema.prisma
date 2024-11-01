@@ -63,10 +63,10 @@ model Issue {
   issueNumber         Int
   issueName           String
   issueDescription    String
-  issuePhoto          String?
+  issuePhotos         String[]
   reportedDate        DateTime
   location            Json?            @db.Json
-  lastUpdated         DateTime
+  lastUpdated         DateTime         @default(now())
   status              Status           @default(OPEN)
 
   // user
