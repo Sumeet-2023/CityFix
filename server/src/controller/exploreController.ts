@@ -282,28 +282,7 @@ export const getClanAutocomplete = async (req: Request, res: Response): Promise<
 //       res.status(500).json({ message: `Error retrieving clan names: ${error.message}` });
 //     }
 // };
-
-export const getClanByName = async (req: Request, res: Response): Promise<void> => {
-    const clanName = req.query.clanName ? String(req.query.clanName) : "";
-    if (!clanName) {
-      res.status(400).json({ message: "Missing clan name in query" });
-      return;
-    }
-    try {
-      const clan = await prisma.clan.findMany({
-        where: {
-          clanName: clanName,
-        }
-      });
-      res.json(clan);
-    } catch (error: any) {
-      res
-        .status(500)
-        .json({ message: `Error retrieving clans: ${error.message}` });
-    }
-}
   
-
 export const searchAll = async (req: Request, res: Response): Promise<void> => {
 
 }

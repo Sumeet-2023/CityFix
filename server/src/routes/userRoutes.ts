@@ -1,13 +1,24 @@
 import { Router } from "express";
-import { getNearbyUsers, createUser, updateUser, getUser, deleteUser } from "../controller/userController";
+import { 
+    getUsers, 
+    getUserById,
+    getNearbyUsers, 
+    createUser, 
+    updateUser, 
+    deleteUser 
+} from "../controller/userController";
 
 const router = Router();
 
-router.get("/", getUser);
+// Get all users
+router.get("/", getUsers);
+router.get("/:id", getUserById);
+router.get("/nearby", getNearbyUsers);
 
-router.post("/nearby", getNearbyUsers);
-router.post("/create", createUser);
-router.post("/update", updateUser)
-router.post("/delete", deleteUser)
+router.post("/", createUser);
+
+router.put("/:id", updateUser);
+
+router.delete("/:id", deleteUser);
 
 export default router;
