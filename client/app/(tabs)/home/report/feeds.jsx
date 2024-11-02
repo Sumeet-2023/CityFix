@@ -96,9 +96,13 @@ const Feeds = () => {
                     <MaterialIcons name="location-on" size={16} color="#555" />
                     <Text className="ml-2 text-base text-gray-600">Location: {issue.location.city}, {issue.location.state}</Text>
                   </View>
-                  <View className="flex-row items-center">
+                  <View className="flex-row items-center mb-2">
                     <MaterialIcons name="update" size={16} color="#555" />
                     <Text className="ml-2 text-base text-gray-600">Last Updated: {new Date(issue.lastUpdated).toLocaleDateString()}</Text>
+                  </View>
+                  <View className="flex-row items-center">
+                    <MaterialIcons name="update" size={16} color="#555" />
+                    <Text className="ml-2 text-base text-gray-600">Local Authority Involment: {issue.authorityNeeds}</Text>
                   </View>
                 </View>
               </TouchableOpacity>

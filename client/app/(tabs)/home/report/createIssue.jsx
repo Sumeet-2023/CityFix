@@ -5,6 +5,7 @@ import MapView, { Marker } from 'react-native-maps';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import axios from 'axios';
+import { MaterialIcons } from "@expo/vector-icons";
 import {
   TextInput,
   Button,
@@ -46,6 +47,15 @@ const CreateIssue = () => {
   const [showGallery, setShowGallery] = useState(false);
   const [locationQuery, setLocationQuery] = useState('');
   const [locationSuggestions, setLocationSuggestions] = useState([]);
+  const [authorityNeeds, setAuthorityNeeds] = useState('Need');
+
+  const toggleAuthorityNeeds = (direction) => {
+    if (direction === 'left') {
+      setAuthorityNeeds('Need');
+    } else {
+      setAuthorityNeeds('Not needed');
+    }
+  };
 
   // const user = auth.currentUser;
 
@@ -90,6 +100,7 @@ const CreateIssue = () => {
         reportedDate: new Date().toISOString(),
         location,
         lastUpdated: new Date().toISOString(),
+        authorityNeeds,
       };
       const response = await axios.post(`${serverurl}/issues`, issueData);
       if (response.status === 201) {
@@ -205,8 +216,8 @@ const CreateIssue = () => {
 
   return (
     <PaperProvider theme={enhancedTheme}>
-      <SafeAreaView className="flex-1 bg-gray-50">
-        <ScrollView>
+      <View className="flex-1 bg-gray-50">
+  
           <View className="bg-blue-600 p-6 rounded-b-3xl shadow-lg">
             <Text className="text-3xl font-bold text-white text-center mb-2">
               Report an Issue
@@ -215,7 +226,7 @@ const CreateIssue = () => {
               Help us make your community better
             </Text>
           </View>
-
+          <ScrollView>
           <View className="px-4 pt-6">
             <Card className="mb-6 elevation-2">
               <Card.Content>
@@ -319,6 +330,32 @@ const CreateIssue = () => {
                 )}
               </Card.Content>
             </Card>
+            <Card className="mb-6 elevation-2">
+              <Card.Content>
+                <Text className="text-lg font-bold mb-4 text-gray-800">
+                  Local Authority Involvement
+                </Text>
+                <View className="flex-row justify-between items-center">
+                  <TouchableOpacity
+                    onPress={() => toggleAuthorityNeeds('left')}
+                    className="bg-gray-200 p-2 rounded-full"
+                  >
+                    <MaterialIcons name="arrow-left" size={24} color="black" />
+                  </TouchableOpacity>
+
+                  <Text className="text-xl font-bold text-blue-600 mx-4">
+                    {authorityNeeds}
+                  </Text>
+
+                  <TouchableOpacity
+                    onPress={() => toggleAuthorityNeeds('right')}
+                    className="bg-gray-200 p-2 rounded-full"
+                  >
+                    <MaterialIcons name="arrow-right" size={24} color="black" />
+                  </TouchableOpacity>
+                </View>
+              </Card.Content>
+            </Card>  
 
             <Button
               mode="contained"
@@ -405,7 +442,7 @@ const CreateIssue = () => {
         </Modal>
 
         <PhotoGalleryModal />
-      </SafeAreaView>
+      </View>
     </PaperProvider>
   );
 };

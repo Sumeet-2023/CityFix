@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, serverurl } from "../../firebaseConfig";
 import { router } from 'expo-router';
-import axios from 'axios';
+import  axios  from 'axios';
 
 const SignUp = () => {
   const [fullName, setFullName] = useState('');

@@ -21,7 +21,6 @@ export const issues = [
     issueName: "Pothole on Main Street",
     userId: johnDoeId,
     issueDescription: "A large pothole has formed near Main Street. It is causing issues for vehicles.",
-    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -31,6 +30,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -40,7 +40,6 @@ export const issues = [
     issueName: "Overflowing Trash Bin at Park",
     userId: janeSmithId,
     issueDescription: "The trash bin at the central park is overflowing. Needs immediate attention.",
-    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -50,6 +49,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -59,7 +59,6 @@ export const issues = [
     issueName: "Broken Streetlight on 5th Ave",
     userId: johnDoeId,
     issueDescription: "Streetlight on 5th Ave is broken, causing dark spots at night.",
-    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -69,6 +68,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -78,7 +78,6 @@ export const issues = [
     issueName: "Graffiti on City Hall",
     userId: janeSmithId,
     issueDescription: "Graffiti found on the walls of City Hall. Needs cleaning.",
-    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -88,6 +87,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -97,7 +97,6 @@ export const issues = [
     issueName: "Cracks on Elm Street",
     userId: johnDoeId,
     issueDescription: "Deep cracks along Elm Street are making driving difficult.",
-    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -107,6 +106,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -116,7 +116,6 @@ export const issues = [
     issueName: "Broken Bench in Riverside Park",
     userId: janeSmithId,
     issueDescription: "A broken park bench in Riverside Park is unsafe for use.",
-    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -126,6 +125,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -135,7 +135,6 @@ export const issues = [
     issueName: "Flooding on Maple Ave",
     userId: johnDoeId,
     issueDescription: "Frequent flooding on Maple Ave during rainstorms.",
-    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -145,6 +144,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -154,7 +154,6 @@ export const issues = [
     issueName: "Unsafe Playground Equipment",
     userId: janeSmithId,
     issueDescription: "The swing set in the local playground is broken and unsafe.",
-    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -164,6 +163,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -173,7 +173,6 @@ export const issues = [
     issueName: "Faulty Traffic Light on Main and 2nd",
     userId: johnDoeId,
     issueDescription: "Traffic light is stuck on red, causing a backup of vehicles.",
-    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -183,6 +182,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -202,6 +202,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -221,6 +222,7 @@ export const issues = [
       country: "India"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -240,6 +242,7 @@ export const issues = [
       country: "India"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -249,7 +252,6 @@ export const issues = [
     issueName: "Broken Streetlight near Silver Park",
     userId: janeSmithId,
     issueDescription: "Streetlight malfunction near Silver Park, making the area dark.",
-    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -259,6 +261,7 @@ export const issues = [
       country: "India"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
 ];
