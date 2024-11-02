@@ -68,7 +68,7 @@ model Issue {
   location            Json?            @db.Json
   lastUpdated         DateTime         @default(now())
   status              Status           @default(OPEN)
-
+  authorityNeeds      String
   // user
   userId              String           @db.ObjectId
   user                User             @relation("UserIssues", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)

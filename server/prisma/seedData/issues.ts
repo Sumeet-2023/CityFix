@@ -30,6 +30,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -48,6 +49,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -66,6 +68,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -84,6 +87,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -102,6 +106,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -120,6 +125,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -138,6 +144,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -156,6 +163,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -174,6 +182,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -192,6 +201,7 @@ export const issues = [
       country: "USA"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -210,6 +220,7 @@ export const issues = [
       country: "India"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -228,6 +239,7 @@ export const issues = [
       country: "India"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
   {
@@ -246,6 +258,7 @@ export const issues = [
       country: "India"
     },
     lastUpdated: new Date(),
+    authorityNeeds : "Need",
     status: Status.OPEN
   },
 ];

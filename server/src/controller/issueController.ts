@@ -72,6 +72,7 @@ export const createIssue = async (req: Request, res: Response): Promise<void> =>
     issueDescription,
     reportedDate,
     location,
+    authorityNeeds,
   } = req.body;
 
   try {
@@ -94,6 +95,7 @@ export const createIssue = async (req: Request, res: Response): Promise<void> =>
         issueDescription,
         reportedDate,
         location,
+        authorityNeeds
       },
       include: {
         user: true,
@@ -148,6 +150,7 @@ export const updateIssue = async (req: Request, res: Response): Promise<void> =>
     location,
     status,
     lastUpdated,
+    authorityNeeds,
     issuePhotos
   } = req.body;
 
@@ -159,6 +162,7 @@ export const updateIssue = async (req: Request, res: Response): Promise<void> =>
   if (location) updateData.location = location;
   if (status) updateData.status = status;
   if (lastUpdated) updateData.lastUpdated = lastUpdated;
+  if (authorityNeeds) updateData.authorityNeeds = authorityNeeds;
   if (issuePhotos) updateData.issuePhotos = { push: issuePhotos };
 
   try {
