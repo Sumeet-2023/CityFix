@@ -21,7 +21,7 @@ export const issues = [
     issueName: "Pothole on Main Street",
     userId: johnDoeId,
     issueDescription: "A large pothole has formed near Main Street. It is causing issues for vehicles.",
-    issuePhoto: null,
+    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -40,7 +40,7 @@ export const issues = [
     issueName: "Overflowing Trash Bin at Park",
     userId: janeSmithId,
     issueDescription: "The trash bin at the central park is overflowing. Needs immediate attention.",
-    issuePhoto: null,
+    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -59,7 +59,7 @@ export const issues = [
     issueName: "Broken Streetlight on 5th Ave",
     userId: johnDoeId,
     issueDescription: "Streetlight on 5th Ave is broken, causing dark spots at night.",
-    issuePhoto: null,
+    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -78,7 +78,7 @@ export const issues = [
     issueName: "Graffiti on City Hall",
     userId: janeSmithId,
     issueDescription: "Graffiti found on the walls of City Hall. Needs cleaning.",
-    issuePhoto: null,
+    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -97,7 +97,7 @@ export const issues = [
     issueName: "Cracks on Elm Street",
     userId: johnDoeId,
     issueDescription: "Deep cracks along Elm Street are making driving difficult.",
-    issuePhoto: null,
+    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -116,7 +116,7 @@ export const issues = [
     issueName: "Broken Bench in Riverside Park",
     userId: janeSmithId,
     issueDescription: "A broken park bench in Riverside Park is unsafe for use.",
-    issuePhoto: null,
+    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -135,7 +135,7 @@ export const issues = [
     issueName: "Flooding on Maple Ave",
     userId: johnDoeId,
     issueDescription: "Frequent flooding on Maple Ave during rainstorms.",
-    issuePhoto: null,
+    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -154,7 +154,7 @@ export const issues = [
     issueName: "Unsafe Playground Equipment",
     userId: janeSmithId,
     issueDescription: "The swing set in the local playground is broken and unsafe.",
-    issuePhoto: null,
+    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -173,7 +173,7 @@ export const issues = [
     issueName: "Faulty Traffic Light on Main and 2nd",
     userId: johnDoeId,
     issueDescription: "Traffic light is stuck on red, causing a backup of vehicles.",
-    issuePhoto: null,
+    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -192,7 +192,7 @@ export const issues = [
     issueName: "Cracked Sidewalk on 3rd St",
     userId: janeSmithId,
     issueDescription: "The sidewalk on 3rd St is heavily cracked and unsafe for pedestrians.",
-    issuePhoto: null,
+    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -211,7 +211,7 @@ export const issues = [
     issueName: "Pothole near Maxus Mall",
     userId: janeSmithId,
     issueDescription: "Large pothole near Maxus Mall entrance, affecting traffic flow.",
-    issuePhoto: null,
+    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -230,7 +230,7 @@ export const issues = [
     issueName: "Overflowing Trash Bin near Mira Road Station",
     userId: johnDoeId,
     issueDescription: "Overflowing trash bin near Mira Road railway station, causing foul smell.",
-    issuePhoto: null,
+    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -249,7 +249,7 @@ export const issues = [
     issueName: "Broken Streetlight near Silver Park",
     userId: janeSmithId,
     issueDescription: "Streetlight malfunction near Silver Park, making the area dark.",
-    issuePhoto: null,
+    
     reportedDate: new Date(),
     location: {
       type: "Point",

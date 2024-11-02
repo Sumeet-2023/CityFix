@@ -95,6 +95,43 @@ export const createCommunity = async (req: Request, res: Response): Promise<void
   }
 };
 
+export const patchCommunity = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params; // Community ID from route params
+  const { communityName, description, location, communityPhotos } = req.body; // Fields to update
+
+  try {
+    // Check if community exists
+    const community = await prisma.community.findUnique({
+      where: { id },
+    });
+
+    if (!community) {
+      res.status(404).json({ message: "Community not found." });
+      return;
+    }
+
+    // Perform partial update on allowed fields
+    const updatedCommunity = await prisma.community.update({
+      where: { id },
+      data: {
+        communityName: communityName || community.communityName,
+        description: description || community.description,
+        location: location || community.location,
+        communityPhotos: communityPhotos || community.communityPhotos,
+      },
+    });
+
+    res.status(200).json({
+      message: "Community updated successfully.",
+      community: updatedCommunity,
+    });
+  } catch (error: any) {
+    console.error("Error updating community:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+
 export const getCommunities = async (req: Request, res: Response): Promise<void> => {
   try {
     const communities = await prisma.community.findMany();
