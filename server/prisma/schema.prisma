@@ -83,11 +83,14 @@ model ResolutionProposal {
   id                  String           @id @default(auto()) @map("_id") @db.ObjectId
   proposalDescription String
   proposedDate        DateTime         @default(now())
+  expectedOutcome String?
   resolverType        ResolverType
 
   // Proposal resolver can be either a user or a community
   userId              String?          @db.ObjectId
   user                User?            @relation("UserProposals", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  status              ResolutionStatus @default(PENDING)
 
   communityId         String?          @db.ObjectId
   community           Community?       @relation("CommunityProposals", fields: [communityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -340,6 +343,7 @@ enum communityCreatorType {
 
 enum Status {
   OPEN
+  RESOLVED
   CLOSED
   IN_PROGRESS
 }
@@ -355,6 +359,11 @@ enum EventStatus {
   SCHEDULED
   ONGOING
   COMPLETED
+}
+
+enum ResolutionStatus {
+  ACCEPTED
+  PENDING
 }
 
 enum FundingType {

@@ -17,6 +17,52 @@ export const getIssues = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: `Error retrieving issues: ${error.message}` });
   }
 };
+export const getFilteredIssues = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { status, userId, tags } = req.query;
+
+    const whereCondition: any = {
+      status: {
+        not: 'CLOSED', // Default condition to exclude CLOSED issues
+      },
+    };
+
+    // Adjust the status filter to allow for multiple values
+    if (status) {
+      // If the status is a string, convert it to an array for uniformity
+      const statusArray = Array.isArray(status) ? status : [status];
+      whereCondition.status = {
+        in: statusArray,
+      };
+    }
+
+    if (userId) {
+      whereCondition.userId = userId;
+    }
+    if (tags) {
+      whereCondition.tags = {
+        some: {
+          name: {
+            in: Array.isArray(tags) ? tags : [tags],
+          },
+        },
+      };
+    }
+
+    const issues = await prisma.issue.findMany({
+      where: whereCondition,
+      include: {
+        user: true,
+        proposals: true,
+        resolution: true,
+      },
+    });
+
+    res.json(issues);
+  } catch (error: any) {
+    res.status(500).json({ message: `Error retrieving issues: ${error.message}` });
+  }
+};
 
 export const createIssue = async (req: Request, res: Response): Promise<void> => {
   const {
@@ -156,6 +202,11 @@ export const getIssuesByUser = async (req: Request, res: Response): Promise<void
         user: true,
         proposals: true,
         resolution: true,
+        _count: {
+          select: {
+            proposals: true
+          }
+        }
       },
       orderBy: {
         reportedDate: 'desc',
@@ -189,6 +240,34 @@ export const getIssuesByStatus = async (req: Request, res: Response): Promise<vo
     res.status(500).json({ message: `Error retrieving issues by status: ${error.message}` });
   }
 };
+
+export const getIssueProposals = async (req: Request, res: Response): Promise<void> => {
+  const {id} = req.params;
+  try {
+      const proposal = await prisma.resolutionProposal.findMany({
+        where: {
+          issueId: id
+        }  
+      })
+      res.json(proposal);
+  } catch (error: any) {
+    res.status(500).json({message: `Error retreiving issue proposals: ${error.message}`});
+  }
+}
+
+export const getIssueProposalsCount = async (req: Request, res: Response): Promise<void> => {
+  const {id} = req.params;
+  try {
+    const count = await prisma.resolutionProposal.count({
+      where: {
+        issueId: id
+      }
+    })
+    res.json(count);
+  } catch (error: any) {
+    res.status(500).json({message: `Error retrieving count of proposals: ${error.message}`});
+  }
+}
 
 export const addProposalToIssue = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;

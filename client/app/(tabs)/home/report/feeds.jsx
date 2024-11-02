@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, RefreshControl } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import useStore from '../../../store';
@@ -11,25 +11,35 @@ const Feeds = () => {
   const [searchIssue, setSearchIssue] = useState('');
   const [issuesData, setIssuesData] = useState([]);
   const [filteredReports, setFilteredReports] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchIssues = async () => {
     try {
-      const response = await axios.get(`${serverurl}/issues`);
-      setIssuesData(response.data); // Store the fetched issues data
-      setFilteredReports(response.data); // Initialize filtered reports with fetched data
+      const response = await axios.get(`${serverurl}/issues/filter/condition?status=OPEN`);
+      setIssuesData(response.data);
+      setFilteredReports(response.data);
     } catch (error) {
       console.error("Error fetching issues:", error);
     }
   };
 
   useEffect(() => {
-    fetchIssues()
+    fetchIssues();
+  }, []);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await fetchIssues();
+    } finally {
+      setRefreshing(false);
+    }
   }, []);
 
   const handleSearchIssue = (reports) => {
     setSearchIssue(reports);
     if (reports.trim() === '') {
-      setFilteredReports(issuesData); // Reset to all issues if search input is empty
+      setFilteredReports(issuesData);
     } else {
       const filtered = issuesData.filter((issue) => 
         issue.id.toString().toLowerCase().includes(reports.toLowerCase()) ||
@@ -54,7 +64,16 @@ const Feeds = () => {
         placeholderTextColor="#999"
       />
       
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#4F46E5"]} // Change this color to match your app's theme
+            tintColor="#4F46E5"  // For iOS
+          />
+        }
+      >
         <View className="flex-1 px-5 py-3">
           {filteredReports.length > 0 ? (
             filteredReports.map((issue) => (
