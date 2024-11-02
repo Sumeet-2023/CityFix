@@ -160,7 +160,7 @@ export const getNearbyAll = async (req: Request, res: Response): Promise<void> =
         // Convert radius from kilometers to radians (required by MongoDB)
         // MongoDB's $centerSphere expects radius in radians
         // To convert km to radians, divide by Earth's radius (6371 km)
-        const radiusInRadians = radius / 6371000;
+        const radiusInRadians = radius / 6371;
 
         const [issues, clan, communities] = await Promise.all([
             prisma.issue.findRaw({

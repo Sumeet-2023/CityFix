@@ -10,7 +10,10 @@ export const users = [
     email: "john.doe@example.com",
     location: {
       type: "Point",
-      coordinates: [-74.0060, 40.7128]
+      coordinates: [-74.0060, 40.7128], // New York City
+      city: "New York City",
+      state: "New York",
+      country: "USA"
     },
     followerCount: 100,
     followingCount: 150,
@@ -24,7 +27,10 @@ export const users = [
     email: "jane.smith@example.com",
     location: {
       type: "Point",
-      coordinates: [-118.2437, 34.0522]
+      coordinates: [-118.2437, 34.0522], // Los Angeles
+      city: "Los Angeles",
+      state: "California",
+      country: "USA"
     },
     followerCount: 50,
     followingCount: 75,
@@ -38,7 +44,10 @@ export const users = [
     email: "alice.jones@example.com",
     location: {
       type: "Point",
-      coordinates: [-87.6298, 41.8781]
+      coordinates: [-87.6298, 41.8781], // Chicago
+      city: "Chicago",
+      state: "Illinois",
+      country: "USA"
     },
     followerCount: 200,
     followingCount: 180,
@@ -52,7 +61,10 @@ export const users = [
     email: "bob.brown@example.com",
     location: {
       type: "Point",
-      coordinates: [-95.3698, 29.7604]
+      coordinates: [-95.3698, 29.7604], // Houston
+      city: "Houston",
+      state: "Texas",
+      country: "USA"
     },
     followerCount: 80,
     followingCount: 90,
@@ -66,7 +78,10 @@ export const users = [
     email: "carol.white@example.com",
     location: {
       type: "Point",
-      coordinates: [-112.074, 33.4484]
+      coordinates: [-112.074, 33.4484], // Phoenix
+      city: "Phoenix",
+      state: "Arizona",
+      country: "USA"
     },
     followerCount: 60,
     followingCount: 70,
@@ -80,7 +95,10 @@ export const users = [
     email: "david.green@example.com",
     location: {
       type: "Point",
-      coordinates: [-75.1652, 39.9526]
+      coordinates: [-75.1652, 39.9526], // Philadelphia
+      city: "Philadelphia",
+      state: "Pennsylvania",
+      country: "USA"
     },
     followerCount: 95,
     followingCount: 110,
@@ -94,7 +112,10 @@ export const users = [
     email: "emily.young@example.com",
     location: {
       type: "Point",
-      coordinates: [-98.4936, 29.4241]
+      coordinates: [-98.4936, 29.4241], // San Antonio
+      city: "San Antonio",
+      state: "Texas",
+      country: "USA"
     },
     followerCount: 150,
     followingCount: 140,
@@ -108,7 +129,10 @@ export const users = [
     email: "frank.johnson@example.com",
     location: {
       type: "Point",
-      coordinates: [-122.3321, 47.6062]
+      coordinates: [-122.3321, 47.6062], // Seattle
+      city: "Seattle",
+      state: "Washington",
+      country: "USA"
     },
     followerCount: 120,
     followingCount: 130,
@@ -122,7 +146,10 @@ export const users = [
     email: "grace.davis@example.com",
     location: {
       type: "Point",
-      coordinates: [-104.9903, 39.7392]
+      coordinates: [-104.9903, 39.7392], // Denver
+      city: "Denver",
+      state: "Colorado",
+      country: "USA"
     },
     followerCount: 90,
     followingCount: 100,
@@ -136,7 +163,10 @@ export const users = [
     email: "henry.wilson@example.com",
     location: {
       type: "Point",
-      coordinates: [-80.1918, 25.7617]
+      coordinates: [-80.1918, 25.7617], // Miami
+      city: "Miami",
+      state: "Florida",
+      country: "USA"
     },
     followerCount: 140,
     followingCount: 160,

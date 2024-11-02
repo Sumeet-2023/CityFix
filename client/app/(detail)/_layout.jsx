@@ -22,9 +22,8 @@ const DetailLayout = () => {
           headerTitleStyle: { fontSize: 18, fontWeight: '600', color: 'black' },
         }}
       />
-
       <Stack.Screen 
-        name="issue-details" 
+        name="issue/[id]" 
         options={{
           headerShown: true,
           title: 'Issue Details',
@@ -38,6 +37,7 @@ const DetailLayout = () => {
           headerTitleStyle: { fontSize: 18, fontWeight: '600', color: 'black' },
         }}
       />
+
       <Stack.Screen 
         name="ngo-details" 
         options={{

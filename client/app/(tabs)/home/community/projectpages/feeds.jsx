@@ -1,6 +1,6 @@
 import React,{useState} from 'react';
 import { View, Text, TouchableOpacity, Image, FlatList,ScrollView, TextInput } from 'react-native';
-import { auth } from '../../../../firebaseConfig';
+import { auth } from '../../../../../firebaseConfig';
 import { router } from 'expo-router';
 
 

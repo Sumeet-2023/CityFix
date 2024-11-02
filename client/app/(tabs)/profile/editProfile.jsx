@@ -23,7 +23,6 @@ const EditProfile = () => {
     if (user) {
       setDisplayName(user.displayName || '');
       setPhoto(user.photoURL);
-      // You might want to fetch profession and location from a separate user profile document in Firestore
     }
   }, [user]);
 

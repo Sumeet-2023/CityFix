@@ -28,6 +28,11 @@ const SignUp = () => {
       });
 
       console.log('User profile updated with name:', fullName);
+      const currentUserData = {
+        email: email,
+        username: fullName
+      }
+      await axios.post(`${serverurl}/user`, currentUserData);
 
       // Navigate to Home Screen after successful signup
       router.push('/home/home');

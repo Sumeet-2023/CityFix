@@ -6,27 +6,32 @@ if (typeof window !== "undefined") {
 }
 
 import { initializeAuth } from "firebase/auth";
-//@ts-ignore
 import { getReactNativePersistence } from '@firebase/auth/dist/rn/index.js'; 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const apiKey = process.env.EXPO_PUBLIC_FIREBASE_API_KEY
-const authDomain = process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN
-const projectId = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID
-const storageBucket = process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET
-const messagingSenderId = process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
-const appId = process.env.EXPO_PUBLIC_FIREBASE_APP_ID
-const measurementId = process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID
+// Environment variables for Firebase configuration
+const {
+  EXPO_PUBLIC_FIREBASE_API_KEY: apiKey,
+  EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN: authDomain,
+  EXPO_PUBLIC_FIREBASE_PROJECT_ID: projectId,
+  EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET: storageBucket,
+  EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: messagingSenderId,
+  EXPO_PUBLIC_FIREBASE_APP_ID: appId,
+  EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID: measurementId,
+} = process.env;
+
+export const openroutekey = process.env.EXPO_PUBLIC_OPEN_ROUTER_API_KEY;
+export const serverurl = process.env.EXPO_PUBLIC_SERVER_URL;
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: apiKey,
-  authDomain: authDomain,
-  projectId: projectId,
-  storageBucket: storageBucket,
-  messagingSenderId: messagingSenderId,
-  appId: appId,
-  measurementId: measurementId
+  apiKey,
+  authDomain,
+  projectId,
+  storageBucket,
+  messagingSenderId,
+  appId,
+  measurementId,
 };
 
 // Initialize Firebase
@@ -37,20 +42,21 @@ const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
 });
 
-// Conditionally initialize Analytics
 let analytics;
 if (getAnalytics) {
-  const { isSupported } = require("firebase/analytics"); // Ensure this is imported when using in a web environment
+  const { isSupported } = require("firebase/analytics");
 
-  isSupported().then((supported) => {
-    if (supported) {
-      analytics = getAnalytics(app);
-    } else {
-      console.warn("Firebase Analytics is not supported in this environment.");
-    }
-  }).catch((error) => {
-    console.error("Error checking analytics support:", error);
-  });
+  isSupported()
+    .then((supported) => {
+      if (supported) {
+        analytics = getAnalytics(app);
+      } else {
+        console.warn("Firebase Analytics is not supported in this environment.");
+      }
+    })
+    .catch((error) => {
+      console.error("Error checking analytics support:", error);
+    });
 }
 
 export { auth, analytics };
