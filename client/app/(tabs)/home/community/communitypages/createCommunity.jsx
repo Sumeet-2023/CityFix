@@ -1,12 +1,17 @@
 import React,{useState} from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text,Image, TextInput, TouchableOpacity,Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import axios from 'axios';
+import useStore from '../../../../store';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { auth, openroutekey, serverurl } from '../../../../../firebaseConfig';
 
 const CreateCommunity = () => {
+  const { userdata } = useStore();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState([]);
 
   const handleChoosePhoto = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -17,12 +22,58 @@ const CreateCommunity = () => {
     });
 
     if (!result.canceled) {
-      setImage(result.uri);
+      setImage([...image,result.assets[0].uri]);
     }
   };
+  // const handleRemovePhoto = () => {
+  //   const newImages = [...image];
+  //   newImages.splice(index, 1);
+  //   setImage(newImages);
+  // }
+
+  const uploadImage = async(uri,userId) => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const storage = getStorage();
+
+    const photoId = Date.now();
+    const storageRef = ref(storage, `issuePhotos/${userId}/${photoId}_${uri.split('/').pop()}`);
+
+    
+    await uploadBytes(storageRef, blob);
+    return await getDownloadURL(storageRef);
+  }
 
   const handleSubmit = async () => {
+    try{
+      const createCommunityData = {
+        creatorId: userdata.id,
+        ngoId:'null',
+        name,
+        description,
+        location,
+        creatorType:"User",
+      };
+      const response = await axios.post(`${serverurl}/community`, createCommunityData);
+      if(response.status === 201){
+        const imageUploadPromises = image.map(uploadImage);
+        const imageUrls = await Promise.all(imageUploadPromises);
 
+        createCommunityData.imageUrls = imageUrls;
+        router.push({
+          pathname: 'home/selectCommunity/myCommunity',
+          params: {
+            update: 'true'
+          }
+        });
+        console.log("Community created successfully:",response.data);
+      }else{
+        console.log("Failed to create community:", response.data.message);
+      }
+    }catch(error){
+      console.error("Falied to create a community:",error.message);
+      Alert.alert("Error, Failed to create a community");
+    }
  
   };
 
@@ -63,11 +114,18 @@ const CreateCommunity = () => {
         <Text className="text-white text-center">Choose Photo</Text>
       </TouchableOpacity>
 
-      {image && (
+      {image.length > 0 && (
         <View className="mb-4">
-          <Image source={{ uri: image }} style={{ width: '100%', height: 200, borderRadius: 10 }} />
+          {image.map((uri, index) => (
+            <Image 
+              key={index}  // Use a unique key for each image
+              source={{ uri }}  // Use the correct variable 'uri'
+              style={{ width: '100%', height: 200, borderRadius: 10 }} 
+            />
+          ))}
         </View>
       )}
+
 
       <TouchableOpacity
         className="bg-green-600 rounded py-3"
