@@ -236,7 +236,7 @@ const MyIssue = () => {
   
   const handleAcceptProposal = async (proposal) => {
     try {
-      const response = await axios.post(`${serverurl}/proposals/${proposal.id}/accept`, {
+      const response = await axios.post(`${serverurl}/issues/proposals/accept/${proposal.id}`, {
         description: proposal.proposalDescription,
         resolverType: proposal.resolverType,
         userId: userdata.id,

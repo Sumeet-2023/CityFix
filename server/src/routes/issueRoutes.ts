@@ -31,11 +31,11 @@ router.get("/user/:userId", getIssuesByUser);
 router.get("/status/:status", getIssuesByStatus);
 
 // Issue resolution routes
-router.get("/:id/proposals", getIssueProposals);
-router.get("/:id/proposalcount", getIssueProposalsCount);
-router.post("/:id/proposals", addProposalToIssue);
+router.get("/proposals/:id", getIssueProposals);
+router.get("/proposalcount/:id", getIssueProposalsCount);
+router.post("/proposals/:id", addProposalToIssue);
 // Update the route for accepting a proposal resolution
-router.post("/proposals/:proposalId/accept", acceptResolution);
+router.post("/proposals/accept/:proposalId", acceptResolution);
 
 
 export default router;
