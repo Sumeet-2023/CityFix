@@ -127,6 +127,11 @@ export const getIssueById = async (req: Request, res: Response): Promise<void> =
             community: true,
           },
         },
+        comments: { // Include comments here
+          include: {
+            user: true, // Optionally include user information for comments
+          },
+        },
       },
     });
 
@@ -344,5 +349,49 @@ export const acceptResolution = async (req: Request, res: Response): Promise<voi
     res.status(201).json(resolution);
   } catch (error: any) {
     res.status(500).json({ message: `Error accepting resolution: ${error.message}` });
+  }
+};
+
+
+
+export const postComment = async (req: Request, res: Response): Promise<void> => {
+  const { issueId } = req.params; // The ID of the issue from the request parameters
+  const { content, userId } = req.body; // Comment content and user ID from the request body
+
+  try {
+    // Create a new comment in the database
+    const comment = await prisma.comment.create({
+      data: {
+        content,
+        issue: {
+          connect: { id: issueId } // Connect the comment to the specified issue
+        },
+        user: {
+          connect: { id: userId } // Connect the comment to the user (optional)
+        }
+      }
+    });
+
+    res.status(201).json(comment); // Respond with the created comment
+  } catch (error: any) {
+    res.status(500).json({ message: `Error posting comment: ${error.message}` });
+  }
+};
+
+// Handler to fetch comments for a specific issue
+export const getCommentsByIssue = async (req: Request, res: Response): Promise<void> => {
+  const { issueId } = req.params; // The ID of the issue from the request parameters
+
+  try {
+    // Fetch comments associated with the specified issue
+    const comments = await prisma.comment.findMany({
+      where: { issueId: issueId }, // Filter by the issue ID
+      include: { user: true }, // Optionally include user information
+      orderBy: { createdAt: 'desc' }, // Order comments by creation date
+    });
+
+    res.json(comments); // Respond with the list of comments
+  } catch (error: any) {
+    res.status(500).json({ message: `Error fetching comments: ${error.message}` });
   }
 };

@@ -20,7 +20,8 @@ model User {
 
   // issue
   issuesCreated       Issue[]          @relation("UserIssues")
-
+  //comments
+  comments  Comment[]  @relation("UserComments")
   // projects
   projectsCreated     Project[]
   projectsJoined      UserProject[]
@@ -74,9 +75,24 @@ model Issue {
   user                User             @relation("UserIssues", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   
   resolution          AcceptedIssueResolution?
-
+  // Correct relation to comments
+  comments            Comment[]              @relation("IssueComments")
   // proposed resolution
   proposals           ResolutionProposal[]
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  createdAt DateTime @default(now())
+
+  // Relationship to Issue
+  issueId   String   @db.ObjectId
+  issue     Issue    @relation("IssueComments", fields: [issueId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  
+   // Optional user reference
+  userId    String?  @db.ObjectId
+  user      User?    @relation("UserComments", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model ResolutionProposal {

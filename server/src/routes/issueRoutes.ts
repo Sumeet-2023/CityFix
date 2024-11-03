@@ -12,6 +12,8 @@ import {
   getFilteredIssues,
   getIssueProposals,
   getIssueProposalsCount,
+  postComment,
+  getCommentsByIssue,
 } from "../controller/issueController";
 
 const router = Router();
@@ -35,5 +37,9 @@ router.get("/:id/proposals", getIssueProposals);
 router.get("/:id/proposalcount", getIssueProposalsCount);
 router.post("/:id/proposals", addProposalToIssue);
 router.post("/:id/resolve", acceptResolution);
+
+// Issue comment route
+router.get('/:issueId/comments', getCommentsByIssue);
+router.post("/:issueId/comments", postComment);
 
 export default router;

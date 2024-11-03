@@ -20,6 +20,7 @@ const Home = () => {
   useEffect(() => {
     const getUser = async () => {
       const email = auth.currentUser.email;
+      console.log(`${serverurl}/user/email/${email}`)
       try {
         const res = await axios.get(`${serverurl}/user/email/${email}`);
         setUserdata(res.data.username, email, res.data.id);
