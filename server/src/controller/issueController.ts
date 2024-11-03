@@ -335,7 +335,7 @@ export const acceptResolution = async (req: Request, res: Response): Promise<voi
     }
 
     // Retrieve the issue ID from the proposal
-    const { issueId } = proposal;
+    const issueId = proposal.issueId;
 
     // Check if the issue exists
     const existingIssue = await prisma.issue.findUnique({
@@ -354,7 +354,7 @@ export const acceptResolution = async (req: Request, res: Response): Promise<voi
     });
 
     if (!existingUser) {
-      res.status(404).json({ message: "User not found." });
+      res.status(404).json({ message: "User not found." }); 
       return;
     }
 
