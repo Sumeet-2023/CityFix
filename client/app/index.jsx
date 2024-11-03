@@ -1,3 +1,4 @@
+import "react-native-gesture-handler";
 import React, { useEffect, useState } from 'react';
 import { Text, View, TouchableOpacity, ImageBackground, StatusBar } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';

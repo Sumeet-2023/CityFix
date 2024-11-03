@@ -72,6 +72,7 @@ export const createIssue = async (req: Request, res: Response): Promise<void> =>
     issueDescription,
     reportedDate,
     location,
+    authorityNeeds,
     issuePhotos
   } = req.body;
 
@@ -95,6 +96,7 @@ export const createIssue = async (req: Request, res: Response): Promise<void> =>
         issueDescription,
         reportedDate,
         location,
+        authorityNeeds,
         issuePhotos: issuePhotos || null
       },
       include: {
