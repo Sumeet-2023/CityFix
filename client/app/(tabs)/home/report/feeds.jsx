@@ -20,7 +20,7 @@ const Feeds = () => {
 
   const fetchIssues = async () => {
     try {
-      const response = await axios.get(`${serverurl}/issues/filter/condition?status=OPEN`);
+      const response = await axios.get(`${serverurl}/issues/filter/condition?status=OPEN&status=IN_PROGRESS`);
       setIssuesData(response.data);
       setFilteredReports(response.data);
     } catch (error) {
@@ -89,7 +89,7 @@ const Feeds = () => {
         userId: userdata.id,  // Use the logged-in user's ID
       };
   
-      const response = await axios.post(`${serverurl}/issues/${selectedIssue.id}/proposals`, proposalData);
+      const response = await axios.post(`${serverurl}/issues/proposals/${selectedIssue.id}`, proposalData);
       if (response.status === 201) {
         Alert.alert("Success", "Proposal Submitted!");
         setShowModal(false);

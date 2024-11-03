@@ -223,7 +223,7 @@ const MyIssue = () => {
   const handleViewProposals = async (issueId) => {
     try {
       // Fetch the proposals for the selected issue using the issue ID
-      const response = await axios.get(`${serverurl}/issues/${issueId}/proposals`);
+      const response = await axios.get(`${serverurl}/issues/proposals/${issueId}`);
       const proposals = response.data;
       
       setSelectedProposals(proposals);
@@ -243,15 +243,56 @@ const MyIssue = () => {
       });
   
       if (response.status === 201) {
-        Alert.alert("Success", "Issue has been resolved successfully");
-        // Optionally, refetch issues to update the UI
-        fetchIssues();
+        Alert.alert('Success', 'Proposal accepted successfully');
+
+        // Remove the accepted issue from the list of myIssues
+        setMyIssues((prevIssues) =>
+          prevIssues.filter((issue) => issue.id !== proposal.issueId)
+        );
+
+        // Close the modal after acceptance
+        setModalVisible(false);
       }
     } catch (error) {
       console.error('Error accepting proposal:', error);
       Alert.alert('Error', 'Failed to accept the proposal');
     }
   };  
+
+  const handleDenyProposal = async (proposal) => {
+    Alert.alert(
+      "Deny Proposal",
+      "Are you sure you want to deny this proposal?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Deny",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              // Send delete request to the server to delete the proposal
+              const response = await axios.delete(`${serverurl}/issues/proposals/${proposal.id}`);
+              
+              if (response.status === 200) {
+                Alert.alert("Success", "Proposal denied successfully.");
+                
+                // Refresh the proposals list to reflect the changes
+                fetchIssues(); // Re-fetch issues to see the updated list of proposals and status
+                setModalVisible(false);
+              }
+            } catch (error) {
+              console.error("Error denying proposal:", error);
+              Alert.alert("Error", "Failed to deny the proposal.");
+            }
+          },
+        },
+      ]
+    );
+  };
+  
   
   const handleEdit = (id) => {
     console.log(`Edit issue with ID: ${id}`);
@@ -380,17 +421,11 @@ const MyIssue = () => {
                       </View>
                     </TouchableOpacity>
   
-                    <TouchableOpacity
-                      className="flex-1 bg-red-500 rounded-lg ml-2 overflow-hidden"
-                      onPress={() => {
-                        // Placeholder action for deny button
-                        Alert.alert("Proposal Denied", "You have denied this proposal.");
-                      }}
+                    <TouchableOpacity 
+                      onPress={() => handleDenyProposal(proposal)}
+                      className="bg-red-500 rounded-lg px-4 py-2"
                     >
-                      <View className="px-4 py-3 flex-row items-center justify-center">
-                        <MaterialIcons name="cancel" size={18} color="white" />
-                        <Text className="ml-2 font-medium text-white">Deny</Text>
-                      </View>
+                      <Text className="text-white font-semibold">Deny</Text>
                     </TouchableOpacity>
                   </View>
                 </View>

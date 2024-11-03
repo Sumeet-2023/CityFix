@@ -12,6 +12,7 @@ import {
   getFilteredIssues,
   getIssueProposals,
   getIssueProposalsCount,
+  deleteProposal
 } from "../controller/issueController";
 
 const router = Router();
@@ -36,6 +37,7 @@ router.get("/proposalcount/:id", getIssueProposalsCount);
 router.post("/proposals/:id", addProposalToIssue);
 // Update the route for accepting a proposal resolution
 router.post("/proposals/accept/:proposalId", acceptResolution);
-
+// Delete proposal route
+router.delete("/proposals/:proposalId", deleteProposal);
 
 export default router;

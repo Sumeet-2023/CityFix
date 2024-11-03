@@ -23,7 +23,7 @@ export const getFilteredIssues = async (req: Request, res: Response): Promise<vo
 
     const whereCondition: any = {
       status: {
-        not: 'CLOSED', // Default condition to exclude CLOSED issues
+        not: 'DENIED', // Default condition to exclude CLOSED issues
       },
     };
 
@@ -302,11 +302,43 @@ export const addProposalToIssue = async (req: Request, res: Response): Promise<v
       },
     });
 
+    await prisma.issue.update({
+      where: { id },
+      data: { status: Status.IN_PROGRESS },
+    });
+
     res.status(201).json(proposal);
   } catch (error: any) {
     res.status(500).json({ message: `Error adding proposal: ${error.message}` });
   }
 };
+
+export const deleteProposal = async (req: Request, res: Response): Promise<void> => {
+  const { proposalId } = req.params;
+
+  try {
+    // Check if the proposal exists
+    const existingProposal = await prisma.resolutionProposal.findUnique({
+      where: { id: proposalId },
+    });
+
+    if (!existingProposal) {
+      res.status(404).json({ message: "Proposal not found." });
+      return;
+    }
+
+    // Delete the proposal
+    await prisma.resolutionProposal.delete({
+      where: { id: proposalId },
+    });
+
+    res.status(200).json({ message: "Proposal deleted successfully." });
+  } catch (error: any) {
+    console.error("Error deleting proposal:", error);
+    res.status(500).json({ message: `Error deleting proposal: ${error.message}` });
+  }
+};
+
 
 export const acceptResolution = async (req: Request, res: Response): Promise<void> => {
   const { proposalId } = req.params; // Use `proposalId` to identify the proposal
