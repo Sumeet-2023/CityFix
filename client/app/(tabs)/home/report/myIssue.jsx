@@ -124,7 +124,7 @@ const IssueCard = ({ issue, onViewProposals, onEdit, onDelete }) => {
         <View className="flex-col space-y-2">
           {/* Proposals Button */}
           <TouchableOpacity 
-            onPress={() => onViewProposals(issue.proposals, issue.user)}
+            onPress={() => onViewProposals(issue.id)}
             className="bg-gray-100 rounded-lg overflow-hidden"
           >
             <View className="px-4 py-3 flex-row items-center justify-center">
@@ -220,12 +220,80 @@ const MyIssue = () => {
     }, [params.update])
   );
 
-  const handleViewProposals = (proposals, userdata) => {
-    setSelectedProposals(proposals);
-    setProposalUser(userdata);
-    setModalVisible(true);
+  const handleViewProposals = async (issueId) => {
+    try {
+      // Fetch the proposals for the selected issue using the issue ID
+      const response = await axios.get(`${serverurl}/issues/proposals/${issueId}`);
+      const proposals = response.data;
+      
+      setSelectedProposals(proposals);
+      setModalVisible(true);
+    } catch (error) {
+      console.error('Error fetching proposals:', error);
+      Alert.alert('Error', 'Failed to fetch proposals for the issue');
+    }
   };
+  
+  const handleAcceptProposal = async (proposal) => {
+    try {
+      const response = await axios.post(`${serverurl}/issues/proposals/accept/${proposal.id}`, {
+        description: proposal.proposalDescription,
+        resolverType: proposal.resolverType,
+        userId: userdata.id,
+      });
+  
+      if (response.status === 201) {
+        Alert.alert('Success', 'Proposal accepted successfully');
 
+        // Remove the accepted issue from the list of myIssues
+        setMyIssues((prevIssues) =>
+          prevIssues.filter((issue) => issue.id !== proposal.issueId)
+        );
+
+        // Close the modal after acceptance
+        setModalVisible(false);
+      }
+    } catch (error) {
+      console.error('Error accepting proposal:', error);
+      Alert.alert('Error', 'Failed to accept the proposal');
+    }
+  };  
+
+  const handleDenyProposal = async (proposal) => {
+    Alert.alert(
+      "Deny Proposal",
+      "Are you sure you want to deny this proposal?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Deny",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              // Send delete request to the server to delete the proposal
+              const response = await axios.delete(`${serverurl}/issues/proposals/${proposal.id}`);
+              
+              if (response.status === 200) {
+                Alert.alert("Success", "Proposal denied successfully.");
+                
+                // Refresh the proposals list to reflect the changes
+                fetchIssues(); // Re-fetch issues to see the updated list of proposals and status
+                setModalVisible(false);
+              }
+            } catch (error) {
+              console.error("Error denying proposal:", error);
+              Alert.alert("Error", "Failed to deny the proposal.");
+            }
+          },
+        },
+      ]
+    );
+  };
+  
+  
   const handleEdit = (id) => {
     console.log(`Edit issue with ID: ${id}`);
   };
@@ -297,7 +365,7 @@ const MyIssue = () => {
                     </View>
                     <View className="ml-3">
                       <Text className="font-semibold text-gray-800">
-                        {proposalUser?.username || 'Anonymous'}
+                        {proposal.user?.username || 'Anonymous'}
                       </Text>
                       <Text className="text-xs text-gray-500">
                         Proposed on: {formatDate(proposal.proposedDate)}
@@ -314,6 +382,22 @@ const MyIssue = () => {
                       </Text>
                     </View>
                   </View>
+
+                  {/* Display Proposal Images if Available */}
+                  {proposal.images && proposal.images.length > 0 && (
+                    <View className="mt-3">
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                        {proposal.images.map((image, i) => (
+                          <Image
+                            key={i}
+                            source={{ uri: image }}
+                            style={{ width: 100, height: 100, marginRight: 10 }}
+                            className="rounded-lg"
+                          />
+                        ))}
+                      </ScrollView>
+                    </View>
+                  )}
   
                   {/* Additional Info or Tags if needed */}
                   <View className="flex-row mt-3 space-x-2">
@@ -325,6 +409,24 @@ const MyIssue = () => {
                         {proposal.status || 'Pending'}
                       </Text>
                     </View>
+                  </View>
+                  <View className="flex-row justify-between mt-4">
+                    <TouchableOpacity
+                      className="flex-1 bg-green-500 rounded-lg mr-2 overflow-hidden"
+                      onPress={() => handleAcceptProposal(proposal)}
+                    >
+                      <View className="px-4 py-3 flex-row items-center justify-center">
+                        <MaterialIcons name="check-circle" size={18} color="white" />
+                        <Text className="ml-2 font-medium text-white">Accept</Text>
+                      </View>
+                    </TouchableOpacity>
+  
+                    <TouchableOpacity 
+                      onPress={() => handleDenyProposal(proposal)}
+                      className="bg-red-500 rounded-lg px-4 py-2"
+                    >
+                      <Text className="text-white font-semibold">Deny</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
@@ -380,7 +482,7 @@ const MyIssue = () => {
           <IssueCard
             key={issue.id}
             issue={issue}
-            onViewProposals={(proposals, user) => handleViewProposals(proposals, user)}
+            onViewProposals={() => handleViewProposals(issue.id)}
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
@@ -392,7 +494,7 @@ const MyIssue = () => {
         </View>
       )}
     </ScrollView>
-  );
+  );  
 };
 
 export default MyIssue;

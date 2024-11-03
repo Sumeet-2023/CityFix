@@ -99,7 +99,6 @@ model ResolutionProposal {
   id                  String           @id @default(auto()) @map("_id") @db.ObjectId
   proposalDescription String
   proposedDate        DateTime         @default(now())
-  expectedOutcome String?
   resolverType        ResolverType
 
   // Proposal resolver can be either a user or a community
@@ -107,10 +106,6 @@ model ResolutionProposal {
   user                User?            @relation("UserProposals", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   status              ResolutionStatus @default(PENDING)
-
-  communityId         String?          @db.ObjectId
-  community           Community?       @relation("CommunityProposals", fields: [communityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
   // Related Issue
   issueId             String           @db.ObjectId
   issue               Issue            @relation(fields: [issueId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -119,16 +114,13 @@ model ResolutionProposal {
 // accepted resolution
 model AcceptedIssueResolution {
   id                  String           @id @default(auto()) @map("_id") @db.ObjectId
-  dateAccepted        DateTime         @default(now())
+  dateAccepted        DateTime?         @default(now())
   resolverType        ResolverType
   description         String
 
   // Accepted resolver details
   userId              String?          @db.ObjectId
   user                User?            @relation("UserResolutions", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  communityId         String?          @db.ObjectId
-  community           Community?       @relation(fields: [communityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   // Issue
   issueId             String           @db.ObjectId @unique
@@ -153,12 +145,6 @@ model Community {
   // ngo
   ngoId               String?          @db.ObjectId
   ngo                 Ngo?             @relation(fields: [ngoId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  
-  // issues
-  resolutionAccepted  AcceptedIssueResolution[]
-
-  // issue resolution proposals
-  proposedRes         ResolutionProposal[]  @relation("CommunityProposals")
 
   // project
   projects            Project[]
@@ -343,7 +329,7 @@ enum ModelType {
 }
 
 enum ResolverType {
-  COMMUNITY
+  AUTHORITY
   USER
 }
 
@@ -362,6 +348,7 @@ enum Status {
   RESOLVED
   CLOSED
   IN_PROGRESS
+  DENIED
 }
 
 enum ProjectStatus {
