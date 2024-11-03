@@ -118,13 +118,11 @@ export const getIssueById = async (req: Request, res: Response): Promise<void> =
         proposals: {
           include: {
             user: true,
-            community: true,
           },
         },
         resolution: {
           include: {
             user: true,
-            community: true,
           },
         },
       },
@@ -274,26 +272,30 @@ export const getIssueProposalsCount = async (req: Request, res: Response): Promi
 }
 
 export const addProposalToIssue = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
+  const { id } = req.params; // `id` represents the issue ID
   const { 
     proposalDescription, 
-    resolverType,
-    userId,
-    communityId 
+    resolverType, // AUTHORITY or USER
+    userId
   } = req.body;
 
   try {
+    // Validate that `userId` is provided
+    if (!userId) {
+      res.status(400).json({ message: "userId must be provided." });
+      return;
+    }
+
+    // Create a new proposal linked to the issue
     const proposal = await prisma.resolutionProposal.create({
       data: {
         proposalDescription,
         resolverType,
         userId,
-        communityId,
-        issueId: id,
+        issueId: id, // Link this proposal to the specific issue
       },
       include: {
         user: true,
-        community: true,
       },
     });
 
@@ -309,7 +311,6 @@ export const acceptResolution = async (req: Request, res: Response): Promise<voi
     description,
     resolverType,
     userId,
-    communityId 
   } = req.body;
 
   try {
@@ -320,12 +321,10 @@ export const acceptResolution = async (req: Request, res: Response): Promise<voi
           description,
           resolverType,
           userId,
-          communityId,
           issueId: id,
         },
         include: {
-          user: true,
-          community: true,
+          user: true
         },
       });
 
