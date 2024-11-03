@@ -162,7 +162,7 @@ const Feeds = () => {
                   >
                     <Text className="text-white font-bold">Share</Text>
                   </TouchableOpacity>
-                  {issue.authorityNeeds === 'Need' && ( 
+                  {issue.authorityNeeds === 'Not needed' && ( 
                     <TouchableOpacity
                       onPress={() => handleSolvePress(issue)}
                       className="flex-1 bg-green-500 rounded-lg py-3 ml-2 items-center"

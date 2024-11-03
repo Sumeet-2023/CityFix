@@ -338,6 +338,7 @@ enum Status {
   RESOLVED
   CLOSED
   IN_PROGRESS
+  DENIED
 }
 
 enum ProjectStatus {

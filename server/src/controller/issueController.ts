@@ -244,18 +244,21 @@ export const getIssuesByStatus = async (req: Request, res: Response): Promise<vo
 };
 
 export const getIssueProposals = async (req: Request, res: Response): Promise<void> => {
-  const {id} = req.params;
+  const { id } = req.params;
   try {
-      const proposal = await prisma.resolutionProposal.findMany({
-        where: {
-          issueId: id
-        }  
-      })
-      res.json(proposal);
+    const proposals = await prisma.resolutionProposal.findMany({
+      where: {
+        issueId: id,
+      },
+      include: {
+        user: true, // Including user info for proposer details
+      },
+    });
+    res.json(proposals);
   } catch (error: any) {
-    res.status(500).json({message: `Error retreiving issue proposals: ${error.message}`});
+    res.status(500).json({ message: `Error retrieving issue proposals: ${error.message}` });
   }
-}
+};
 
 export const getIssueProposalsCount = async (req: Request, res: Response): Promise<void> => {
   const {id} = req.params;
