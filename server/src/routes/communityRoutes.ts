@@ -8,14 +8,16 @@ import {
     leaveCommunity, 
     joinCommunityNGO,
     removeNGOFromCommunity,
-    patchCommunity
+    patchCommunity,
+    getCommunityUser
 } from "../controller/communityController";
 
 const router = Router();
 
 // GET requests for retrieving data
 router.get("/", getCommunities);
-router.get("/:id", getCommunityById);  // Changed from query param to route param
+router.get("/:id", getCommunityById);
+router.get("/communityList/:creatorId", getCommunityUser);
 
 // POST for creating new resources
 router.post("/", createCommunity);

@@ -14,10 +14,11 @@ import {
   Card,
   Surface,
 } from 'react-native-paper';
-import useStore from '../../../../store';
+// import useStore from '../../../../store';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { serverurl } from '../../../../../firebaseConfig';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useAuthStore } from '../../../../store';
 
 const enhancedTheme = {
   ...DefaultTheme,
@@ -34,7 +35,7 @@ const enhancedTheme = {
 };
 
 const CreateCommunity = () => {
-  const { userdata } = useStore();
+  const {user, isLoading} = useAuthStore;
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState({
@@ -84,7 +85,7 @@ const CreateCommunity = () => {
     try {
       const communityData = {
         communityName: name,
-        userId: userdata.id,
+        userId: user.id,
         description,
         reportedDate: new Date().toISOString(),
         location,

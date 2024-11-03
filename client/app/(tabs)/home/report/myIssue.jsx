@@ -4,7 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import { useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { serverurl } from '../../../../firebaseConfig';
-import useStore from '../../../store';
+import { useAuthStore } from '../../../store';
 
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -184,7 +184,7 @@ const MyIssue = () => {
   const [refreshing, setRefreshing] = useState(false); // State for refreshing
   const [error, setError] = useState(null);
   const [update, setUpdate] = useState(params.update === 'true' || false);
-  const { userdata } = useStore();
+  const { user } = useAuthStore();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedProposals, setSelectedProposals] = useState([]);
   const [proposalUser, setProposalUser] = useState(null);
@@ -193,7 +193,7 @@ const MyIssue = () => {
     try {
       setLoading(true);
       setRefreshing(true); // Set refreshing to true when starting fetch
-      const response = await axios.get(`${serverurl}/issues/user/${userdata.id}`);
+      const response = await axios.get(`${serverurl}/issues/user/${user.id}`);
       setMyIssues(response.data);
       setError(null);
       setUpdate(false);
@@ -239,7 +239,7 @@ const MyIssue = () => {
       const response = await axios.post(`${serverurl}/issues/proposals/${proposal.id}/accept`, {
         description: proposal.proposalDescription,
         resolverType: proposal.resolverType,
-        userId: userdata.id,
+        userId: user.id,
       });
   
       if (response.status === 201) {

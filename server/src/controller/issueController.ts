@@ -73,7 +73,7 @@ export const createIssue = async (req: Request, res: Response): Promise<void> =>
     reportedDate,
     location,
     authorityNeeds,
-    issuePhotos
+    // issuePhotos
   } = req.body;
 
   try {
@@ -97,7 +97,7 @@ export const createIssue = async (req: Request, res: Response): Promise<void> =>
         reportedDate,
         location,
         authorityNeeds,
-        issuePhotos: issuePhotos || null
+        // issuePhotos: issuePhotos || null
       },
       include: {
         user: true,

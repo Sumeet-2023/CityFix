@@ -25,7 +25,7 @@ const SignUp = () => {
   
       // Update user profile
       await updateProfile(user, {
-        displayName: fullName
+        displayName: fullName,
       });
   
       console.log('User profile updated with name:', fullName);

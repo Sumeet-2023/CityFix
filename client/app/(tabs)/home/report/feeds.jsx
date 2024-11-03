@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, RefreshControl, Modal, Image, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import useStore from '../../../store';
+import { useAuthStore } from '../../../store';
 import axios from 'axios';
 import { serverurl } from '../../../../firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
 
 const Feeds = () => {
-  const { userdata } = useStore();
+  const { user } = useAuthStore();
   const [searchIssue, setSearchIssue] = useState('');
   const [issuesData, setIssuesData] = useState([]);
   const [filteredReports, setFilteredReports] = useState([]);
@@ -86,7 +86,7 @@ const Feeds = () => {
       const proposalData = {
         proposalDescription,
         resolverType: "USER", // Assuming user for now
-        userId: userdata.id,  // Use the logged-in user's ID
+        userId: user.id,  // Use the logged-in user's ID
       };
   
       const response = await axios.post(`${serverurl}/issues/${selectedIssue.id}/proposals`, proposalData);

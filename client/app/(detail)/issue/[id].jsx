@@ -4,7 +4,6 @@ import { useLocalSearchParams } from 'expo-router';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import axios from 'axios';
 import { serverurl } from '../../../firebaseConfig';
-import useStore from '../../store';
 
 const IssueDetails = () => {
   const { id } = useLocalSearchParams();

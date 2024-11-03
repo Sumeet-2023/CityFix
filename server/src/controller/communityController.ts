@@ -311,3 +311,45 @@ export const deleteCommunity = async (req: Request, res: Response): Promise<void
     res.status(500).json({ message: "Internal server error." });
   }
 };
+
+export const getCommunityUser = async (req: Request, res: Response): Promise<void> => {
+  const { creatorId } = req.params;
+
+  try {
+    // Validate creatorId
+    if (!creatorId) {
+      res.status(400).json({ message: "Creator ID is required" });
+      return;
+    }
+
+    const community = await prisma.community.findMany({
+      where: {
+        creatorId: {
+          equals: creatorId,
+          not: null // Explicitly exclude null values
+        }
+      },
+      include: {
+        creator: {
+          select: {
+            username: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    if (community.length === 0) {
+      res.status(200).json({ message: "No communities found for this creator", communities: [] });
+      return;
+    }
+
+    res.status(200).json(community);
+  } catch (error: any) {
+    console.error("Error fetching communities:", error);
+    res.status(500).json({
+      message: "Could not get community list for the specified user",
+      error: error.message
+    });
+  }
+};

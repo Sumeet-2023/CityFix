@@ -16,7 +16,8 @@ import {
   Card,
   Chip
 } from 'react-native-paper';
-import useStore from '../../../store';
+// import useStore from '../../../store';
+import { useAuthStore } from '../../../store';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth, openroutekey, serverurl } from '../../../../firebaseConfig';
 
@@ -34,7 +35,7 @@ const enhancedTheme = {
 const issueTags = ['Garbage', 'Road', 'Safety', 'Noise', 'Other'];
 
 const CreateIssue = () => {
-  const {userdata} = useStore();
+  const {user, isLoading} = useAuthStore();
   const [issueTag, setIssueTag] = useState('Garbage');
   const [issueName, setIssueName] = useState('');
   const [issueDescription, setIssueDescription] = useState('');
@@ -95,7 +96,7 @@ const CreateIssue = () => {
       const issueData = {
         issueTag,
         issueName,
-        userId: userdata.id,
+        userId: user.id,
         issueDescription,
         reportedDate: new Date().toISOString(),
         location,
