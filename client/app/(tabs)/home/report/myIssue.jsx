@@ -234,8 +234,25 @@ const MyIssue = () => {
     }
   };
   
+  const handleAcceptProposal = async (proposal) => {
+    try {
+      const response = await axios.post(`${serverurl}/proposals/${proposal.id}/accept`, {
+        description: proposal.proposalDescription,
+        resolverType: proposal.resolverType,
+        userId: userdata.id,
+      });
   
-
+      if (response.status === 201) {
+        Alert.alert("Success", "Issue has been resolved successfully");
+        // Optionally, refetch issues to update the UI
+        fetchIssues();
+      }
+    } catch (error) {
+      console.error('Error accepting proposal:', error);
+      Alert.alert('Error', 'Failed to accept the proposal');
+    }
+  };  
+  
   const handleEdit = (id) => {
     console.log(`Edit issue with ID: ${id}`);
   };
@@ -353,32 +370,29 @@ const MyIssue = () => {
                     </View>
                   </View>
                   <View className="flex-row justify-between mt-4">
-                  <TouchableOpacity
-                    className="flex-1 bg-green-500 rounded-lg mr-2 overflow-hidden"
-                    onPress={() => {
-                      // Placeholder action for accept button
-                      Alert.alert("Proposal Accepted", "You have accepted this proposal.");
-                    }}
-                  >
-                    <View className="px-4 py-3 flex-row items-center justify-center">
-                      <MaterialIcons name="check-circle" size={18} color="white" />
-                      <Text className="ml-2 font-medium text-white">Accept</Text>
-                    </View>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    className="flex-1 bg-red-500 rounded-lg ml-2 overflow-hidden"
-                    onPress={() => {
-                      // Placeholder action for deny button
-                      Alert.alert("Proposal Denied", "You have denied this proposal.");
-                    }}
-                  >
-                    <View className="px-4 py-3 flex-row items-center justify-center">
-                      <MaterialIcons name="cancel" size={18} color="white" />
-                      <Text className="ml-2 font-medium text-white">Deny</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
+                    <TouchableOpacity
+                      className="flex-1 bg-green-500 rounded-lg mr-2 overflow-hidden"
+                      onPress={() => handleAcceptProposal(proposal)}
+                    >
+                      <View className="px-4 py-3 flex-row items-center justify-center">
+                        <MaterialIcons name="check-circle" size={18} color="white" />
+                        <Text className="ml-2 font-medium text-white">Accept</Text>
+                      </View>
+                    </TouchableOpacity>
+  
+                    <TouchableOpacity
+                      className="flex-1 bg-red-500 rounded-lg ml-2 overflow-hidden"
+                      onPress={() => {
+                        // Placeholder action for deny button
+                        Alert.alert("Proposal Denied", "You have denied this proposal.");
+                      }}
+                    >
+                      <View className="px-4 py-3 flex-row items-center justify-center">
+                        <MaterialIcons name="cancel" size={18} color="white" />
+                        <Text className="ml-2 font-medium text-white">Deny</Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             ))

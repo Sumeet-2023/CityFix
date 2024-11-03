@@ -98,16 +98,13 @@ model ResolutionProposal {
 // accepted resolution
 model AcceptedIssueResolution {
   id                  String           @id @default(auto()) @map("_id") @db.ObjectId
-  dateAccepted        DateTime         @default(now())
+  dateAccepted        DateTime?         @default(now())
   resolverType        ResolverType
   description         String
 
   // Accepted resolver details
   userId              String?          @db.ObjectId
   user                User?            @relation("UserResolutions", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  communityId         String?          @db.ObjectId
-  community           Community?       @relation(fields: [communityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   // Issue
   issueId             String           @db.ObjectId @unique
@@ -132,9 +129,6 @@ model Community {
   // ngo
   ngoId               String?          @db.ObjectId
   ngo                 Ngo?             @relation(fields: [ngoId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  
-  // issues
-  resolutionAccepted  AcceptedIssueResolution[]
 
   // project
   projects            Project[]

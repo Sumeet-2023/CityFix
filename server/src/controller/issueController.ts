@@ -309,42 +309,80 @@ export const addProposalToIssue = async (req: Request, res: Response): Promise<v
 };
 
 export const acceptResolution = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
+  const { proposalId } = req.params; // Use `proposalId` to identify the proposal
   const { 
     description,
     resolverType,
     userId,
   } = req.body;
 
+  // Debugging: Ensure all required fields are present
+  if (!proposalId || !description || !resolverType || !userId) {
+    res.status(400).json({ message: "Missing required fields: proposalId, description, resolverType, and userId are all required." });
+    return;
+  }
+
   try {
-    const resolution = await prisma.$transaction(async (prisma) => {
-      // Create the accepted resolution
-      const acceptedResolution = await prisma.acceptedIssueResolution.create({
-        data: {
-          description,
-          resolverType,
-          userId,
-          issueId: id,
-        },
-        include: {
-          user: true
-        },
-      });
-
-      // Update the issue status to CLOSED
-      await prisma.issue.update({
-        where: { id },
-        data: { 
-          status: Status.CLOSED,
-          lastUpdated: new Date(),
-        },
-      });
-
-      return acceptedResolution;
+    // Find the proposal by ID
+    const proposal = await prisma.resolutionProposal.findUnique({
+      where: { id: proposalId },
     });
 
-    res.status(201).json(resolution);
+    // If the proposal does not exist, return a 404 response
+    if (!proposal) {
+      res.status(404).json({ message: "Resolution proposal not found." });
+      return;
+    }
+
+    // Retrieve the issue ID from the proposal
+    const { issueId } = proposal;
+
+    // Check if the issue exists
+    const existingIssue = await prisma.issue.findUnique({
+      where: { id: issueId },
+    });
+
+    // If the issue does not exist, return a 404 response
+    if (!existingIssue) {
+      res.status(404).json({ message: "Issue not found." });
+      return;
+    }
+
+    // Ensure the user exists (optional but recommended)
+    const existingUser = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!existingUser) {
+      res.status(404).json({ message: "User not found." });
+      return;
+    }
+
+    // Create the accepted resolution entry
+    const acceptedResolution = await prisma.acceptedIssueResolution.create({
+      data: {
+        description,
+        resolverType,
+        userId,
+        issueId,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    // Update the issue status to CLOSED
+    await prisma.issue.update({
+      where: { id: issueId },
+      data: { 
+        status: Status.CLOSED,
+        lastUpdated: new Date(),
+      },
+    });
+
+    res.status(201).json(acceptedResolution);
   } catch (error: any) {
+    console.error('Error accepting resolution:', error);
     res.status(500).json({ message: `Error accepting resolution: ${error.message}` });
   }
 };
