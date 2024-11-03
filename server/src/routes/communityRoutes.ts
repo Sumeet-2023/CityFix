@@ -7,7 +7,8 @@ import {
     joinCommunity, 
     leaveCommunity, 
     joinCommunityNGO,
-    removeNGOFromCommunity
+    removeNGOFromCommunity,
+    patchCommunity
 } from "../controller/communityController";
 
 const router = Router();
@@ -22,6 +23,8 @@ router.post("/", createCommunity);
 // PUT for establishing relationships/updating
 router.put("/:id/members", joinCommunity);       // Changed from POST to PUT
 router.put("/:id/ngo", joinCommunityNGO);        // Changed from POST to PUT
+
+router.patch("/:id", patchCommunity)
 
 // DELETE for removing resources/relationships
 router.delete("/:id/members", leaveCommunity);    // Changed from POST to DELETE

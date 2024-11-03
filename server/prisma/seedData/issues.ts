@@ -192,6 +192,7 @@ export const issues = [
     issueName: "Cracked Sidewalk on 3rd St",
     userId: janeSmithId,
     issueDescription: "The sidewalk on 3rd St is heavily cracked and unsafe for pedestrians.",
+    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -211,6 +212,7 @@ export const issues = [
     issueName: "Pothole near Maxus Mall",
     userId: janeSmithId,
     issueDescription: "Large pothole near Maxus Mall entrance, affecting traffic flow.",
+    
     reportedDate: new Date(),
     location: {
       type: "Point",
@@ -230,6 +232,7 @@ export const issues = [
     issueName: "Overflowing Trash Bin near Mira Road Station",
     userId: johnDoeId,
     issueDescription: "Overflowing trash bin near Mira Road railway station, causing foul smell.",
+    
     reportedDate: new Date(),
     location: {
       type: "Point",
