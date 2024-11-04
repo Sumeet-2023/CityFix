@@ -35,6 +35,72 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
   }
 };
 
+export const getProjectByCommunityId = async (req: Request, res: Response): Promise<void> => {
+  const {communityId} = req.params;
+
+  try{
+    const projects = await prisma.project.findMany({
+      where: {communityId: communityId}
+    })
+
+    res.status(200).json(projects);
+  } catch (error: any) {
+    res
+      .status(500)
+      .json({ message: `Error retrieving projects: ${error.message}` });
+  }
+}
+
+export const getProjectsByCommunityWithFilter = async (req: Request, res: Response): Promise<void> => {
+  const { communityId } = req.params;
+  const { userId, filterType } = req.query;
+
+  try {
+    const baseCondition = { communityId: communityId };
+
+    let filterCondition = {};
+
+    if (filterType === 'all') {
+      filterCondition = baseCondition;
+    } else if (filterType === 'userProjects') {
+      filterCondition = {
+        ...baseCondition,
+        members: {
+          some: {
+            userId: String(userId)
+          }
+        }
+      };
+    } else if (filterType === 'nonMemberProjects') {
+      filterCondition = {
+        ...baseCondition,
+        members: {
+          none: {
+            userId: String(userId)
+          }
+        }
+      };
+    } else if (filterType === 'userCreatedProjects') {
+      filterCondition = {
+        ...baseCondition,
+        creatorID: String(userId)
+      };
+    }
+
+    const projects = await prisma.project.findMany({
+      where: filterCondition,
+      include: {
+        members: true,
+        creator: true,
+      }
+    });
+
+    res.status(200).json(projects);
+  } catch (error: any) {
+    res.status(500).json({ message: `Error retrieving projects: ${error.message}` });
+  }
+};
+
 export const createProject = async (req: Request, res: Response): Promise<void> => {
   const {
     projectTag,
@@ -103,11 +169,25 @@ export const updateProject = async (req: Request, res: Response): Promise<void> 
 };
 
 export const deleteProject = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
+  const { userId, projectId } = req.params;
 
   try {
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+    });
+
+    if (!project) {
+      res.status(404).json({ message: "Project not found" });
+      return;
+    }
+
+    if (project.creatorID !== userId) {
+      res.status(403).json({ message: "Unauthorized: Only the creator can delete this project" });
+      return;
+    }
+
     await prisma.project.delete({
-      where: { id: id },
+      where: { id: projectId },
     });
 
     res.status(204).send();
@@ -121,6 +201,7 @@ export const deleteProject = async (req: Request, res: Response): Promise<void> 
       .json({ message: `Error deleting project: ${error.message}` });
   }
 };
+
 export const joinProject = async (req: Request, res: Response): Promise<void> => {
   const {
     userId,
@@ -134,6 +215,35 @@ export const joinProject = async (req: Request, res: Response): Promise<void> =>
         projectId: projectId
       }
     });
+    res.status(200).json({ message: 'Successfully joined the project' });
+  } catch (error: any) {
+    res.status(500).json({ message: `Error joining the project: ${error.message}` });
+  }
+};
+
+export const joinCommunityProject = async (req: Request, res: Response): Promise<void> => {
+  const {
+    userId,
+    projectId,
+    communityId
+  } = req.body;
+
+  try {
+    await prisma.userProject.create({
+      data: {
+        userId: userId,
+        projectId: projectId
+      }
+    });
+
+    await prisma.project.update({
+      where: {
+        id: projectId
+      },
+      data: {
+        communityId: communityId
+      }
+    })
     res.status(200).json({ message: 'Successfully joined the project' });
   } catch (error: any) {
     res.status(500).json({ message: `Error joining the project: ${error.message}` });
@@ -224,30 +334,3 @@ export const checkProjectMembership = async (req: Request, res: Response): Promi
     res.status(500).json({ message: `Error checking project membership: ${error.message}` });
   }
 };
-
-// To be implemented if we decide to make roles in projects
-// export const updateMemberRole = async (req: Request, res: Response): Promise<void> => {
-//   const { userId, projectId } = req.params;
-//   const { role } = req.body;
-
-//   try {
-//     const updatedMembership = await prisma.userProject.update({
-//       where: {
-//         userId_projectId: {
-//           userId: userId,
-//           projectId: projectId
-//         }
-//       },
-//       data: {
-//         role: role
-//       }
-//     });
-//     res.status(200).json(updatedMembership);
-//   } catch (error: any) {
-//     if (error.code === 'P2025') {
-//       res.status(404).json({ message: "User is not a member of this project" });
-//       return;
-//     }
-//     res.status(500).json({ message: `Error updating member role: ${error.message}` });
-//   }
-// };
