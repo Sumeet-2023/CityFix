@@ -25,7 +25,7 @@ const IssueDetails = () => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [rotateAnim] = useState(new Animated.Value(0));
-  const { user } = useStore();
+  const { user } = useAuthStore();
   useEffect(() => {
     fetchIssueDetails();
     
