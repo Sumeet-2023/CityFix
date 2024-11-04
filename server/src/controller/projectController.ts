@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export const getProjects = async (req: Request, res: Response): Promise<void> => {
   try {
-    const projects = await prisma.community.findMany();
+    const projects = await prisma.project.findMany();
     res.json(projects);
   } catch (error: any) {
     res
@@ -20,6 +20,9 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
   try {
     const project = await prisma.project.findUnique({
       where: { id: id },
+      include: {
+        community: true
+      }
     });
 
     if (!project) {

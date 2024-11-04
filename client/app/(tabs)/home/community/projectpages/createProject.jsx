@@ -25,7 +25,7 @@ export default function CreateProject() {
     setLocation('');
     setVolunteers('');
     setContactInfo('');
-    router.push('home/community/myProjects');
+    router.push('home/community/projectpages/myProjects');
   };
   const onChangeDate = (event,selectedDate) => {
     const currentDate = selectedDate || date;
