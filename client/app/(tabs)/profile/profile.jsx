@@ -1,64 +1,65 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   Image,
   TouchableOpacity,
-  useWindowDimensions,
-  StyleSheet,
   ScrollView,
-  Share
+  Share,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { MaterialIcons } from "@expo/vector-icons";
-import { TabView, TabBar } from "react-native-tab-view";
-import { COLORS, images, FONTS, SIZES } from "../../../constants";
-import { photos } from "../../../constants/data";
-import { router } from "expo-router";
+import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import { auth } from "../../../firebaseConfig";
-import { useAuthStore } from "../../store";
+import { router } from "expo-router";
+import { images } from "../../../constants";
+import Badge from "../../../components/badge";
+import { LinearGradient } from "expo-linear-gradient";
 
 // Component for displaying user profile information
 const ProfileHeader = ({ user }) => (
-  <View style={styles.profileInfo}>
+  <View className="flex items-center p-4 mt-4 bg-white rounded-2xl shadow-md">
     <Image
       source={user.photoURL ? { uri: user.photoURL } : images.defaultProfile}
       resizeMode="cover"
-      style={styles.profileImage}
+      className="w-36 h-36 rounded-full border-4 border-primary mb-4"
     />
-    <Text style={styles.name}>{user.name || 'Unknown User'}</Text>
-    <Text style={styles.profession}>{user.profession}</Text>
-    <View style={styles.location}>
-      <MaterialIcons name="location-on" size={24} color={COLORS.primary} />
-      <Text style={styles.locationText}>{user.location}</Text>
+    <Text className="text-2xl font-bold text-primary mb-1">
+      {user.name || "Unknown User"}
+    </Text>
+    <View className="flex-row items-center mb-4">
+      <MaterialIcons name="location-on" size={20} color="#3B82F6" />
+      <Text className="text-sm text-gray-500 ml-1">{user.location}</Text>
     </View>
-    <View style={styles.stats}>
-      {["followers", "following", "likes"].map((key) => (
-        <View key={key} style={styles.statItem}>
-          <Text style={styles.statNumber}>
-            {key === "likes" ? user.likes.toLocaleString() : user[key]}
-          </Text>
-          <Text style={styles.statLabel}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
-        </View>
-      ))}
+    {/* Separator Line */}
+    <View className="w-3/4 h-[1px] bg-gray-300 my-2"></View>
+    {/* Followers and Following Section */}
+    <View className="flex-row justify-between items-center w-3/4">
+      <View className="items-center">
+        <Text className="text-2xl font-bold text-primary">{user.followers}</Text>
+        <Text className="text-gray-600">Followers</Text>
+      </View>
+      {/* Vertical Separator Line */}
+      <View className="h-12 w-[1px] bg-gray-300"></View>
+      <View className="items-center">
+        <Text className="text-2xl font-bold text-primary">{user.following}</Text>
+        <Text className="text-gray-600">Following</Text>
+      </View>
     </View>
   </View>
 );
 
 // Component for profile action buttons
-const ProfileActions = ({user}) => {
+const ProfileActions = ({ user }) => {
   const handleShare = async () => {
     try {
       const result = await Share.share({
         message: `Check out ${user.name}'s profile on our platform!`,
       });
 
-      if (result && result.action) {
-        if (result.action === Share.sharedAction) {
-          console.log('Shared successfully!');
-        } else if (result.action === Share.dismissedAction) {
-          console.log('Share dismissed');
-        }
+      if (result.action === Share.sharedAction) {
+        console.log("Shared successfully!");
+      } else if (result.action === Share.dismissedAction) {
+        console.log("Share dismissed");
       }
     } catch (error) {
       alert(error.message);
@@ -66,263 +67,106 @@ const ProfileActions = ({user}) => {
   };
 
   return (
-    <View style={styles.buttons}>
-      <TouchableOpacity style={styles.button} onPress={() => router.push('profile/editProfile')}>
-        <Text style={styles.buttonText}>Edit Profile</Text>
+    <View className="flex-row justify-center space-x-4 mt-6 mb-4 px-4">
+      <TouchableOpacity
+        className="flex-row items-center justify-center flex-1 h-12 bg-blue-700 rounded-full shadow-lg"
+        onPress={() => router.push("profile/editProfile")}
+      >
+        <FontAwesome5 name="edit" size={16} color="white" />
+        <Text className="text-white font-bold ml-2">Edit Profile</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={handleShare}>
-        <Text style={styles.buttonText}>Share Profile</Text>
+      <TouchableOpacity
+        className="flex-row items-center justify-center flex-1 h-12 bg-blue-700 rounded-full shadow-lg"
+        onPress={handleShare}
+      >
+        <FontAwesome5 name="share-alt" size={16} color="white" />
+        <Text className="text-white font-bold ml-2">Share Profile</Text>
       </TouchableOpacity>
     </View>
   );
-}
-
-// Component for TabView
-const TabViewContainer = ({ index, setIndex, layout }) => {
-  const routes = useMemo(
-    () => [
-      { key: 'photos', title: 'Photos' },
-      { key: 'likes', title: 'Likes' },
-    ],
-    []
-  );
-
-  const renderScene = ({ route }) => {
-    if (route.key === 'photos') {
-      return (
-        <ScrollView contentContainerStyle={styles.photoScrollContainer}>
-          <View style={styles.photosContainer}>
-            {photos.map((item, index) => (
-              <View key={index} style={styles.photoItem}>
-                <Image source={item} style={styles.photo} />
-              </View>
-            ))}
-          </View>
-        </ScrollView>
-      );
-    } else if (route.key === 'likes') {
-      return (
-        <View style={styles.likeItem}>
-          {/* Implement your like rendering logic */}
-        </View>
-      );
-    }
-    return null;
-  };
-
-  return (
-    <TabView
-      navigationState={{ index, routes }}
-      renderScene={renderScene}
-      onIndexChange={setIndex}
-      initialLayout={{ width: layout.width }}
-      renderTabBar={(props) => (
-        <TabBar
-          {...props}
-          indicatorStyle={styles.tabIndicator}
-          style={styles.tabBar}
-          renderLabel={({ focused, route }) => (
-            <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>
-              {route.title}
-            </Text>
-          )}
-          tabStyle={styles.tabStyle} // Add custom tabStyle
-        />
-      )}
-    />
-  );
 };
+
+// Points Section Component with gradient background
+const PointsSection = ({ points }) => (
+  <LinearGradient
+    colors={["#4882C4", "#123F72"]}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 1, y: 1 }}
+    className="my-4 mx-4 rounded-2xl shadow-lg p-6"
+  >
+    <View className="flex-row items-center justify-center mb-2">
+      <FontAwesome5 name="star" size={30} color="#fff" />
+      <Text className="text-lg font-bold text-white ml-4">Points Earned</Text>
+    </View>
+    <Text className="text-4xl font-bold text-white text-center">{points}</Text>
+  </LinearGradient>
+);
+
+// Profile Badges Section Component
+const ProfileBadges = ({ badges }) => (
+  <View className="p-4 mt-4 bg-white rounded-2xl shadow-lg mx-4">
+    <Text className="text-xl font-bold text-primary mb-4">Badges</Text>
+    {badges.length > 0 ? (
+      badges.map((badge) => (
+        <Badge
+          key={badge.id}
+          name={badge.name}
+          icon={badge.icon}
+          reason={badge.reason}
+        />
+      ))
+    ) : (
+      <Text className="text-gray-500">No badges yet</Text>
+    )}
+  </View>
+);
 
 // Main Profile component
 const Profile = () => {
-  const layout = useWindowDimensions();
-  const [index, setIndex] = useState(0);
   const [user, setUser] = useState({
-    name: '',
-    profession: 'Interior Design',
-    location: 'Lagos, Nigeria',
-    followers: 10,
-    following: 10,
-    likes: 100,
+    name: "",
+    location: "Mumbai, India",
+    followers: 15,
+    following: 20,
+    points: 250,
     photoURL: null,
+    badges: [
+      {
+        id: 1,
+        name: "Contributor",
+        icon: "trophy",
+        reason: "Contributed to 10 issues",
+      },
+      {
+        id: 2,
+        name: "Helper",
+        icon: "hands-helping",
+        reason: "Helped resolve 5 issues",
+      },
+    ],
   });
 
-  const {user: currentUser} = useAuthStore();
   useEffect(() => {
+    const currentUser = auth.currentUser;
     if (currentUser) {
       setUser((prev) => ({
         ...prev,
-        name: currentUser.username || 'Unknown User',
-        photoURL: currentUser.profileUrl || null,
+        name: currentUser.displayName || "Unknown User",
+        photoURL: currentUser.photoURL || null,
       }));
-      console.log(currentUser);
     }
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-gray-100">
       <ScrollView>
-        <View style={styles.header}>
-          <Image source={images.cover} resizeMode="cover" style={styles.coverImage} />
-        </View>
         <ProfileHeader user={user} />
-        <ProfileActions user={user}/>
-        <View style={styles.tabsContainer}>
-          <TabViewContainer index={index} setIndex={setIndex} layout={layout} />
-        </View>
+        <ProfileActions user={user} />
+        <PointsSection points={user.points} />
+        <ProfileBadges badges={user.badges} />
       </ScrollView>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-  },
-  header: {
-    width: "100%",
-  },
-  coverImage: {
-    height: 228,
-    width: "100%",
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    overflow: "hidden",
-  },
-  profileInfo: {
-    alignItems: "center",
-    paddingHorizontal: SIZES.padding,
-    width: '100%',
-    maxWidth: 600,
-    marginTop: -50,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Slightly translucent background
-    borderRadius: 15,
-    elevation: 2, // Add shadow for Android
-    shadowColor: '#000', // iOS shadow
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    alignSelf: 'center', // Center the profile info
-  },
-  profileImage: {
-    height: 155,
-    width: 155,
-    borderRadius: 999,
-    borderColor: COLORS.primary,
-    borderWidth: 2,
-    marginTop: -77,
-  },
-  name: {
-    ...FONTS.h3,
-    color: COLORS.primary,
-    marginVertical: 8,
-  },
-  profession: {
-    ...FONTS.body4,
-    color: COLORS.black,
-  },
-  location: {
-    flexDirection: "row",
-    marginVertical: 6,
-    alignItems: "center",
-  },
-  locationText: {
-    ...FONTS.body4,
-    marginLeft: 4,
-    color: COLORS.primary,
-  },
-  stats: {
-    flexDirection: "row",
-    paddingVertical: 8,
-    justifyContent: 'center',
-    width: '100%',
-  },
-  statItem: {
-    alignItems: "center",
-    marginHorizontal: SIZES.padding,
-  },
-  statNumber: {
-    ...FONTS.h2,
-    color: COLORS.primary,
-  },
-  statLabel: {
-    ...FONTS.body4,
-    color: COLORS.primary,
-  },
-  buttons: {
-    flexDirection: "row",
-    justifyContent: 'center',
-    width: '100%',
-    marginVertical: SIZES.padding,
-  },
-  button: {
-    width: 124,
-    height: 36,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: COLORS.primary,
-    borderRadius: 10,
-    marginHorizontal: SIZES.padding,
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  buttonText: {
-    ...FONTS.body4,
-    color: COLORS.white,
-  },
-  tabsContainer: {
-    width: '100%',
-    maxWidth: 800,
-    height: 500,
-    alignSelf: 'center', // Center the TabView container
-  },
-  tabBar: {
-    backgroundColor: COLORS.white,
-    height: 44,
-    elevation: 2,
-  },
-  tabStyle: {
-    flex: 1, // Allow tabs to take up equal space
-    justifyContent: 'center', // Center the label vertically
-  },
-  tabIndicator: {
-    backgroundColor: COLORS.primary,
-  },
-  tabLabel: {
-    color: '#4A4A4A',
-    ...FONTS.body4,
-    textAlign: 'center', // Center align text
-    width: 50,
-  },
-  tabLabelFocused: {
-    color: COLORS.black,
-    fontWeight: 'bold', // Emphasize the focused tab
-  },
-  photoScrollContainer: {
-    padding: 10,
-  },
-  photosContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  photoItem: {
-    width: '33.3%', // Adjust width based on the number of columns
-    padding: 5, // Adjust padding for spacing between photos
-  },
-  photo: {
-    width: "100%",
-    height: 100, // Set a fixed height to make it square
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLORS.lightGray, // Optional border color for aesthetics
-  },
-  likeItem: {
-    // Style for like item
-  },
-});
 
 export default Profile;
