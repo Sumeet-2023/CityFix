@@ -35,7 +35,7 @@ const enhancedTheme = {
 };
 
 const CreateCommunity = () => {
-  const {user, isLoading} = useAuthStore;
+  const {user} = useAuthStore();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState({
@@ -85,7 +85,7 @@ const CreateCommunity = () => {
     try {
       const communityData = {
         communityName: name,
-        userId: user.id,
+        creatorId: user.id,
         description,
         reportedDate: new Date().toISOString(),
         location,

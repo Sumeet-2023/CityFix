@@ -16,6 +16,7 @@ import { COLORS, images, FONTS, SIZES } from "../../../constants";
 import { photos } from "../../../constants/data";
 import { router } from "expo-router";
 import { auth } from "../../../firebaseConfig";
+import { useAuthStore } from "../../store";
 
 // Component for displaying user profile information
 const ProfileHeader = ({ user }) => (
@@ -146,14 +147,15 @@ const Profile = () => {
     photoURL: null,
   });
 
+  const {user: currentUser} = useAuthStore();
   useEffect(() => {
-    const currentUser = auth.currentUser;
     if (currentUser) {
       setUser((prev) => ({
         ...prev,
-        name: currentUser.displayName || 'Unknown User',
-        photoURL: currentUser.photoURL || null,
+        name: currentUser.username || 'Unknown User',
+        photoURL: currentUser.profileUrl || null,
       }));
+      console.log(currentUser);
     }
   }, []);
 

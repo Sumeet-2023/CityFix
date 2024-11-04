@@ -12,6 +12,9 @@ const useAuthStore = create(
       updateUser: (updates) => set((state) => ({
         user: state.user ? { ...state.user, ...updates } : null
       })),
+      setProfileUrl: (url) => set((state) => ({
+        user: state.user ? { ...state.user, profileUrl: url } : null
+      })),
     }),
     {
       name: 'auth-storage',

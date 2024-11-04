@@ -21,12 +21,14 @@ const Home = () => {
   useEffect(() => {
     const getUser = async () => {
       const email = auth.currentUser.email;
+      // const photoUrl = auth.currentUser.photoURL;
       try {
         const res = await axios.get(`${serverurl}/user/email/${email}`);
-        setUser({
+        await setUser({
           id: res.data.id,
           email: email,
-          username: res.data.username
+          username: res.data.username,
+          profileUrl: res.data.profileUrl
         });
       } catch (error) {
         console.error("Error fetching user data:", error);

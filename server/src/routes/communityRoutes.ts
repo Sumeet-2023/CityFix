@@ -9,7 +9,8 @@ import {
     joinCommunityNGO,
     removeNGOFromCommunity,
     patchCommunity,
-    getCommunityUser
+    getUserOwnedCommunities,
+    getUserCommunities
 } from "../controller/communityController";
 
 const router = Router();
@@ -17,7 +18,8 @@ const router = Router();
 // GET requests for retrieving data
 router.get("/", getCommunities);
 router.get("/:id", getCommunityById);
-router.get("/communityList/:creatorId", getCommunityUser);
+router.get("/communityList/:creatorId", getUserOwnedCommunities);
+router.get("/communityJoined/:userId", getUserCommunities);
 
 // POST for creating new resources
 router.post("/", createCommunity);

@@ -6,21 +6,23 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import axios from 'axios';
 import { serverurl } from '../../../../../firebaseConfig';
-// import useStore from '../../../../store';
 import { useAuthStore } from '../../../../store';
+import { router } from 'expo-router';
 
 const CommunityChannels = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('Your');
-  const [communities, setCommunities] = useState(null);
-  const {user} = useAuthStore();
+  const [communities, setCommunities] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuthStore();
 
-  // Sample categories
+  // Categories based on your needs
   const categories = [
     'Your',
     'Explore',
@@ -29,86 +31,30 @@ const CommunityChannels = () => {
     'Events'
   ];
 
-  // Sample channels data
-  const channels = [
-    {
-      id: '1',
-      name: 'Road Repairs',
-      category: 'Issues',
-      members: 156,
-      lastActive: '2m ago',
-      priority: 'high',
-      icon: 'construct'
-    },
-    {
-      id: '2',
-      name: 'Community Garden',
-      category: 'Projects',
-      members: 89,
-      lastActive: '5m ago',
-      priority: 'medium',
-      icon: 'leaf'
-    },
-    {
-      id: '3',
-      name: 'Mental Health Support',
-      category: 'Support',
-      members: 234,
-      lastActive: 'Just now',
-      priority: 'high',
-      icon: 'people'
-    },
-    {
-      id: '4',
-      name: 'Street Cleaning',
-      category: 'Issues',
-      members: 67,
-      lastActive: '1h ago',
-      priority: 'medium',
-      icon: 'brush'
-    }
-  ];
-
-  const getIconName = (iconName) => {
-    switch (iconName) {
-      case 'construct':
-        return 'construct-outline';
-      case 'leaf':
-        return 'leaf-outline';
-      case 'people':
-        return 'people-outline';
-      case 'brush':
-        return 'brush-outline';
-      default:
-        return 'alert-circle-outline';
-    }
-  };
-
   useEffect(() => {
-    const fetchList = async () => {
-      const list = await axios.get(`${serverurl}/community/communityList/${userData.id}`);
-      setCommunities(list);
-    }
+    const fetchCommunities = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get(`${serverurl}/community/communityJoined/${user.id}`);
+        setCommunities(response.data);
+      } catch (error) {
+        console.error('Error fetching communities:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    fetchList();
-  }, [])
+    fetchCommunities();
+  }, [user.id]);
 
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case 'high':
-        return '#EF4444';
-      case 'medium':
-        return '#F59E0B';
-      default:
-        return '#10B981';
-    }
+  const getDefaultIcon = (communityName) => {
+    // Generate an icon based on first letter of community name
+    return communityName.charAt(0).toUpperCase();
   };
 
-  const filteredChannels = channels.filter(channel => {
-    const matchesSearch = channel.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = activeCategory === 'Your' || channel.category === activeCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredCommunities = communities.filter(community => 
+    community.communityName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
@@ -139,7 +85,7 @@ const CommunityChannels = () => {
         }}>
           <Ionicons name="search-outline" size={20} color="#6B7280" />
           <TextInput
-            placeholder="Search channels"
+            placeholder="Search communities"
             value={searchQuery}
             onChangeText={setSearchQuery}
             style={{ marginLeft: 8, flex: 1, fontSize: 16 }}
@@ -174,64 +120,86 @@ const CommunityChannels = () => {
           ))}
         </ScrollView>
 
-        {/* Channels List */}
+        {/* Communities List */}
         <ScrollView showsVerticalScrollIndicator={false}>
-          {filteredChannels.map((channel) => (
-            <TouchableOpacity
-              key={channel.id}
-              style={{
-                backgroundColor: 'white',
-                borderRadius: 12,
-                padding: 16,
-                marginBottom: 12,
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: 0.1,
-                shadowRadius: 2,
-                elevation: 2
-              }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View style={{
-                    backgroundColor: '#F3F4F6',
-                    borderRadius: 8,
-                    padding: 8,
-                    marginRight: 12
-                  }}>
-                    <Ionicons name={getIconName(channel.icon)} size={24} color="#4B5563" />
-                  </View>
-                  <View>
-                    <Text style={{ fontSize: 16, fontWeight: '600', color: '#111827' }}>
-                      {channel.name}
-                    </Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
-                      <Ionicons name="people-outline" size={14} color="#6B7280" />
-                      <Text style={{ marginLeft: 4, color: '#6B7280', fontSize: 12 }}>
-                        {channel.members} members
-                      </Text>
+          {isLoading ? (
+            <ActivityIndicator size="large" color="#111827" style={{ marginTop: 20 }} />
+          ) : (
+            filteredCommunities.map((community) => (
+              <TouchableOpacity
+                key={community.id}
+                style={{
+                  backgroundColor: 'white',
+                  borderRadius: 12,
+                  padding: 16,
+                  marginBottom: 12,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 2,
+                  elevation: 2
+                }}
+                onPress={() => router.push({
+                  pathname: "/(modals)/chatRoom",
+                  params: {
+                    id: community.id
+                  }
+                })}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {community.communityPhotos && community.communityPhotos.length > 0 ? (
+                      <Image
+                        source={{ uri: community.communityPhotos[0] }}
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 8,
+                          marginRight: 12
+                        }}
+                      />
+                    ) : (
                       <View style={{
-                        width: 4,
-                        height: 4,
-                        borderRadius: 2,
-                        backgroundColor: '#D1D5DB',
-                        marginHorizontal: 8
-                      }} />
-                      <Text style={{ color: '#6B7280', fontSize: 12 }}>
-                        {channel.lastActive}
+                        backgroundColor: '#F3F4F6',
+                        borderRadius: 8,
+                        padding: 12,
+                        marginRight: 12,
+                        width: 40,
+                        height: 40,
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        <Text style={{ fontSize: 16, fontWeight: '600', color: '#4B5563' }}>
+                          {getDefaultIcon(community.communityName)}
+                        </Text>
+                      </View>
+                    )}
+                    <View>
+                      <Text style={{ fontSize: 16, fontWeight: '600', color: '#111827' }}>
+                        {community.communityName}
                       </Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                        <Text style={{ color: '#6B7280', fontSize: 12 }}>
+                          Community #{community.communityNumber}
+                        </Text>
+                        <View style={{
+                          width: 4,
+                          height: 4,
+                          borderRadius: 2,
+                          backgroundColor: '#D1D5DB',
+                          marginHorizontal: 8
+                        }} />
+                        <Text style={{ color: '#6B7280', fontSize: 12 }}>
+                          {community.location.city}, {community.location.country}
+                        </Text>
+                      </View>
                     </View>
                   </View>
+                  <Ionicons name="chevron-forward" size={20} color="#6B7280" />
                 </View>
-                <View style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: 4,
-                  backgroundColor: getPriorityColor(channel.priority)
-                }} />
-              </View>
-            </TouchableOpacity>
-          ))}
+              </TouchableOpacity>
+            ))
+          )}
         </ScrollView>
       </View>
     </SafeAreaView>

@@ -7,6 +7,9 @@ import { router } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { getAuth, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useAuthStore } from '../../store';
+import axios from 'axios';
+import { serverurl } from '../../../firebaseConfig';
 
 const EditProfile = () => {
   const [displayName, setDisplayName] = useState('');
@@ -15,7 +18,9 @@ const EditProfile = () => {
   const [photo, setPhoto] = useState(null);
   const [newPassword, setNewPassword] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
-
+  // const setProfileUrl = useAuthStore(state => state.setProfileUrl);
+  const { updateUser, user: currentUser } = useAuthStore()
+  
   const auth = getAuth();
   const user = auth.currentUser;
 
@@ -60,7 +65,17 @@ const EditProfile = () => {
         photoURL: photoURL,
       });
 
-      // Here you might want to update profession and location in a separate user profile document in Firestore
+      const updateData = {
+        profileUrl: photoURL,
+        username: displayName
+      }
+
+      await axios.put(`${serverurl}/user/${currentUser.id}`, updateData);
+
+      updateUser({
+        profileUrl: photoURL,
+        username: displayName
+      });
 
       if (newPassword) {
         const credential = EmailAuthProvider.credential(user.email, currentPassword);
