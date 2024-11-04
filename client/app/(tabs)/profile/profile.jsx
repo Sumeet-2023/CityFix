@@ -6,42 +6,45 @@ import {
   TouchableOpacity,
   ScrollView,
   Share,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
-import { auth } from "../../../firebaseConfig";
+import { useAuthStore } from "../../store";
 import { router } from "expo-router";
 import { images } from "../../../constants";
 import Badge from "../../../components/badge";
 import { LinearGradient } from "expo-linear-gradient";
+import axios from "axios";
+import { serverurl } from "../../../firebaseConfig"; // Adjust based on where your server URL is stored
 
-// Component for displaying user profile information
-const ProfileHeader = ({ user }) => (
+// Component for displaying me profile information
+const ProfileHeader = ({ me }) => (
   <View className="flex items-center p-4 mt-4 bg-white rounded-2xl shadow-md">
     <Image
-      source={user.photoURL ? { uri: user.photoURL } : images.defaultProfile}
+      source={me.profileUrl ? { uri: me.profileUrl } : images.defaultProfile}
       resizeMode="cover"
       className="w-36 h-36 rounded-full border-4 border-primary mb-4"
     />
     <Text className="text-2xl font-bold text-primary mb-1">
-      {user.name || "Unknown User"}
+      {me.username || "Unknown User"}
     </Text>
     <View className="flex-row items-center mb-4">
       <MaterialIcons name="location-on" size={20} color="#3B82F6" />
-      <Text className="text-sm text-gray-500 ml-1">{user.location}</Text>
+      <Text className="text-sm text-gray-500 ml-1">{me.location || "Location not available"}</Text>
     </View>
     {/* Separator Line */}
     <View className="w-3/4 h-[1px] bg-gray-300 my-2"></View>
     {/* Followers and Following Section */}
     <View className="flex-row justify-between items-center w-3/4">
       <View className="items-center">
-        <Text className="text-2xl font-bold text-primary">{user.followers}</Text>
+        <Text className="text-2xl font-bold text-primary">{me.followerCount || 0}</Text>
         <Text className="text-gray-600">Followers</Text>
       </View>
       {/* Vertical Separator Line */}
       <View className="h-12 w-[1px] bg-gray-300"></View>
       <View className="items-center">
-        <Text className="text-2xl font-bold text-primary">{user.following}</Text>
+        <Text className="text-2xl font-bold text-primary">{me.followingCount || 0}</Text>
         <Text className="text-gray-600">Following</Text>
       </View>
     </View>
@@ -49,11 +52,11 @@ const ProfileHeader = ({ user }) => (
 );
 
 // Component for profile action buttons
-const ProfileActions = ({ user }) => {
+const ProfileActions = ({ me }) => {
   const handleShare = async () => {
     try {
       const result = await Share.share({
-        message: `Check out ${user.name}'s profile on our platform!`,
+        message: `Check out ${me.username}'s profile on our platform!`,
       });
 
       if (result.action === Share.sharedAction) {
@@ -98,7 +101,7 @@ const PointsSection = ({ points }) => (
       <FontAwesome5 name="star" size={30} color="#fff" />
       <Text className="text-lg font-bold text-white ml-4">Points Earned</Text>
     </View>
-    <Text className="text-4xl font-bold text-white text-center">{points}</Text>
+    <Text className="text-4xl font-bold text-white text-center">{points || 0}</Text>
   </LinearGradient>
 );
 
@@ -123,47 +126,56 @@ const ProfileBadges = ({ badges }) => (
 
 // Main Profile component
 const Profile = () => {
-  const [user, setUser] = useState({
-    name: "",
-    location: "Mumbai, India",
-    followers: 15,
-    following: 20,
-    points: 250,
-    photoURL: null,
-    badges: [
-      {
-        id: 1,
-        name: "Contributor",
-        icon: "trophy",
-        reason: "Contributed to 10 issues",
-      },
-      {
-        id: 2,
-        name: "Helper",
-        icon: "hands-helping",
-        reason: "Helped resolve 5 issues",
-      },
-    ],
+  const [me, setMe] = useState({
+    username: "",
+    location: "",
+    followerCount: 0,
+    followingCount: 0,
+    points: 0,
+    profileUrl: null,
+    badges: [],
   });
+  const [loading, setLoading] = useState(true);
+
+  const { user: currentUser } = useAuthStore();
 
   useEffect(() => {
-    const currentUser = auth.currentUser;
-    if (currentUser) {
-      setUser((prev) => ({
-        ...prev,
-        name: currentUser.displayName || "Unknown User",
-        photoURL: currentUser.photoURL || null,
-      }));
-    }
-  }, []);
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        if (currentUser && currentUser.id) {
+          const response = await axios.get(`${serverurl}/user/${currentUser.id}`);
+          setMe((prev) => ({
+            ...prev,
+            ...response.data,
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [currentUser]);
+
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#3B82F6" />
+      </View>
+    );
+  }
+
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
       <ScrollView>
-        <ProfileHeader user={user} />
-        <ProfileActions user={user} />
-        <PointsSection points={user.points} />
-        <ProfileBadges badges={user.badges} />
+        <ProfileHeader me={me} />
+        <ProfileActions me={me} />
+        <PointsSection points={me.points} />
+
       </ScrollView>
     </SafeAreaView>
   );
