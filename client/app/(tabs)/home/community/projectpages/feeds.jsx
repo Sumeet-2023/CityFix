@@ -96,7 +96,7 @@ export default function Feeds() {
         end={{ x: 1, y: 1 }}
         className="px-5 pt-12 pb-6"
       >
-        <Text className="text-2xl font-bold text-white text-center mb-4">
+        <Text className="text-xl font-bold text-white text-center mb-4">
           Community Projects
         </Text>
         <View className="bg-white rounded-xl flex-row items-center px-4 py-2 mb-4">
