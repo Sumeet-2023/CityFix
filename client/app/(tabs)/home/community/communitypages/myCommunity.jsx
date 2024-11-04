@@ -4,7 +4,7 @@ import { router } from "expo-router";
 import CommunityList from '../../../../../components/community/communityList';
 import { serverurl } from '../../../../../firebaseConfig';
 import { useAuthStore } from '../../../../store';
-import { AntDesign } from '@expo/vector-icons'; // Make sure to install expo/vector-icons if not already installed
+import { AntDesign } from '@expo/vector-icons';
 
 const MyCommunities = () => {
   const {user} = useAuthStore();
@@ -38,11 +38,11 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2196F3', // You can change this to match your app's theme
+    backgroundColor: '#2196F3',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 4, // for Android shadow
-    shadowColor: '#000', // for iOS shadow
+    elevation: 4,
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,

@@ -50,7 +50,12 @@ const CommunityList = ({ userId, serverUrl }) => {
     return (
       <TouchableOpacity
         className="bg-white rounded-xl mb-4 shadow-sm overflow-hidden"
-        onPress={() => router.push("/home/community/projectpages/feeds")}
+        onPress={() => router.push({
+            pathname: '/home/community/projectpages/feeds',
+            params: {
+              communityId: community.id
+            }
+        })}
         activeOpacity={0.7}
       >
         <View className="relative">
