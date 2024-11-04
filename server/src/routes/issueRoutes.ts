@@ -36,7 +36,9 @@ router.get("/status/:status", getIssuesByStatus);
 router.get("/:id/proposals", getIssueProposals);
 router.get("/:id/proposalcount", getIssueProposalsCount);
 router.post("/:id/proposals", addProposalToIssue);
-router.post("/:id/resolve", acceptResolution);
+// Update the route for accepting a proposal resolution
+router.post("/proposals/:proposalId/accept", acceptResolution);
+
 
 // Issue comment route
 router.get('/:issueId/comments', getCommentsByIssue);

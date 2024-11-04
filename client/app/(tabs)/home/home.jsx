@@ -11,19 +11,25 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { auth, serverurl } from "../../../firebaseConfig";
-import useStore from "../../store";
+// import useStore from "../../store";
 import axios from 'axios';
+import { useAuthStore } from "../../store";
 
 const Home = () => {
-  const { setUserdata } = useStore();
+  const setUser = useAuthStore(state => state.setUser);
 
   useEffect(() => {
     const getUser = async () => {
       const email = auth.currentUser.email;
-      console.log(`${serverurl}/user/email/${email}`)
+      // const photoUrl = auth.currentUser.photoURL;
       try {
         const res = await axios.get(`${serverurl}/user/email/${email}`);
-        setUserdata(res.data.username, email, res.data.id);
+        await setUser({
+          id: res.data.id,
+          email: email,
+          username: res.data.username,
+          profileUrl: res.data.profileUrl
+        });
       } catch (error) {
         console.error("Error fetching user data:", error);
       }

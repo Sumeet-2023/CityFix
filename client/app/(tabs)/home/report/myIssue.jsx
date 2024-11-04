@@ -4,7 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import { useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { serverurl } from '../../../../firebaseConfig';
-import useStore from '../../../store';
+import { useAuthStore } from '../../../store';
 
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -124,7 +124,7 @@ const IssueCard = ({ issue, onViewProposals, onEdit, onDelete }) => {
         <View className="flex-col space-y-2">
           {/* Proposals Button */}
           <TouchableOpacity 
-            onPress={() => onViewProposals(issue.proposals, issue.user)}
+            onPress={() => onViewProposals(issue.id)}
             className="bg-gray-100 rounded-lg overflow-hidden"
           >
             <View className="px-4 py-3 flex-row items-center justify-center">
@@ -184,7 +184,7 @@ const MyIssue = () => {
   const [refreshing, setRefreshing] = useState(false); // State for refreshing
   const [error, setError] = useState(null);
   const [update, setUpdate] = useState(params.update === 'true' || false);
-  const { userdata } = useStore();
+  const { user } = useAuthStore();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedProposals, setSelectedProposals] = useState([]);
   const [proposalUser, setProposalUser] = useState(null);
@@ -193,7 +193,7 @@ const MyIssue = () => {
     try {
       setLoading(true);
       setRefreshing(true); // Set refreshing to true when starting fetch
-      const response = await axios.get(`${serverurl}/issues/user/${userdata.id}`);
+      const response = await axios.get(`${serverurl}/issues/user/${user.id}`);
       setMyIssues(response.data);
       setError(null);
       setUpdate(false);
@@ -220,12 +220,39 @@ const MyIssue = () => {
     }, [params.update])
   );
 
-  const handleViewProposals = (proposals, userdata) => {
-    setSelectedProposals(proposals);
-    setProposalUser(userdata);
-    setModalVisible(true);
+  const handleViewProposals = async (issueId) => {
+    try {
+      // Fetch the proposals for the selected issue using the issue ID
+      const response = await axios.get(`${serverurl}/issues/${issueId}/proposals`);
+      const proposals = response.data;
+      
+      setSelectedProposals(proposals);
+      setModalVisible(true);
+    } catch (error) {
+      console.error('Error fetching proposals:', error);
+      Alert.alert('Error', 'Failed to fetch proposals for the issue');
+    }
   };
-
+  
+  const handleAcceptProposal = async (proposal) => {
+    try {
+      const response = await axios.post(`${serverurl}/issues/proposals/${proposal.id}/accept`, {
+        description: proposal.proposalDescription,
+        resolverType: proposal.resolverType,
+        userId: user.id,
+      });
+  
+      if (response.status === 201) {
+        Alert.alert("Success", "Issue has been resolved successfully");
+        // Optionally, refetch issues to update the UI
+        fetchIssues();
+      }
+    } catch (error) {
+      console.error('Error accepting proposal:', error);
+      Alert.alert('Error', 'Failed to accept the proposal');
+    }
+  };  
+  
   const handleEdit = (id) => {
     console.log(`Edit issue with ID: ${id}`);
   };
@@ -297,7 +324,7 @@ const MyIssue = () => {
                     </View>
                     <View className="ml-3">
                       <Text className="font-semibold text-gray-800">
-                        {proposalUser?.username || 'Anonymous'}
+                        {proposal.user?.username || 'Anonymous'}
                       </Text>
                       <Text className="text-xs text-gray-500">
                         Proposed on: {formatDate(proposal.proposedDate)}
@@ -314,6 +341,22 @@ const MyIssue = () => {
                       </Text>
                     </View>
                   </View>
+
+                  {/* Display Proposal Images if Available */}
+                  {proposal.images && proposal.images.length > 0 && (
+                    <View className="mt-3">
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                        {proposal.images.map((image, i) => (
+                          <Image
+                            key={i}
+                            source={{ uri: image }}
+                            style={{ width: 100, height: 100, marginRight: 10 }}
+                            className="rounded-lg"
+                          />
+                        ))}
+                      </ScrollView>
+                    </View>
+                  )}
   
                   {/* Additional Info or Tags if needed */}
                   <View className="flex-row mt-3 space-x-2">
@@ -325,6 +368,30 @@ const MyIssue = () => {
                         {proposal.status || 'Pending'}
                       </Text>
                     </View>
+                  </View>
+                  <View className="flex-row justify-between mt-4">
+                    <TouchableOpacity
+                      className="flex-1 bg-green-500 rounded-lg mr-2 overflow-hidden"
+                      onPress={() => handleAcceptProposal(proposal)}
+                    >
+                      <View className="px-4 py-3 flex-row items-center justify-center">
+                        <MaterialIcons name="check-circle" size={18} color="white" />
+                        <Text className="ml-2 font-medium text-white">Accept</Text>
+                      </View>
+                    </TouchableOpacity>
+  
+                    <TouchableOpacity
+                      className="flex-1 bg-red-500 rounded-lg ml-2 overflow-hidden"
+                      onPress={() => {
+                        // Placeholder action for deny button
+                        Alert.alert("Proposal Denied", "You have denied this proposal.");
+                      }}
+                    >
+                      <View className="px-4 py-3 flex-row items-center justify-center">
+                        <MaterialIcons name="cancel" size={18} color="white" />
+                        <Text className="ml-2 font-medium text-white">Deny</Text>
+                      </View>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
@@ -380,7 +447,7 @@ const MyIssue = () => {
           <IssueCard
             key={issue.id}
             issue={issue}
-            onViewProposals={(proposals, user) => handleViewProposals(proposals, user)}
+            onViewProposals={() => handleViewProposals(issue.id)}
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
@@ -392,7 +459,7 @@ const MyIssue = () => {
         </View>
       )}
     </ScrollView>
-  );
+  );  
 };
 
 export default MyIssue;

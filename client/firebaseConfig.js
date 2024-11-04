@@ -8,6 +8,7 @@ if (typeof window !== "undefined") {
 import { initializeAuth } from "firebase/auth";
 import { getReactNativePersistence } from '@firebase/auth/dist/rn/index.js'; 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getFirestore } from "firebase/firestore";
 
 // Environment variables for Firebase configuration
 const {
@@ -58,5 +59,7 @@ if (getAnalytics) {
       console.error("Error checking analytics support:", error);
     });
 }
+
+export const db = getFirestore(app);
 
 export { auth, analytics };

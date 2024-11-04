@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -15,6 +16,14 @@ import { MaterialIcons, Feather } from "@expo/vector-icons";
 import axios from "axios";
 import { serverurl } from "../../../firebaseConfig";
 import useStore from "../../store";
+=======
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, Image, TextInput, TouchableOpacity, ActivityIndicator, Animated } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { MaterialIcons, Feather } from '@expo/vector-icons';
+import axios from 'axios';
+import { serverurl } from '../../../firebaseConfig';
+>>>>>>> issueResolution
 
 const IssueDetails = () => {
   const { id } = useLocalSearchParams();

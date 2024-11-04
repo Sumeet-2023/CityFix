@@ -42,7 +42,8 @@ export const getUserByEmail = async (req: Request, res: Response): Promise<void>
             select: {
                 id: true,
                 email: true,
-                username: true
+                username: true,
+                profileUrl: true
             },
         });
 
@@ -99,6 +100,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
         lastname?: string;
         email?: string;
         updatedAt?: Date;
+        profileUrl?: string;
     } = {};
 
     if (req.body.username !== undefined) updateData.username = req.body.username;
@@ -109,6 +111,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     if (req.body.firstname !== undefined) updateData.firstname = req.body.firstname;
     if (req.body.lastname !== undefined) updateData.lastname = req.body.lastname;
     if (req.body.email !== undefined) updateData.email = req.body.email;
+    if (req.body.profileUrl !== undefined) updateData.profileUrl = req.body.profileUrl;
 
     updateData.updatedAt = new Date();
 

@@ -73,7 +73,7 @@ export const createIssue = async (req: Request, res: Response): Promise<void> =>
     reportedDate,
     location,
     authorityNeeds,
-    issuePhotos
+    // issuePhotos
   } = req.body;
 
   try {
@@ -97,7 +97,7 @@ export const createIssue = async (req: Request, res: Response): Promise<void> =>
         reportedDate,
         location,
         authorityNeeds,
-        issuePhotos: issuePhotos || null
+        // issuePhotos: issuePhotos || null
       },
       include: {
         user: true,
@@ -120,13 +120,11 @@ export const getIssueById = async (req: Request, res: Response): Promise<void> =
         proposals: {
           include: {
             user: true,
-            community: true,
           },
         },
         resolution: {
           include: {
             user: true,
-            community: true,
           },
         },
         comments: { // Include comments here
@@ -253,18 +251,21 @@ export const getIssuesByStatus = async (req: Request, res: Response): Promise<vo
 };
 
 export const getIssueProposals = async (req: Request, res: Response): Promise<void> => {
-  const {id} = req.params;
+  const { id } = req.params;
   try {
-      const proposal = await prisma.resolutionProposal.findMany({
-        where: {
-          issueId: id
-        }  
-      })
-      res.json(proposal);
+    const proposals = await prisma.resolutionProposal.findMany({
+      where: {
+        issueId: id,
+      },
+      include: {
+        user: true, // Including user info for proposer details
+      },
+    });
+    res.json(proposals);
   } catch (error: any) {
-    res.status(500).json({message: `Error retreiving issue proposals: ${error.message}`});
+    res.status(500).json({ message: `Error retrieving issue proposals: ${error.message}` });
   }
-}
+};
 
 export const getIssueProposalsCount = async (req: Request, res: Response): Promise<void> => {
   const {id} = req.params;
@@ -281,26 +282,30 @@ export const getIssueProposalsCount = async (req: Request, res: Response): Promi
 }
 
 export const addProposalToIssue = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
+  const { id } = req.params; // `id` represents the issue ID
   const { 
     proposalDescription, 
-    resolverType,
-    userId,
-    communityId 
+    resolverType, // AUTHORITY or USER
+    userId
   } = req.body;
 
   try {
+    // Validate that `userId` is provided
+    if (!userId) {
+      res.status(400).json({ message: "userId must be provided." });
+      return;
+    }
+
+    // Create a new proposal linked to the issue
     const proposal = await prisma.resolutionProposal.create({
       data: {
         proposalDescription,
         resolverType,
         userId,
-        communityId,
-        issueId: id,
+        issueId: id, // Link this proposal to the specific issue
       },
       include: {
         user: true,
-        community: true,
       },
     });
 
@@ -311,45 +316,80 @@ export const addProposalToIssue = async (req: Request, res: Response): Promise<v
 };
 
 export const acceptResolution = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
+  const { proposalId } = req.params; // Use `proposalId` to identify the proposal
   const { 
     description,
     resolverType,
     userId,
-    communityId 
   } = req.body;
 
+  // Debugging: Ensure all required fields are present
+  if (!proposalId || !description || !resolverType || !userId) {
+    res.status(400).json({ message: "Missing required fields: proposalId, description, resolverType, and userId are all required." });
+    return;
+  }
+
   try {
-    const resolution = await prisma.$transaction(async (prisma) => {
-      // Create the accepted resolution
-      const acceptedResolution = await prisma.acceptedIssueResolution.create({
-        data: {
-          description,
-          resolverType,
-          userId,
-          communityId,
-          issueId: id,
-        },
-        include: {
-          user: true,
-          community: true,
-        },
-      });
-
-      // Update the issue status to CLOSED
-      await prisma.issue.update({
-        where: { id },
-        data: { 
-          status: Status.CLOSED,
-          lastUpdated: new Date(),
-        },
-      });
-
-      return acceptedResolution;
+    // Find the proposal by ID
+    const proposal = await prisma.resolutionProposal.findUnique({
+      where: { id: proposalId },
     });
 
-    res.status(201).json(resolution);
+    // If the proposal does not exist, return a 404 response
+    if (!proposal) {
+      res.status(404).json({ message: "Resolution proposal not found." });
+      return;
+    }
+
+    // Retrieve the issue ID from the proposal
+    const issueId = proposal.issueId;
+
+    // Check if the issue exists
+    const existingIssue = await prisma.issue.findUnique({
+      where: { id: issueId },
+    });
+
+    // If the issue does not exist, return a 404 response
+    if (!existingIssue) {
+      res.status(404).json({ message: "Issue not found." });
+      return;
+    }
+
+    // Ensure the user exists (optional but recommended)
+    const existingUser = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!existingUser) {
+      res.status(404).json({ message: "User not found." }); 
+      return;
+    }
+
+    // Create the accepted resolution entry
+    const acceptedResolution = await prisma.acceptedIssueResolution.create({
+      data: {
+        description,
+        resolverType,
+        userId,
+        issueId,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    // Update the issue status to CLOSED
+    await prisma.issue.update({
+      where: { id: issueId },
+      data: { 
+        status: Status.CLOSED,
+        lastUpdated: new Date(),
+      },
+    });
+
+    res.status(201).json(acceptedResolution);
   } catch (error: any) {
+    console.error('Error accepting resolution:', error);
     res.status(500).json({ message: `Error accepting resolution: ${error.message}` });
   }
 };

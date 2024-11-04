@@ -148,6 +148,9 @@ export const getCommunityById = async (req: Request, res: Response): Promise<voi
   try {
     const community = await prisma.community.findUnique({
       where: { id: String(id) },
+      include: {
+        members: true
+      }
     });
 
     if (!community) {
@@ -309,5 +312,106 @@ export const deleteCommunity = async (req: Request, res: Response): Promise<void
   } catch (error: any) {
     console.error("Error deleting community:", error);
     res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+export const getUserOwnedCommunities = async (req: Request, res: Response): Promise<void> => {
+  const { creatorId } = req.params;
+
+  try {
+    // Validate creatorId
+    if (!creatorId) {
+      res.status(400).json({ message: "Creator ID is required" });
+      return;
+    }
+
+    const community = await prisma.community.findMany({
+      where: {
+        creatorId: {
+          equals: creatorId,
+          not: null // Explicitly exclude null values
+        }
+      },
+      include: {
+        creator: {
+          select: {
+            username: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    if (community.length === 0) {
+      res.status(200).json({ message: "No communities found for this creator", communities: [] });
+      return;
+    }
+
+    res.status(200).json(community);
+  } catch (error: any) {
+    console.error("Error fetching communities:", error);
+    res.status(500).json({
+      message: "Could not get community list for the specified user",
+      error: error.message
+    });
+  }
+};
+
+export const getUserCommunities = async (req: Request, res: Response): Promise<void> => {
+  const { userId } = req.params;
+
+  try {
+    // Validate creatorId
+    if (!userId) {
+      res.status(400).json({ message: "User ID is required" });
+      return;
+    }
+
+    const communities = await prisma.community.findMany({
+      where: {
+        OR: [
+          { creatorId: userId },
+          {
+            members: {
+              some: {
+                userId: userId
+              }
+            }
+          }
+        ]
+      },
+      include: {
+        creator: {
+          select: {
+            username: true,
+            email: true
+          }
+        },
+        members: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                email: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if (communities.length === 0) {
+      res.status(200).json({ message: "No communities found for this user", communities: [] });
+      return;
+    }
+
+    res.status(200).json(communities);
+  } catch (error: any) {
+    console.error("Error fetching communities:", error);
+    res.status(500).json({
+      message: "Could not get community list for the specified user",
+      error: error.message
+    });
   }
 };
