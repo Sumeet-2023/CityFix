@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -15,15 +14,8 @@ import { useLocalSearchParams } from "expo-router";
 import { MaterialIcons, Feather } from "@expo/vector-icons";
 import axios from "axios";
 import { serverurl } from "../../../firebaseConfig";
-import useStore from "../../store";
-=======
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Image, TextInput, TouchableOpacity, ActivityIndicator, Animated } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { MaterialIcons, Feather } from '@expo/vector-icons';
-import axios from 'axios';
-import { serverurl } from '../../../firebaseConfig';
->>>>>>> issueResolution
+// import useStore from "../../store";
+import { useAuthStore } from "../../store";
 
 const IssueDetails = () => {
   const { id } = useLocalSearchParams();
@@ -33,7 +25,7 @@ const IssueDetails = () => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [rotateAnim] = useState(new Animated.Value(0));
-  const { userdata } = useStore();
+  const { user } = useStore();
   useEffect(() => {
     fetchIssueDetails();
     
@@ -74,7 +66,7 @@ const IssueDetails = () => {
     try {
       const response = await axios.post(`${serverurl}/issues/${id}/comments`, {
         content: newComment,
-        userId: userdata.id, // Pass the userId if you want to associate the comment with a user
+        userId: user.id, // Pass the userId if you want to associate the comment with a user
       });
 
       console.log("Comment posted successfully:", response.data);
