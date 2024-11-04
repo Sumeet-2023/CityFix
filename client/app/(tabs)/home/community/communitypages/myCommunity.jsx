@@ -1,55 +1,55 @@
 import React from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from "expo-router";
+import CommunityList from '../../../../../components/community/communityList';
+import { serverurl } from '../../../../../firebaseConfig';
+import { useAuthStore } from '../../../../store';
+import { AntDesign } from '@expo/vector-icons'; // Make sure to install expo/vector-icons if not already installed
 
-// Sample data for communities
-const communityData = [
-  {
-    id: '1',
-    name: 'Yoga Enthusiasts',
-    description: 'A community for yoga lovers to connect and share.',
-    location: 'San Francisco, CA',
-    photo: 'https://example.com/yoga-community.jpg',
-  },
-  {
-    id: '2',
-    name: 'Mountain Bikers',
-    description: 'Join us for mountain biking adventures!',
-    location: 'Denver, CO',
-    photo: 'https://example.com/biking-community.jpg',
-  },
-  {
-    id: '3',
-    name: 'Cooking Masters',
-    description: 'For those who love to cook and learn new recipes.',
-    location: 'New York, NY',
-    photo: 'https://example.com/cooking-community.jpg',
-  },
-];
+const MyCommunities = () => {
+  const {user} = useAuthStore();
 
-const CommunityCard = ({ community }) => (
-  <TouchableOpacity className="bg-white p-4 rounded-lg shadow-md mb-4 flex-row items-center" onPress={() => router.push("/home/community/projectpages/feeds")}>
-    <Image
-      source={{ uri: community.photo }}
-      className="w-16 h-16 rounded-full mr-4"
-    />
-    <View className="flex-1">
-      <Text className="text-lg font-bold text-gray-800">{community.name}</Text>
-      <Text className="text-sm text-gray-600">{community.description}</Text>
-      <Text className="text-sm text-gray-500">{community.location}</Text>
-    </View>
-  </TouchableOpacity>
-);
+  const handleCreateCommunity = () => {
+    router.push('/(modals)/createCommunity');
+  };
 
-const CommunityList = () => {
   return (
-    <FlatList
-      data={communityData}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => <CommunityCard community={item} />}
-      contentContainerStyle={{ padding: 16 }}
-    />
+    <View style={styles.container}>
+      <CommunityList serverUrl={serverurl} userId={user?.id}/>
+      <TouchableOpacity 
+        style={styles.fab}
+        onPress={handleCreateCommunity}
+      >
+        <AntDesign name="plus" size={24} color="white" />
+      </TouchableOpacity>
+    </View>
   );
 };
 
-export default CommunityList;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    position: 'relative',
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#2196F3', // You can change this to match your app's theme
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4, // for Android shadow
+    shadowColor: '#000', // for iOS shadow
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+});
+
+export default MyCommunities;

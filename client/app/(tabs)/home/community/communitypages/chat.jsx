@@ -22,7 +22,6 @@ const CommunityChannels = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuthStore();
 
-  // Categories based on your needs
   const categories = [
     'Your',
     'Explore',

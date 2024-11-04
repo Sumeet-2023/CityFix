@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, Modal, Alert, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, Image, Modal, Alert, TouchableOpacity, ScrollView, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MapView, { Marker } from 'react-native-maps';
 import * as ImagePicker from 'expo-image-picker';
@@ -11,14 +11,16 @@ import {
   Provider as PaperProvider,
   DefaultTheme,
   IconButton,
+  List,
   Card,
   Surface,
 } from 'react-native-paper';
 // import useStore from '../../../../store';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { serverurl } from '../../../../../firebaseConfig';
+import { serverurl, openroutekey } from '../../firebaseConfig';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useAuthStore } from '../../../../store';
+import { useAuthStore } from '../store';
+import CreateCommunityHeader from '../../components/community/createCommunityHeader';
 
 const enhancedTheme = {
   ...DefaultTheme,
@@ -44,6 +46,8 @@ const CreateCommunity = () => {
     city: 'Los Angeles',
     country: 'USA'
   });
+  const [locationQuery, setLocationQuery] = useState('');
+  const [locationSuggestions, setLocationSuggestions] = useState([]);
   const [images, setImages] = useState([]);
   const [showMap, setShowMap] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
@@ -59,6 +63,52 @@ const CreateCommunity = () => {
       setImages([...images, result.assets[0].uri]);
     }
   };
+
+  const fetchLocationSuggestions = async () => {
+    if (locationQuery.trim().length === 0) {
+      setLocationSuggestions([]);
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `https://api.openrouteservice.org/geocode/autocomplete?api_key=${openroutekey}&text=${locationQuery}`
+      );
+      setLocationSuggestions(response.data.features || []);
+    } catch (error) {
+      console.error('Error fetching location suggestions:', error.message);
+    }
+  };
+
+  const handleMapClose = async () => {
+    setShowMap(false);
+  
+    try {
+      const res = await axios.get(
+        `https://api.openrouteservice.org/geocode/reverse?api_key=${openroutekey}&point.lon=${location.coordinates[0]}&point.lat=${location.coordinates[1]}`
+      );
+  
+      const locationData = res.data.features[0].properties;
+      setLocation({
+        ...location,
+        country: locationData.country || '',
+        city: locationData.locality || '',
+        state: locationData.region || '',
+      });
+    } catch (error) {
+      console.error('Error fetching reverse geocode:', error.message);
+    }
+  };
+
+  const handleMarkerDrag = (e) => {
+    const { latitude, longitude } = e.nativeEvent.coordinate;
+    setLocation({
+      ...location,
+      type: 'Point',
+      coordinates: [longitude, latitude],
+    });
+    setLocationQuery('');
+  };
+
 
   const handleRemovePhoto = (index) => {
     const newImages = [...images];
@@ -178,6 +228,7 @@ const CreateCommunity = () => {
   return (
     <PaperProvider theme={enhancedTheme}>
       <SafeAreaView className="flex-1 bg-gray-50">
+        <CreateCommunityHeader />
         <ScrollView>
           <LinearGradient
             colors={['#4F46E5', '#818CF8']}
@@ -303,37 +354,79 @@ const CreateCommunity = () => {
         </ScrollView>
 
         <Modal visible={showMap} animationType="slide">
-          <SafeAreaView className="flex-1">
+            <View className="flex-1 bg-white">
+            <View className="p-4">
+                <TextInput
+                mode="outlined"
+                value={locationQuery}
+                onChangeText={setLocationQuery}
+                placeholder="Search location"
+                onEndEditing={fetchLocationSuggestions}
+                className="bg-white mb-0"
+                />
+            </View>
+
+            {locationSuggestions.length > 0 && (
+                <View className="mx-4 max-h-36 bg-white shadow rounded-lg">
+                <FlatList
+                    data={locationSuggestions}
+                    keyExtractor={(item) => item.properties.id}
+                    renderItem={({ item }) => (
+                    <List.Item
+                        onPress={() => {
+                        setLocation({
+                            ...location,
+                            type: 'Point',
+                            coordinates: [
+                            item.geometry.coordinates[0],
+                            item.geometry.coordinates[1],
+                            ],
+                        });
+                        setLocationQuery(item.properties.label);
+                        setLocationSuggestions([]);
+                        }}
+                        title={item.properties.label}
+                        titleNumberOfLines={2}
+                        className="border-b border-gray-100"
+                    />
+                    )}
+                />
+                </View>
+            )}
+
             <MapView
-              className="flex-1"
-              region={{
+                className="flex-1"
+                region={{
                 latitude: location.coordinates[1],
                 longitude: location.coordinates[0],
                 latitudeDelta: 0.01,
                 longitudeDelta: 0.01,
-              }}
-              onPress={handleMapPress}
+                }}
+                onPress={handleMapPress}
             >
-              <Marker
+                <Marker
                 coordinate={{
-                  latitude: location.coordinates[1],
-                  longitude: location.coordinates[0],
+                    latitude: location.coordinates[1],
+                    longitude: location.coordinates[0],
                 }}
                 title="Community Location"
-              />
+                draggable={true}
+                onDragEnd={handleMarkerDrag}
+                />
             </MapView>
-            <View className="p-4 bg-white">
-              <Button
+
+            <Button
                 mode="contained"
-                onPress={() => setShowMap(false)}
+                onPress={handleMapClose}
+                className="m-4"
                 contentStyle={{ height: 50 }}
                 labelStyle={{ fontSize: 16, fontWeight: '600' }}
-              >
+            >
                 Confirm Location
-              </Button>
+            </Button>
             </View>
-          </SafeAreaView>
         </Modal>
+
 
         <PhotoGalleryModal />
       </SafeAreaView>

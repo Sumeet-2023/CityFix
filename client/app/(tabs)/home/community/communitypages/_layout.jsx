@@ -22,9 +22,9 @@ export default function TabLayout() {
         }}
        >      
         <MaterialTopTabs.Screen name="myCommunity" options={{ title: "Your Communities" }} />
-        <MaterialTopTabs.Screen name="createCommunity" options={{ title: "Create Community" }} />
-        {/* <MaterialTopTabs.Screen name="chat" options={{ title: "Chat" }} />
-        <MaterialTopTabs.Screen name="chatRoom" options={{ title: "Create Community" }} /> */}
+        {/* <MaterialTopTabs.Screen name="createCommunity" options={{ title: "Create Community" }} /> */}
+        <MaterialTopTabs.Screen name="chat" options={{ title: "Chat" }} />
+        {/* <MaterialTopTabs.Screen name="chatRoom" options={{ title: "Create Community" }} /> */}
      
       </MaterialTopTabs>
  

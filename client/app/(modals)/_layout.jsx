@@ -18,27 +18,18 @@ const ChatLayout = () => {
       <Stack.Screen
         name="chatRoom"
         options={{
-        //   title: 'Chats',
           headerShown: false,
-        //   headerShadowVisible: false,
-        //   headerStyle: {
-        //     backgroundColor: '#F9FAFB'
-        //   },
-        //   headerTitleStyle: {
-        //     fontWeight: '600',
-        //     color: '#111827'
-        //   },
         }}
       />
-      {/* <Stack.Screen
-        name="[id]"
+      <Stack.Screen
+        name="createCommunity"
         options={{
           headerShown: false,
           gestureEnabled: Platform.OS === 'ios',
           gestureDirection: 'horizontal',
           animation: 'slide_from_right'
         }}
-      /> */}
+      />
     </Stack>
   );
 };
