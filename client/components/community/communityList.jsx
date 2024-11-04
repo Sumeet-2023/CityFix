@@ -65,7 +65,7 @@ const CommunityList = ({ userId, serverUrl }) => {
     );
   }
 
-  if (communities.length === 0) {
+  if (communities[0]?.id === undefined) {
     return (
       <View className="flex-1 justify-center items-center px-5">
         <MaterialCommunityIcons name="account-group" size={48} color="#666" />

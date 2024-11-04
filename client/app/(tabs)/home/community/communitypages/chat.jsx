@@ -15,6 +15,18 @@ import { serverurl } from '../../../../../firebaseConfig';
 import { useAuthStore } from '../../../../store';
 import { router } from 'expo-router';
 
+const CommunityNotFound = () => {
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
+      <View style={{ alignItems: 'center', marginTop: 40 }}>
+        <Text style={{ fontSize: 16, color: '#000' }}>
+          No communities joined or created yet
+        </Text>
+      </View>
+    </SafeAreaView>
+  )
+}
+
 const CommunityChannels = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('Your');
@@ -51,9 +63,16 @@ const CommunityChannels = () => {
     return communityName.charAt(0).toUpperCase();
   };
 
-  const filteredCommunities = communities.filter(community => 
-    community.communityName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredCommunities = Array.isArray(communities)
+  ? communities.filter(community =>
+      community.communityName.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  : [];
+
+  // if (communities[0]?.id === undefined) {
+  //   console.log('Community Not Found');
+  //   return <CommunityNotFound />;
+  // }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
@@ -120,86 +139,94 @@ const CommunityChannels = () => {
         </ScrollView>
 
         {/* Communities List */}
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {isLoading ? (
-            <ActivityIndicator size="large" color="#111827" style={{ marginTop: 20 }} />
-          ) : (
-            filteredCommunities.map((community) => (
-              <TouchableOpacity
-                key={community.id}
-                style={{
-                  backgroundColor: 'white',
-                  borderRadius: 12,
-                  padding: 16,
-                  marginBottom: 12,
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 1 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 2,
-                  elevation: 2
-                }}
-                onPress={() => router.push({
-                  pathname: "/(modals)/chatRoom",
-                  params: {
-                    id: community.id
-                  }
-                })}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    {community.communityPhotos && community.communityPhotos.length > 0 ? (
-                      <Image
-                        source={{ uri: community.communityPhotos[0] }}
-                        style={{
+        {communities[0]?.id !== undefined ? (
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {isLoading ? (
+              <ActivityIndicator size="large" color="#111827" style={{ marginTop: 20 }} />
+            ) : (
+              filteredCommunities.map((community) => (
+                <TouchableOpacity
+                  key={community.id}
+                  style={{
+                    backgroundColor: 'white',
+                    borderRadius: 12,
+                    padding: 16,
+                    marginBottom: 12,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 1 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 2,
+                    elevation: 2
+                  }}
+                  onPress={() => router.push({
+                    pathname: "/(modals)/chatRoom",
+                    params: {
+                      id: community.id
+                    }
+                  })}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      {community.communityPhotos && community.communityPhotos.length > 0 ? (
+                        <Image
+                          source={{ uri: community.communityPhotos[0] }}
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 8,
+                            marginRight: 12
+                          }}
+                        />
+                      ) : (
+                        <View style={{
+                          backgroundColor: '#F3F4F6',
+                          borderRadius: 8,
+                          padding: 12,
+                          marginRight: 12,
                           width: 40,
                           height: 40,
-                          borderRadius: 8,
-                          marginRight: 12
-                        }}
-                      />
-                    ) : (
-                      <View style={{
-                        backgroundColor: '#F3F4F6',
-                        borderRadius: 8,
-                        padding: 12,
-                        marginRight: 12,
-                        width: 40,
-                        height: 40,
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        <Text style={{ fontSize: 16, fontWeight: '600', color: '#4B5563' }}>
-                          {getDefaultIcon(community.communityName)}
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <Text style={{ fontSize: 16, fontWeight: '600', color: '#4B5563' }}>
+                            {getDefaultIcon(community.communityName)}
+                          </Text>
+                        </View>
+                      )}
+                      <View>
+                        <Text style={{ fontSize: 16, fontWeight: '600', color: '#111827' }}>
+                          {community.communityName}
                         </Text>
-                      </View>
-                    )}
-                    <View>
-                      <Text style={{ fontSize: 16, fontWeight: '600', color: '#111827' }}>
-                        {community.communityName}
-                      </Text>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
-                        <Text style={{ color: '#6B7280', fontSize: 12 }}>
-                          Community #{community.communityNumber}
-                        </Text>
-                        <View style={{
-                          width: 4,
-                          height: 4,
-                          borderRadius: 2,
-                          backgroundColor: '#D1D5DB',
-                          marginHorizontal: 8
-                        }} />
-                        <Text style={{ color: '#6B7280', fontSize: 12 }}>
-                          {community.location.city}, {community.location.country}
-                        </Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                          <Text style={{ color: '#6B7280', fontSize: 12 }}>
+                            Community #{community.communityNumber}
+                          </Text>
+                          <View style={{
+                            width: 4,
+                            height: 4,
+                            borderRadius: 2,
+                            backgroundColor: '#D1D5DB',
+                            marginHorizontal: 8
+                          }} />
+                          <Text style={{ color: '#6B7280', fontSize: 12 }}>
+                            {community.location.city}, {community.location.country}
+                          </Text>
+                        </View>
                       </View>
                     </View>
+                    <Ionicons name="chevron-forward" size={20} color="#6B7280" />
                   </View>
-                  <Ionicons name="chevron-forward" size={20} color="#6B7280" />
-                </View>
-              </TouchableOpacity>
-            ))
-          )}
-        </ScrollView>
+                </TouchableOpacity>
+              ))
+            )}
+          </ScrollView>
+        ):(
+          <View style={{ alignItems: 'center', marginTop: 40 }}>
+            <Text style={{ fontSize: 16, color: '#6B7280' }}>
+              No communities joined or created yet
+            </Text>
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );

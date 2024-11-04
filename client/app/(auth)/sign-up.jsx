@@ -19,24 +19,20 @@ const SignUp = () => {
     }
 
     try {
-      // First create Firebase user
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
   
-      // Update user profile
       await updateProfile(user, {
         displayName: fullName,
       });
   
       console.log('User profile updated with name:', fullName);
       
-      // Prepare user data for server
       const currentUserData = {
         email: email,
         username: fullName
       };
   
-      // Make POST request to your server
       try {
         const response = await axios.post(`${serverurl}/user`, currentUserData);
         console.log('Server response:', response.data);
@@ -47,8 +43,6 @@ const SignUp = () => {
           status: axiosError.response?.status,
           url: `${serverurl}/user`
         });
-        // You might want to handle this error appropriately
-        // Consider if you need to delete the Firebase user if the server POST fails
       }
   
       // Navigate to Home Screen after successful signup

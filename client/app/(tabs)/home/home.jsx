@@ -11,7 +11,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { auth, serverurl } from "../../../firebaseConfig";
-// import useStore from "../../store";
 import axios from 'axios';
 import { useAuthStore } from "../../store";
 
@@ -21,7 +20,6 @@ const Home = () => {
   useEffect(() => {
     const getUser = async () => {
       const email = auth.currentUser.email;
-      // const photoUrl = auth.currentUser.photoURL;
       try {
         const res = await axios.get(`${serverurl}/user/email/${email}`);
         await setUser({
@@ -33,8 +31,15 @@ const Home = () => {
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
-    };    
-    getUser();
+    };
+
+    // Delay the fetch call by 2-3 seconds
+    const timer = setTimeout(() => {
+      getUser();
+    }, 2000); // 2000 milliseconds = 2 seconds
+
+    // Cleanup the timer on component unmount
+    return () => clearTimeout(timer);
   }, []);
 
   const menuItems = [
@@ -58,7 +63,6 @@ const Home = () => {
     <SafeAreaView className="flex-1 bg-white p-4">
       <StatusBar barStyle={'dark-content'} />
       <ScrollView>
-        
         <View className="flex-row justify-between items-center mb-4">
           <Text className="text-4xl font-bold">Home</Text>
           <TouchableOpacity onPress={handleSettingsPress}>
@@ -75,7 +79,7 @@ const Home = () => {
           />
         </View>
 
-        <Text className="text-xl font-bold mb-3">My DashBoard</Text>
+        <Text className="text-xl font-bold mb-3">My Dashboard</Text>
         <View className="bg-white rounded-lg shadow-lg divide-y divide-gray-200">
           {menuItems.map((item, index) => (
             <TouchableOpacity
