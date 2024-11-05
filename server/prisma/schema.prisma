@@ -161,7 +161,7 @@ model Project {
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @default(now())
   contactInfo         ContactInfo
-  status              ProjectStatus
+  status              ProjectStatus    @default(VOTING)
 
   // community
   communityId         String?          @db.ObjectId
@@ -295,6 +295,7 @@ model UserCommunities {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   userId      String   @db.ObjectId
   communityId String   @db.ObjectId 
+  role        CommunityRoles @default(MEMBER)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   community   Community     @relation(fields: [communityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   @@unique([userId, communityId])
@@ -359,6 +360,7 @@ enum ProjectStatus {
   INACTIVE
   ONGOING
   COMPLETED
+  VOTING
 }
 
 enum EventStatus {
@@ -370,6 +372,12 @@ enum EventStatus {
 enum ResolutionStatus {
   ACCEPTED
   PENDING
+}
+
+enum CommunityRoles {
+  CREATOR
+  COORDINATOR
+  MEMBER
 }
 
 enum FundingType {

@@ -13,6 +13,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import FoldableLegend from '../../components/map/foldableLegend';
 import ClanSearch from '../../components/map/clanSearch';
+import { serverurl } from '../../firebaseConfig';
 
 const MARKER_COLORS = {
   issue: '#1565C0',      // Darker blue
@@ -67,11 +68,11 @@ export default function Explore() {
   const [searchLocation, setSearchLocation] = useState(null);
   const [searchLocationDetails, setSearchLocationDetails] = useState(null);
   
-  const [radius, setRadius] = useState(4000);
+  const [radius, setRadius] = useState(400000);
   const [errorMsg, setErrorMsg] = useState('');
   const [nearbyLocations, setNearbyLocations] = useState({
     issues: [],
-    crowd: [],
+    clan: [],
     communities: []
   });
   const [showUserLocation, setShowUserLocation] = useState(false);
@@ -92,7 +93,7 @@ export default function Explore() {
   const fetchNearbyLocations = async (latitude, longitude) => {
     try {
       const response = await fetch(
-        `https://nfjmfmrf-3000.inc1.devtunnels.ms/explore?latitude=${latitude}&longitude=${longitude}&radius=${radius}`
+        `${serverurl}/explore?latitude=${latitude}&longitude=${longitude}&radius=${radius/1000}`
       );
       
       if (!response.ok) {
@@ -219,9 +220,9 @@ export default function Explore() {
           </Marker>
         ))}
 
-        {nearbyLocations.crowd.map((location) => (
+        {nearbyLocations.clan.map((location) => (
           <Marker
-            key={`crowd-${location.clanTag}`}
+            key={`clan-${location.clanTag}`}
             coordinate={{ 
               latitude: location.location.coordinates[1], 
               longitude: location.location.coordinates[0] 
@@ -233,15 +234,15 @@ export default function Explore() {
           </Marker>
         ))}
 
-        {nearbyLocations.communities.map((location) => (
+        {nearbyLocations.communities.map((community, index) => (
           <Marker
-            key={`community-${location.projectNumber}`}
+            key={`community-${community.id || index}`}
             coordinate={{ 
-              latitude: location.location?.latitude || 0, 
-              longitude: location.location?.longitude || 0 
+              latitude: community.location?.latitude || 0, 
+              longitude: community.location?.longitude || 0 
             }}
             onPress={() => handleMarkerPress(location)}
-            title={location.projectName}
+            title={community.communityName}
           >
             <CustomMarker type="community" />
           </Marker>

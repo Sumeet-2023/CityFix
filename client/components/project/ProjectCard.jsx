@@ -131,21 +131,29 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
                 className="bg-red-100 px-6 py-3 rounded-xl flex-row items-center"
                 onPress={() => handleLeaveProject(item.id)}
               >
-                <Ionicons name="exit-outline" size={18} color="#DC2626" />
-                <Text className="text-red-600 font-bold ml-2">Leave</Text>
+                <Ionicons name="thumbs-down-outline" size={18} color="#DC2626" />
+                <Text className="text-red-600 font-bold ml-2">Down Vote</Text>
               </TouchableOpacity>
             </View>
           );
         
         case 'nonMemberProjects':
+          var icon = "enter-outline";
+          var actionText = '';
+          if (item.status === 'ACTIVE') {
+            actionText = 'Join Project'
+          } else {
+            actionText = 'Vote Project';
+            icon = "thumbs-up-outline";
+          }
           return (
             <View className="flex-row justify-between">
               <TouchableOpacity 
                 className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center flex-1 mr-3"
                 onPress={() => handleJoinProject(item.id)}
               >
-                <Ionicons name="enter-outline" size={18} color="white" />
-                <Text className="text-white font-bold ml-2">Join Project</Text>
+                <Ionicons name={icon} size={18} color="white" />
+                <Text className="text-white font-bold ml-2">{actionText}</Text>
               </TouchableOpacity>
               <TouchableOpacity 
                 className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center"
@@ -155,7 +163,7 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
                 <Text className="text-gray-700 font-bold ml-2">Info</Text>
               </TouchableOpacity>
             </View>
-          );
+        );
         
         default:
           return (
@@ -176,20 +184,22 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
                   <Text className="text-red-600 font-bold ml-2">Delete</Text>
                 </TouchableOpacity>
               ) : !item.members?.some(member => member.userId === userId) ? (
-                <TouchableOpacity 
+                <TouchableOpacity
                   className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center"
                   onPress={() => handleJoinProject(item.id)}
                 >
-                  <Ionicons name="enter-outline" size={18} color="#4B5563" />
-                  <Text className="text-gray-700 font-bold ml-2">Join</Text>
+                  <Ionicons name="thumbs-up-outline" size={18} color="#4B5563" />
+                  <View className="bg-indigo-600 rounded-full px-2 py-1 ml-2">
+                    <Text className="text-white text-xs font-bold">{item.members.length + 1}</Text>
+                  </View>
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity 
                   className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center"
                   onPress={() => handleLeaveProject(item.id)}
                 >
-                  <Ionicons name="exit-outline" size={18} color="#4B5563" />
-                  <Text className="text-gray-700 font-bold ml-2">Leave</Text>
+                  <Ionicons name="thumbs-down-outline" size={18} color="#4B5563" />
+                  <Text className="text-gray-700 font-bold ml-2"></Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -198,77 +208,105 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
     };
   
     return (
-      <TouchableOpacity 
-        onPress={() => onPress(item)}
-        className="bg-white rounded-2xl mb-4 overflow-hidden shadow-lg"
-        activeOpacity={0.7}
+    <TouchableOpacity
+      onPress={() => onPress(item)}
+      className="bg-white rounded-2xl mb-4 overflow-hidden shadow-lg"
+      ACTIVEOpacity={0.7}
+    >
+      <LinearGradient
+        colors={
+          filterType === 'userCreatedProjects'
+            ? ['#7C3AED', '#A78BFA']
+            : filterType === 'userProjects'
+            ? ['#4F46E5', '#818CF8']
+            : filterType === 'nonMemberProjects'
+            ? ['#6366F1', '#A5B4FC']
+            : ['#4F46E5', '#818CF8']
+        }
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        className="px-4 py-4"
       >
-        <LinearGradient
-          colors={
-            filterType === 'userCreatedProjects' ? ['#7C3AED', '#A78BFA'] :
-            filterType === 'userProjects' ? ['#4F46E5', '#818CF8'] : 
-            filterType === 'nonMemberProjects' ? ['#6366F1', '#A5B4FC'] : 
-            ['#4F46E5', '#818CF8']
-          }
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          className="px-4 py-2"
-        >
-          <View className="flex-row justify-between items-center">
-            <Text className="text-white font-bold text-lg">{item.projectName}</Text>
-            <View className="flex-row items-center">
-              {isCreator && (
-                <View className="bg-white/20 px-2 py-1 rounded-full mr-2">
-                  <Text className="text-white text-xs">Creator</Text>
-                </View>
-              )}
-              {filterType === 'userProjects' && (
-                <View className="bg-white/20 px-2 py-1 rounded-full">
-                  <Text className="text-white text-xs">Member</Text>
-                </View>
-              )}
-            </View>
+        <View className="flex-row justify-between items-center">
+          <Text className="text-white font-bold text-lg">{item.projectName}</Text>
+          <View className="flex-row items-center">
+            {isCreator && (
+              <View className="bg-white/20 px-2 py-1 rounded-full mr-2">
+                <Text className="text-white text-xs">Creator</Text>
+              </View>
+            )}
+            {filterType === 'userProjects' && (
+              <View className="bg-white/20 px-2 py-1 rounded-full">
+                <Text className="text-white text-xs">Member</Text>
+              </View>
+            )}
           </View>
-        </LinearGradient>
-        
-        <View className="p-4">
-          <View className="flex-row items-center mb-4">
-            <View className="w-12 h-12 rounded-full bg-indigo-100 items-center justify-center mr-3">
-              <Ionicons name="briefcase-outline" size={24} color="#4F46E5" />
-            </View>
-            <View className="flex-1">
-              <Text className="text-gray-600 text-sm">Project ID</Text>
-              <Text className="text-gray-800 font-semibold">{item.id.slice(0, 8)}...</Text>
-            </View>
-            <View className={`px-3 py-1 rounded-full ${
-              item.status === 'active' ? 'bg-green-100' : 
-              item.status === 'pending' ? 'bg-yellow-100' : 'bg-gray-100'
-            }`}>
-              <Text className={`font-medium ${
-                item.status === 'active' ? 'text-green-600' : 
-                item.status === 'pending' ? 'text-yellow-600' : 'text-gray-600'
-              }`}>
-                {item.status}
-              </Text>
-            </View>
-          </View>
-  
-          <Text className="text-gray-600 mb-2" numberOfLines={2}>{item.description}</Text>
-          
-          <View className="flex-row items-center mb-3">
-            <Ionicons name="calendar-outline" size={16} color="#6B7280" />
-            <Text className="text-gray-500 ml-2 text-sm">{formattedDate}</Text>
-          </View>
-  
-          <View className="flex-row items-center mb-4">
-            <Ionicons name="mail-outline" size={16} color="#6B7280" />
-            <Text className="text-gray-500 ml-2 text-sm">{item.contactInfo.email}</Text>
-          </View>
-  
-          {renderActionButtons()}
         </View>
-      </TouchableOpacity>
-    );
+      </LinearGradient>
+
+      <View className="p-4">
+        <View className="flex-row items-center mb-4">
+          <View className="w-12 h-12 rounded-full bg-indigo-100 items-center justify-center mr-3">
+            <Ionicons name="briefcase-outline" size={24} color="#4F46E5" />
+          </View>
+          <View className="flex-1">
+            <Text className="text-gray-600 text-sm">Project ID</Text>
+            <Text className="text-gray-800 font-semibold">{item.id.slice(0, 8)}...</Text>
+          </View>
+          <View
+            className={`px-3 py-1 rounded-full ${
+              item.status === 'ACTIVE'
+                ? 'bg-green-100'
+                : item.status === 'INACTIVE'
+                ? 'bg-gray-300'
+                : item.status === 'ONGOING'
+                ? 'bg-blue-100'
+                : item.status === 'COMPLETED'
+                ? 'bg-purple-100'
+                : item.status === 'VOTING'
+                ? 'bg-yellow-100'
+                : 'bg-gray-100'
+            }`}
+          >
+            <Text
+              className={`font-medium ${
+                item.status === 'ACTIVE'
+                  ? 'text-green-600'
+                  : item.status === 'INACTIVE'
+                  ? 'text-gray-500'
+                  : item.status === 'ONGOING'
+                  ? 'text-blue-600'
+                  : item.status === 'COMPLETED'
+                  ? 'text-purple-600'
+                  : item.status === 'VOTING'
+                  ? 'text-yellow-600'
+                  : 'text-gray-600'
+              }`}
+            >
+              {item.status}
+            </Text>
+          </View>
+
+        </View>
+
+        <Text className="text-gray-600 mb-2" numberOfLines={2}>
+          {item.description}
+        </Text>
+
+        <View className="flex-row items-center mb-3">
+          <Ionicons name="calendar-outline" size={16} color="#6B7280" />
+          <Text className="text-gray-500 ml-2 text-sm">{formattedDate}</Text>
+        </View>
+
+        <View className="flex-row items-center mb-4">
+          <Ionicons name="mail-outline" size={16} color="#6B7280" />
+          <Text className="text-gray-500 ml-2 text-sm">{item.contactInfo.email}</Text>
+        </View>
+
+        {renderActionButtons()}
+      </View>
+    </TouchableOpacity>
+  );
 };
 
 export default ProjectCard;

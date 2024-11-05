@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { CommunityRoles, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -88,6 +88,11 @@ export const createCommunity = async (req: Request, res: Response): Promise<void
         creatorType,
       },
     });
+
+    await prisma.userCommunities.create({
+      data: { userId: creatorId, communityId: newCommunity.id, role: CommunityRoles.CREATOR },
+    });
+
     res.status(201).json(newCommunity);
   } catch (error: any) {
     console.error("Error creating a community:", error);
@@ -131,6 +136,117 @@ export const patchCommunity = async (req: Request, res: Response): Promise<void>
   }
 };
 
+export const promoteMember = async (req: Request, res: Response): Promise<void> => {
+  const {id} = req.params;
+  const {userId} = req.body;
+
+  try{
+    const currentRole = await prisma.userCommunities.findUnique({
+      where: {
+        userId_communityId: {
+          userId: String(userId),
+          communityId: String(id),
+        },
+      },
+      select: {
+        role: true
+      }
+    });
+    switch (currentRole?.role){
+      case CommunityRoles.CREATOR:
+      case CommunityRoles.COORDINATOR:
+        res.status(404).json({message: 'You cant promote a co-ordinator or the user is creator', role: currentRole?.role});
+        break;
+      default :
+        await prisma.userCommunities.update({
+          where: {
+            userId_communityId: {
+              userId: String(userId),
+              communityId: String(id),
+            },
+          },
+          data: {
+            role: CommunityRoles.COORDINATOR
+          }
+        })
+    }
+    if (currentRole?.role === CommunityRoles.COORDINATOR ){
+    } else {
+      
+    }
+  } catch (error: any) {
+    res.status(500).json({message: `failed to promote the user: ${error}`});
+  }
+}
+
+export const demoteMember = async (req: Request, res: Response): Promise<void> => {
+  const {id} = req.params;
+  const {userId} = req.body;
+
+  try{
+    const currentRole = await prisma.userCommunities.findUnique({
+      where: {
+        userId_communityId: {
+          userId: String(userId),
+          communityId: String(id),
+        },
+      },
+      select: {
+        role: true
+      }
+    });
+
+    if (currentRole?.role === CommunityRoles.COORDINATOR) {
+      await prisma.userCommunities.update({
+        where: {
+          userId_communityId: {
+            userId: String(userId),
+            communityId: String(id),
+          },
+        },
+        data: {
+          role: CommunityRoles.MEMBER
+        }
+      });
+      res.json({message: `Successfully demoted the member!`})
+    } else if (currentRole?.role === CommunityRoles.MEMBER) {
+      await prisma.userCommunities.delete({
+        where: {
+          userId_communityId: {
+            userId: String(userId),
+            communityId: String(id),
+          },
+        }
+      })
+      res.json({message: `Successfully removed the member!`});
+    }
+  } catch (error: any) {
+    res.status(500).json({message: `failed to demote the member: ${error}`});
+  }
+}
+
+export const fetchUserRole = async (req: Request, res: Response): Promise<void> => {
+  const {id} = req.params;
+  const {userId} = req.body;
+
+  try{
+    const currentRole = await prisma.userCommunities.findUnique({
+      where: {
+        userId_communityId: {
+          userId: String(userId),
+          communityId: String(id),
+        },
+      },
+      select: {
+        role: true
+      }
+    });
+    res.json({userRole: currentRole?.role});
+  }
+  catch (error: any) {
+    res.status(500).json({message: `Error fetching role: ${error}`});
+  }
+}
 
 export const getCommunities = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -415,3 +531,23 @@ export const getUserCommunities = async (req: Request, res: Response): Promise<v
     });
   }
 };
+
+export const getCommunityMembers = async (req: Request, res: Response): Promise<void> => {
+  const {communityId} = req.params;
+
+  try{
+    const community = await prisma.userCommunities.findMany({
+      where: {
+        communityId: communityId
+      },
+      select: {
+        user: true,
+        community: true,
+        role: true
+      }
+    })
+    res.json(community);
+  } catch (error: any) {
+    res.status(500).json({message: `Error finding members: ${error}`});
+  }
+}

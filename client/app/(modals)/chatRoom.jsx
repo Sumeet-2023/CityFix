@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   Image,
 } from 'react-native';
-import { useRouter, useLocalSearchParams, Stack } from 'expo-router';
+// import { useRouter, useLocalSearchParams, Stack } from 'expo-router';
 import axios from 'axios';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { db, serverurl } from '../../firebaseConfig';
@@ -24,25 +24,24 @@ const ChatRoom = () => {
   const [newMessage, setNewMessage] = useState('');
   const [channel, setChannel] = useState(null);
   const flatListRef = useRef(null);
-  const { user } = useAuthStore();
-  const params = useLocalSearchParams();
+  const { user, communityId } = useAuthStore();
   
   const { messages, isLoading, sendMessage } = useChatRoom(channel?.id, user);
 
   useEffect(() => {
     const fetchChannelDetails = async () => {
       try {
-        const response = await axios.get(`${serverurl}/community/${params.id}`);
+        const response = await axios.get(`${serverurl}/community/${communityId}`);
         setChannel(response.data);
       } catch (error) {
         console.error('Error fetching channel details:', error);
       }
     };
 
-    if (params.id) {
+    if (communityId) {
       fetchChannelDetails();
     }
-  }, [params.id]);
+  }, [communityId]);
 
   const handleSendMessage = async () => {
     const success = await sendMessage(newMessage);

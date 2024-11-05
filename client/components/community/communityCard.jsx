@@ -7,22 +7,24 @@ import {
 } from 'react-native';
 import { router } from "expo-router";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useAuthStore } from '../../app/store';
 
 const CommunityCard = ({ community }) => {
+    const {setCommunityId} = useAuthStore();
     // Format location string from the location object
     const locationString = community.location ? 
       `${community.location.city}, ${community.location.country}` : 
       'Location not available';
 
+    const onCardPress = () => {
+      router.push('/home/community/projectpages/feeds');
+      setCommunityId(community.id);
+    }
+
     return (
       <TouchableOpacity
         className="bg-white rounded-xl mb-4 shadow-sm overflow-hidden"
-        onPress={() => router.push({
-            pathname: '/home/community/projectpages/feeds',
-            params: {
-              communityId: community.id
-            }
-        })}
+        onPress={onCardPress}
         activeOpacity={0.7}
       >
         <View className="relative">
