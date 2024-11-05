@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Image, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Image, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
-import { COLORS, FONTS, SIZES } from "../../../constants";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
@@ -12,15 +11,16 @@ import axios from 'axios';
 import { serverurl } from '../../../firebaseConfig';
 
 const EditProfile = () => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [profession, setProfession] = useState('');
   const [location, setLocation] = useState('');
   const [photo, setPhoto] = useState(null);
   const [newPassword, setNewPassword] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
-  // const setProfileUrl = useAuthStore(state => state.setProfileUrl);
-  const { updateUser, user: currentUser } = useAuthStore()
-  
+  const { updateUser, user: currentUser } = useAuthStore();
+
   const auth = getAuth();
   const user = auth.currentUser;
 
@@ -28,6 +28,9 @@ const EditProfile = () => {
     if (user) {
       setDisplayName(user.displayName || '');
       setPhoto(user.photoURL);
+      setFirstName(currentUser?.firstname || '');
+      setLastName(currentUser?.lastname || '');
+      setProfession(currentUser?.profession || ''); // Set profession from current user
     }
   }, [user]);
 
@@ -67,14 +70,22 @@ const EditProfile = () => {
 
       const updateData = {
         profileUrl: photoURL,
-        username: displayName
-      }
+        username: displayName,
+        firstname: firstName,
+        lastname: lastName,
+        location,
+        profession,
+      };
 
-      await axios.put(`${serverurl}/user/${currentUser.id}`, updateData);
+      await axios.patch(`${serverurl}/user/${currentUser.id}`, updateData);
 
       updateUser({
         profileUrl: photoURL,
-        username: displayName
+        username: displayName,
+        firstname: firstName,
+        lastname: lastName,
+        location,
+        profession,
       });
 
       if (newPassword) {
@@ -92,55 +103,77 @@ const EditProfile = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.form}>
-        <TouchableOpacity style={styles.photoContainer} onPress={pickImage}>
+    <SafeAreaView className="flex-1 bg-white">
+      <ScrollView className="p-4">
+        <TouchableOpacity className="w-24 h-24 rounded-full bg-gray-200 justify-center items-center self-center mb-4" onPress={pickImage}>
           {photo ? (
-            <Image source={{ uri: photo }} style={styles.photo} />
+            <Image source={{ uri: photo }} className="w-24 h-24 rounded-full" />
           ) : (
-            <MaterialIcons name="add-a-photo" size={40} color={COLORS.primary} />
+            <MaterialIcons name="add-a-photo" size={40} color="#3B82F6" />
           )}
         </TouchableOpacity>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Name</Text>
+        <View className="mb-4">
+          <Text className="text-sm font-semibold text-gray-700 mb-1">First Name</Text>
           <TextInput
-            style={styles.input}
+            className="border border-gray-300 rounded-lg p-3"
+            placeholder="Enter your first name"
+            placeholderTextColor="#9CA3AF"
+            value={firstName}
+            onChangeText={setFirstName}
+          />
+        </View>
+
+        <View className="mb-4">
+          <Text className="text-sm font-semibold text-gray-700 mb-1">Last Name</Text>
+          <TextInput
+            className="border border-gray-300 rounded-lg p-3"
+            placeholder="Enter your last name"
+            placeholderTextColor="#9CA3AF"
+            value={lastName}
+            onChangeText={setLastName}
+          />
+        </View>
+
+        <View className="mb-4">
+          <Text className="text-sm font-semibold text-gray-700 mb-1">Name</Text>
+          <TextInput
+            className="border border-gray-300 rounded-lg p-3"
             placeholder="Enter your name"
-            placeholderTextColor={COLORS.gray}
+            placeholderTextColor="#9CA3AF"
             value={displayName}
             onChangeText={setDisplayName}
           />
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Profession</Text>
+        <View className="mb-4">
+          <Text className="text-sm font-semibold text-gray-700 mb-1">Profession</Text>
           <TextInput
-            style={styles.input}
+            className="border border-gray-300 rounded-lg p-3"
             placeholder="Enter your profession"
-            placeholderTextColor={COLORS.gray}
+            placeholderTextColor="#9CA3AF"
             value={profession}
             onChangeText={setProfession}
           />
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Location</Text>
+        <View className="mb-4">
+          <Text className="text-sm font-semibold text-gray-700 mb-1">Location</Text>
           <TextInput
-            style={styles.input}
+            className="border border-gray-300 rounded-lg p-3"
             placeholder="Enter your location"
-            placeholderTextColor={COLORS.gray}
+            placeholderTextColor="#9CA3AF"
             value={location}
             onChangeText={setLocation}
           />
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>New Password (optional)</Text>
+        <View className="mb-4">
+          <Text className="text-sm font-semibold text-gray-700 mb-1">New Password (optional)</Text>
           <TextInput
-            style={styles.input}
+            className="border border-gray-300 rounded-lg p-3"
             placeholder="Enter new password"
-            placeholderTextColor={COLORS.gray}
+            placeholderTextColor="#9CA3AF"
             secureTextEntry
             value={newPassword}
             onChangeText={setNewPassword}
@@ -148,12 +181,12 @@ const EditProfile = () => {
         </View>
 
         {newPassword ? (
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Current Password</Text>
+          <View className="mb-4">
+            <Text className="text-sm font-semibold text-gray-700 mb-1">Current Password</Text>
             <TextInput
-              style={styles.input}
+              className="border border-gray-300 rounded-lg p-3"
               placeholder="Enter current password"
-              placeholderTextColor={COLORS.gray}
+              placeholderTextColor="#9CA3AF"
               secureTextEntry
               value={currentPassword}
               onChangeText={setCurrentPassword}
@@ -161,76 +194,12 @@ const EditProfile = () => {
           </View>
         ) : null}
 
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Save Changes</Text>
+        <TouchableOpacity className="bg-blue-600 rounded-lg p-4 mt-4 items-center" onPress={handleSave}>
+          <Text className="text-white font-bold">Save Changes</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: SIZES.padding,
-    paddingVertical: SIZES.padding,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.lightGray,
-  },
-  headerTitle: {
-    ...FONTS.h4,
-    color: COLORS.black,
-  },
-  form: {
-    padding: SIZES.padding,
-  },
-  photoContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: COLORS.lightGray,
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
-    marginBottom: SIZES.padding,
-  },
-  photo: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-  },
-  inputContainer: {
-    marginBottom: SIZES.padding,
-  },
-  label: {
-    ...FONTS.body4,
-    color: COLORS.black,
-    marginBottom: 5,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: COLORS.lightGray,
-    borderRadius: 8,
-    padding: SIZES.padding,
-    ...FONTS.body4,
-  },
-  saveButton: {
-    backgroundColor: COLORS.primary,
-    padding: SIZES.padding,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: SIZES.padding,
-  },
-  saveButtonText: {
-    ...FONTS.body3,
-    color: COLORS.white,
-  },
-});
 
 export default EditProfile;

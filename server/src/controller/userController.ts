@@ -82,44 +82,32 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
         });
         res.status(201).json(user);
     } catch (error: any) {
-        res.status(500)
-            .json({ message: `Error creating user: ${error.message}` });
+        res.status(500).json({ message: `Error creating user: ${error.message}` });
     }
 };
 
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
-    
+
+    // Define updateData with a more permissive type
     const updateData: {
-        username?: string;
-        location?: string;
-        points?: number;
-        followerCount?: number;
-        followingCount?: number;
-        firstname?: string;
-        lastname?: string;
-        email?: string;
-        updatedAt?: Date;
-        profileUrl?: string;
-    } = {};
+        [key: string]: any;
+    } = {
+        updatedAt: new Date(), // Always add updatedAt
+    };
 
-    if (req.body.username !== undefined) updateData.username = req.body.username;
-    if (req.body.location !== undefined) updateData.location = req.body.location;
-    if (req.body.points !== undefined) updateData.points = req.body.points;
-    if (req.body.followerCount !== undefined) updateData.followerCount = req.body.followerCount;
-    if (req.body.followingCount !== undefined) updateData.followingCount = req.body.followingCount;
-    if (req.body.firstname !== undefined) updateData.firstname = req.body.firstname;
-    if (req.body.lastname !== undefined) updateData.lastname = req.body.lastname;
-    if (req.body.email !== undefined) updateData.email = req.body.email;
-    if (req.body.profileUrl !== undefined) updateData.profileUrl = req.body.profileUrl;
-
-    updateData.updatedAt = new Date();
+    // Iterate over the keys in the request body
+    Object.keys(req.body).forEach((key) => {
+        if (req.body[key] !== undefined) {
+            updateData[key] = req.body[key];
+        }
+    });
 
     try {
         if (Object.keys(updateData).length > 1) { // > 1 because updatedAt is always present
             const updatedUser = await prisma.user.update({
                 where: { id },
-                data: updateData
+                data: updateData,
             });
             res.status(200).json(updatedUser);
         } else {
@@ -130,10 +118,10 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
             res.status(404).json({ message: "User not found" });
             return;
         }
-        res.status(500)
-            .json({ message: `Error updating user: ${error.message}` });
+        res.status(500).json({ message: `Error updating user: ${error.message}` });
     }
 };
+
 
 export const deleteUser = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
