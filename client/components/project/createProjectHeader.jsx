@@ -8,17 +8,21 @@ import {
   StatusBar,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 
-const CreateCommunityHeader = () => {
+const CreateProjectHeader = () => {
   const router = useRouter();
+
+  const handleBackPress = () => {
+    router.back();
+  };
 
   return (
     <SafeAreaView className="bg-white">
       <StatusBar barStyle={'dark-content'} />
       <View className="flex-row items-center justify-between px-4 py-3 border-b border-gray-100">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={handleBackPress}
           className="p-2"
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
@@ -27,14 +31,15 @@ const CreateCommunityHeader = () => {
         
         <View className="flex-1 items-center mx-4">
           <Text className="text-lg font-semibold text-gray-900">
-            Start Your Community
+            Create New Project
           </Text>
         </View>
 
-        <View className="w-10" />
+        {/* Placeholder view to maintain layout balance */}
+        <View style={{ width: 24 }} />
       </View>
     </SafeAreaView>
   );
 };
 
-export default CreateCommunityHeader;
+export default CreateProjectHeader;

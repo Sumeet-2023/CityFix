@@ -10,29 +10,33 @@ import {
     removeNGOFromCommunity,
     patchCommunity,
     getUserOwnedCommunities,
-    getUserCommunities
+    getUserCommunities,
+    getCommunityMembers,
+    promoteMember,
+    demoteMember,
+    fetchUserRole
 } from "../controller/communityController";
 
 const router = Router();
 
-// GET requests for retrieving data
 router.get("/", getCommunities);
 router.get("/:id", getCommunityById);
 router.get("/communityList/:creatorId", getUserOwnedCommunities);
 router.get("/communityJoined/:userId", getUserCommunities);
+router.get("/members/:communityId", getCommunityMembers);
 
-// POST for creating new resources
+router.post('/fetchUserRole/:id', fetchUserRole);
 router.post("/", createCommunity);
 
-// PUT for establishing relationships/updating
-router.put("/:id/members", joinCommunity);       // Changed from POST to PUT
-router.put("/:id/ngo", joinCommunityNGO);        // Changed from POST to PUT
+router.put("/:id/members", joinCommunity);
+router.put("/:id/ngo", joinCommunityNGO);
 
-router.patch("/:id", patchCommunity)
+router.patch("/:id", patchCommunity);
+router.patch("/:id/promote", promoteMember);
+router.patch("/:id/demote", demoteMember);
 
-// DELETE for removing resources/relationships
-router.delete("/:id/members", leaveCommunity);    // Changed from POST to DELETE
-router.delete("/:id", deleteCommunity);          // Changed from POST to DELETE
+router.delete("/:id/members", leaveCommunity);
+router.delete("/:id", deleteCommunity);
 router.delete("/:id/ngo", removeNGOFromCommunity);
 
 export default router;

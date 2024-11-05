@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, Linking } from 'react-native';
 import { MaterialIcons } from "@expo/vector-icons";
-import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
-import { serverurl } from '../../../firebaseConfig';
+import { serverurl } from '../../firebaseConfig';
+import { useAuthStore } from '../store';
 
 const FeedDetails = () => {
-  const { id } = useLocalSearchParams();
+  const {projectId} = useAuthStore();
   const [projectDetails, setProjectDetails] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const response = await axios.get(`${serverurl}/project/${id}`);
+        const response = await axios.get(`${serverurl}/project/${projectId}`);
         setProjectDetails(response.data);
       } catch (error) {
         console.error('Error fetching project details:', error);

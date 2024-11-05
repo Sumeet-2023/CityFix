@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, ProjectStatus } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -77,11 +77,15 @@ export const getProjectsByCommunityWithFilter = async (req: Request, res: Respon
     } else if (filterType === 'nonMemberProjects') {
       filterCondition = {
         ...baseCondition,
+        creatorID: {
+          not: String(userId)
+        },
         members: {
           none: {
             userId: String(userId)
           }
-        }
+        },
+        
       };
     } else if (filterType === 'userCreatedProjects') {
       filterCondition = {
@@ -125,9 +129,16 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
         communityId,
         createdAt: new Date(),
         updatedAt: new Date(),
-        status: "ACTIVE",
       },
     });
+
+    await prisma.userProject.create({
+      data: {
+        userId: creatorID,
+        projectId: newProject.id,
+      },
+    });
+
     res.status(201).json(newProject);
   } catch (error: any) {
     res
@@ -225,28 +236,44 @@ export const joinProject = async (req: Request, res: Response): Promise<void> =>
 };
 
 export const joinCommunityProject = async (req: Request, res: Response): Promise<void> => {
-  const {
-    userId,
-    projectId,
-    communityId
-  } = req.body;
+  const { userId, projectId, communityId } = req.body;
 
   try {
-    await prisma.userProject.create({
-      data: {
-        userId: userId,
+    // Check if the number of members in the community is more than half
+    const communityMemberCount = await prisma.userProject.count({
+      where: {
         projectId: projectId
+      },
+    });
+
+    const project = await prisma.project.findUnique({
+      where: {
+        id: projectId,
+      },
+      select:{
+        members: true,
+        status: true
       }
     });
 
-    await prisma.project.update({
-      where: {
-        id: projectId
-      },
+    if ( project?.members &&(communityMemberCount > project?.members.length / 2) && project.status !== ProjectStatus.ACTIVE) {
+      await prisma.project.update({
+        where: {
+          id: projectId,
+        },
+        data: {
+          status: 'ACTIVE',
+        },
+      });
+    }
+
+    await prisma.userProject.create({
       data: {
-        communityId: communityId
-      }
-    })
+        userId: userId,
+        projectId: projectId,
+      },
+    });
+
     res.status(200).json({ message: 'Successfully joined the project' });
   } catch (error: any) {
     res.status(500).json({ message: `Error joining the project: ${error.message}` });
@@ -257,6 +284,32 @@ export const leaveProject = async (req: Request, res: Response): Promise<void> =
   const { userId, projectId } = req.body;
 
   try {
+    const communityMemberCount = await prisma.userProject.count({
+      where: {
+        projectId: projectId
+      },
+    });
+
+    const project = await prisma.project.findUnique({
+      where: {
+        id: projectId,
+      },
+      select:{
+        members: true,
+        status: true
+      }
+    });
+
+    if ( project?.members && (communityMemberCount - 1 < project?.members.length / 2) && project.status !== ProjectStatus.INACTIVE) {
+      await prisma.project.update({
+        where: {
+          id: projectId,
+        },
+        data: {
+          status: 'INACTIVE',
+        },
+      });
+    }
     await prisma.userProject.delete({
       where: {
         userId_projectId: {
