@@ -103,6 +103,14 @@ export const createIssue = async (req: Request, res: Response): Promise<void> =>
         user: true,
       },
     });
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        points: { increment: 10 }, // Increase by 10 points for creating an issue
+      },
+    });
+
     res.status(201).json(newIssue);
   } catch (error: any) {
     res.status(500).json({ message: `Error creating an issue: ${error.message}` });
@@ -416,6 +424,13 @@ export const acceptResolution = async (req: Request, res: Response): Promise<voi
       data: { 
         status: Status.CLOSED,
         lastUpdated: new Date(),
+      },
+    });
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        points: { increment: 20 }, // Increase by 20 points for resolving an issue
       },
     });
 

@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, Image, TouchableOpacity, RefreshControl } from 'react-native';
 import { MaterialIcons, FontAwesome5, Ionicons } from '@expo/vector-icons';
-import { serverurl } from '../../../../firebaseConfig';
+import { useSolvedIssuesStore } from '../../../store';
 
 const SolvedIssue = () => {
-  const [solvedIssues, setSolvedIssues] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false); // State for managing refresh control
+  const { solvedIssues, isLoading , fetchSolvedIssues } = useSolvedIssuesStore();
 
   // Custom date formatter
   const formatDate = (dateString) => {
@@ -25,24 +24,6 @@ const SolvedIssue = () => {
     return `${month} ${day}, ${year} ${formattedHours}:${formattedMinutes} ${ampm}`;
   };
 
-  // Fetch solved issues from the server
-  const fetchSolvedIssues = async () => {
-    setLoading(true);
-    setError(null); // Reset error state
-    try {
-      const response = await fetch(`${serverurl}/issues/filter/condition?status=CLOSED&status=RESOLVED`);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      setSolvedIssues(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-      setRefreshing(false); // Stop refreshing after fetching
-    }
-  };
 
   // Initial fetch
   useEffect(() => {
@@ -170,7 +151,7 @@ const SolvedIssue = () => {
     </View>
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
       <View className="flex-1 justify-center items-center">
         <ActivityIndicator size="large" color="#6366F1" />

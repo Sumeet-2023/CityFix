@@ -17,7 +17,7 @@ import {
   Chip
 } from 'react-native-paper';
 // import useStore from '../../../store';
-import { useAuthStore } from '../../../store';
+import { useAuthStore, useFeedsStore, useMyIssuesStore } from '../../../store';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth, openroutekey, serverurl } from '../../../../firebaseConfig';
 
@@ -115,12 +115,11 @@ const CreateIssue = () => {
         });
 
         Alert.alert('Success', 'Issue Created Successfully!');
-        router.push({
-          pathname: 'home/report/myIssue',
-          params: {
-            update: 'true'
-          }
-        });
+        const { user } = useAuthStore.getState();
+        useFeedsStore.getState().fetchFeeds();
+        useMyIssuesStore.getState().fetchMyIssues(user.id);
+        useMyIssuesStore.setState({ isLoading: false });
+        router.push('home/report/myIssue');
       }
     } catch (error) {
       console.error('Error creating issue', error.message);
