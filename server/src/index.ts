@@ -13,6 +13,7 @@ import clanRoutes from "./routes/clanRoutes";
 import userRoutes from "./routes/userRoutes";
 import exploreRoutes from "./routes/exploreRoutes";
 import communityRoutes from "./routes/communityRoutes";
+import notificationRoutes from "./routes/notificationRoutes";
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -36,6 +37,7 @@ app.use("/clan", clanRoutes);
 app.use("/user", userRoutes);
 app.use("/explore", exploreRoutes);
 app.use("/community", communityRoutes);
+app.use("/notification", notificationRoutes);
 
 /* SERVER */
 const port = process.env.PORT || 3000;
