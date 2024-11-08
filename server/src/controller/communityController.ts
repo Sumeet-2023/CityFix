@@ -265,7 +265,7 @@ export const getCommunityById = async (req: Request, res: Response): Promise<voi
     const community = await prisma.community.findUnique({
       where: { id: String(id) },
       include: {
-        members: true
+        members: true,
       }
     });
 
@@ -477,7 +477,6 @@ export const getUserCommunities = async (req: Request, res: Response): Promise<v
   const { userId } = req.params;
 
   try {
-    // Validate creatorId
     if (!userId) {
       res.status(400).json({ message: "User ID is required" });
       return;
@@ -549,5 +548,23 @@ export const getCommunityMembers = async (req: Request, res: Response): Promise<
     res.json(community);
   } catch (error: any) {
     res.status(500).json({message: `Error finding members: ${error}`});
+  }
+}
+
+export const getUserRole = async (req: Request, res: Response): Promise<void> => {
+  const {communityId, userId} = req.params;
+
+  try{
+    const rel = await prisma.userCommunities.findUnique({
+      where: {
+        userId_communityId: {
+          userId: userId,
+          communityId: communityId
+        }
+      }
+    });
+    res.json({role: rel?.role});
+  } catch (error: any) {
+    res.status(500).json({message: `Error getting user role: ${error}`});
   }
 }

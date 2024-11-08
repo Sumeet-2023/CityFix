@@ -33,7 +33,8 @@ const ChatLayout = () => {
       <Stack.Screen
         name="editProject"
         options={{
-          headerShown: false,
+          headerShown: true,
+          headerTitle: 'Edit Project',
           gestureEnabled: Platform.OS === 'ios',
           gestureDirection: 'horizontal',
           animation: 'slide_from_right'

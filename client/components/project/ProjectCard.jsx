@@ -121,7 +121,7 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
             return (
               <View className="flex-row justify-between gap-2">
                 <TouchableOpacity
-                  className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center flex-1 ml-3"
+                  className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center justify-center flex-1 ml-3"
                   onPress={() => handleLeaveProject(item.id)}
                 >
                   <Ionicons name="eye-outline" size={18} color="white" />
@@ -147,7 +147,7 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
                   <Text className="text-white font-bold ml-2">Join</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center"
+                  className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center justify-center"
                   onPress={() => onPress(item)}
                 >
                   <Ionicons name="information-circle-outline" size={18} color="#4B5563" />
@@ -169,7 +169,7 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
                   <Text className="text-white font-bold ml-2">Manage</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  className="bg-red-100 px-6 py-3 rounded-xl flex-row items-center"
+                  className="bg-red-100 px-6 py-3 rounded-xl flex-row items-center justify-center"
                   onPress={() => handleDeleteProject(item.id)}
                 >
                   <Ionicons name="trash-outline" size={18} color="#DC2626" />
@@ -181,7 +181,7 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
             return (
               <View className="flex-row justify-between">
                 <TouchableOpacity
-                  className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center"
+                  className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center justify-center"
                   onPress={() => handleLeaveProject(item.id)}
                 >
                   <Ionicons name="thumbs-down-outline" size={18} color="#4B5563" />
@@ -200,14 +200,14 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
             return (
               <View className="flex-row justify-between">
                 <TouchableOpacity
-                  className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center flex-1 mr-3"
+                  className="bg-indigo-600 px-6 py-3 rounded-xl flex-row justify-center items-center flex-1 mr-3"
                   onPress={() => handleJoinProject(item.id)}
                 >
                   <Ionicons name="thumbs-up-outline" size={18} color="white" />
-                  <Text className="text-white font-bold ml-2">Vote Project</Text>
+                  <Text className="text-white font-bold ml-2">Vote</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center"
+                  className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center justify-center"
                   onPress={() => onPress(item)}
                 >
                   <Ionicons name="information-circle-outline" size={18} color="#4B5563" />
@@ -222,7 +222,7 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
             return (
               <View className="flex-row justify-between">
                 <TouchableOpacity
-                  className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center flex-1 mr-3"
+                  className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center justify-center flex-1 mr-3"
                   onPress={() => onPress(item)}
                 >
                   <Ionicons name="settings-outline" size={18} color="white" />
@@ -234,7 +234,7 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
             return (
               <View className="flex-row justify-between">
                 <TouchableOpacity
-                  className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center"
+                  className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center justify-center"
                   onPress={() => handleLeaveProject(item.id)}
                 >
                   <Ionicons name="thumbs-down-outline" size={18} color="#4B5563" />
@@ -249,7 +249,7 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
           return (
             <View className="flex-row justify-center">
               <TouchableOpacity
-                className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center"
+                className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center justify-center"
                 onPress={() => onPress(item)}
               >
                 <Ionicons name="eye-outline" size={18} color="white" />

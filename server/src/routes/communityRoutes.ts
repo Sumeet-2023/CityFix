@@ -14,7 +14,8 @@ import {
     getCommunityMembers,
     promoteMember,
     demoteMember,
-    fetchUserRole
+    fetchUserRole,
+    getUserRole
 } from "../controller/communityController";
 
 const router = Router();
@@ -24,6 +25,7 @@ router.get("/:id", getCommunityById);
 router.get("/communityList/:creatorId", getUserOwnedCommunities);
 router.get("/communityJoined/:userId", getUserCommunities);
 router.get("/members/:communityId", getCommunityMembers);
+router.get("/role/:communityId/:userId", getUserRole);
 
 router.post('/fetchUserRole/:id', fetchUserRole);
 router.post("/", createCommunity);

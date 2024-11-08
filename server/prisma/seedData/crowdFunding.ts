@@ -2,7 +2,6 @@ import { ObjectId } from 'bson';
 import { dataStore } from './dataStore';
 import { FundingType } from '@prisma/client';
 
-// Assuming "project1" and "clan1" are existing projects and clans in your dataStore
 const project1Id = dataStore.projects.get("Elder Support Services");
 const clan1Id = dataStore.clans.get("GOTHEARTH");
 

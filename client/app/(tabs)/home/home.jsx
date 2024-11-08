@@ -62,7 +62,7 @@ const Home = () => {
   return (
     <SafeAreaView className="flex-1 bg-white p-4">
       <StatusBar barStyle={'dark-content'} />
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View className="flex-row justify-between items-center mb-4">
           <Text className="text-4xl font-bold">Home</Text>
           <TouchableOpacity onPress={handleSettingsPress}>

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { PrismaClient, ProjectStatus } from "@prisma/client";
+import { CommunityRoles, PrismaClient, ProjectStatus } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -93,6 +93,16 @@ export const getProjectsByCommunityWithFilter = async (req: Request, res: Respon
         ...baseCondition,
         creatorID: String(userId)
       };
+    } else if (filterType === 'activeProjects') {
+      filterCondition = {
+        ...baseCondition,
+        status: 'ACTIVE'
+      };
+    } else if (filterType === 'ongoingProjects') {
+      filterCondition = {
+        ...baseCondition,
+        status: 'ONGOING'
+      };
     }
 
     const projects = await prisma.project.findMany({
@@ -156,19 +166,45 @@ export const updateProject = async (req: Request, res: Response): Promise<void> 
     description,
     contactInfo,
     status,
+    userId,
+    communityId
   } = req.body;
 
   try {
+    const data: any = {};
+
+    if (projectTag) data.projectTag = projectTag;
+    if (projectName) data.projectName = projectName;
+    if (description) data.description = description;
+    if (contactInfo) data.contactInfo = contactInfo;
+    // if (status) data.status = status;
+
+    if (status) {
+      if (!userId || !communityId){
+        res.status(404).json({message: "You can't change status without providing user & community id's!"});
+        return
+      }
+      const rel = await prisma.userCommunities.findUnique({
+        where: {
+          userId_communityId: {
+            userId: userId,
+            communityId: communityId
+          }
+        }
+      });
+      if (rel?.role === CommunityRoles.MEMBER) {
+        res.status(403).json({message: "You need to be a creator or a coordinator to change a project's status"});
+        return
+      } else {
+        data.status = status
+      }
+    }
+
+    data.updatedAt = new Date();
+
     const updatedProject = await prisma.project.update({
       where: { id: id },
-      data: {
-        projectTag,
-        projectName,
-        description,
-        contactInfo,
-        status,
-        updatedAt: new Date(),
-      },
+      data: data,
     });
 
     res.json(updatedProject);
@@ -177,11 +213,10 @@ export const updateProject = async (req: Request, res: Response): Promise<void> 
       res.status(404).json({ message: "Project not found" });
       return;
     }
-    res
-      .status(500)
-      .json({ message: `Error updating project: ${error.message}` });
+    res.status(500).json({ message: `Error updating project: ${error.message}` });
   }
 };
+
 
 export const deleteProject = async (req: Request, res: Response): Promise<void> => {
   const { userId, projectId } = req.params;
@@ -216,6 +251,50 @@ export const deleteProject = async (req: Request, res: Response): Promise<void> 
       .json({ message: `Error deleting project: ${error.message}` });
   }
 };
+
+export const deleteCommunityProject = async (req: Request, res: Response): Promise<void> => {
+  const {projectId} = req.params;
+  const {userId, communityId} = req.body;
+
+  try{
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+    });
+
+    const community = await prisma.userCommunities.findUnique({
+      where: {
+        userId_communityId: {
+          communityId: communityId,
+          userId: userId
+        }
+      }
+    })
+
+    if (!project) {
+      res.status(404).json({ message: "Project not found" });
+      return;
+    }
+
+    if (community?.role !== CommunityRoles.COORDINATOR && community?.role !== CommunityRoles.CREATOR) {
+      res.status(403).json({ message: "Unauthorized: Only the authorities can delete this project" });
+      return;
+    }
+
+    await prisma.project.delete({
+      where: { id: projectId },
+    });
+
+    res.status(204).send();
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      res.status(404).json({ message: "Project not found" });
+      return;
+    }
+    res
+      .status(500)
+      .json({ message: `Error deleting project: ${error.message}` });
+  }
+}
 
 export const joinProject = async (req: Request, res: Response): Promise<void> => {
   const {
@@ -265,6 +344,7 @@ export const joinCommunityProject = async (req: Request, res: Response): Promise
         },
         data: {
           status: 'ACTIVE',
+          updatedAt: new Date()
         },
       });
     }

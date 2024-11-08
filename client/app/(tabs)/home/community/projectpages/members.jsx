@@ -27,7 +27,11 @@ const CommunityMembersPage = () => {
   const fetchCommunityMembers = async () => {
     try {
       const response = await axios.get(`${serverurl}/community/members/${communityId}`);
-      setMembers(response.data);
+      const sortedMembers = response.data.sort((a, b) => {
+        const rolePriority = { CREATOR: 1, COORDINATOR: 2, MEMBER: 3 };
+        return rolePriority[a.role] - rolePriority[b.role];
+      });
+      setMembers(sortedMembers);
     } catch (error) {
       console.error('Error fetching community members:', error);
     }
@@ -82,56 +86,61 @@ const CommunityMembersPage = () => {
   //   }
   // };
 
-  const renderMemberItem = ({ item }) => (
-    <View className="flex-row justify-between items-center bg-white rounded-lg px-4 py-3 mb-3">
-      <View className="flex-row items-center">
-        <View className="w-10 h-10 rounded-full bg-indigo-100 items-center justify-center mr-3">
-          <Ionicons name="person-outline" size={20} color="#4F46E5" />
+  const renderMemberItem = ({ item }) => {
+    const isCurrentUser = item.user.id === userId;
+    return (
+      <View className={`flex-row justify-between items-center rounded-lg px-4 py-3 mb-3 ${
+        isCurrentUser ? 'bg-blue-100 bg-opacity-20' : 'bg-white'
+        }`} >
+        <View className="flex-row items-center">
+          <View className="w-10 h-10 rounded-full bg-indigo-100 items-center justify-center mr-3">
+            <Ionicons name="person-outline" size={20} color="#4F46E5" />
+          </View>
+          <View>
+            <Text className="text-gray-800 font-semibold">{item.user.username}</Text>
+            <Text className="text-gray-500">
+              {item.role === 'MEMBER' ? 'Member' : item.role === 'COORDINATOR' ? 'Coordinator' : 'Creator'}
+            </Text>
+          </View>
         </View>
-        <View>
-          <Text className="text-gray-800 font-semibold">{item.user.username}</Text>
-          <Text className="text-gray-500">
-            {item.role === 'MEMBER' ? 'Member' : item.role === 'COORDINATOR' ? 'Coordinator' : 'Creator'}
-          </Text>
+        <View className="flex-row">
+          {(item.role === 'MEMBER' && (userRole === 'CREATOR' || userRole === 'COORDINATOR')) && (
+            <TouchableOpacity
+              className="bg-green-600 px-4 py-2 rounded-lg mr-2"
+              onPress={() => promoteMember(item.user.id)}
+            >
+              <View className="flex-row justify-center items-center">
+                <Ionicons name="arrow-up-outline" color="#FFF" />
+                {/* <Text className="text-white font-bold ml-2">Promote</Text> */}
+              </View>
+            </TouchableOpacity>
+          )}
+          {((item.role === 'COORDINATOR' && userRole === 'CREATOR')) && (
+            <TouchableOpacity
+              className="bg-red-600 px-4 py-2 rounded-lg mr-2"
+              onPress={() => demoteMember(item.user.id)}
+            >
+              <View className="flex-row justify-center items-center">
+                <Ionicons name="arrow-down-outline" color="#FFF" />
+                {/* <Text className="text-white font-bold ml-2">Demote</Text> */}
+              </View>
+            </TouchableOpacity>
+          )}
+          {item.role === 'MEMBER' && (userRole === 'CREATOR' || userRole === 'COORDINATOR') && (
+            <TouchableOpacity
+              className="bg-red-600 px-4 py-2 rounded-lg"
+              onPress={() => demoteMember(item.user.userId)}
+            >
+              <View className="flex-row justify-center items-center">
+                <Ionicons name="trash-outline" color="#FFF" />
+                {/* <Text className="text-white font-bold ml-2">Kick Out</Text> */}
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
-      <View className="flex-row">
-        {(item.role === 'MEMBER' && (userRole === 'CREATOR' || userRole === 'COORDINATOR')) && (
-          <TouchableOpacity
-            className="bg-green-600 px-4 py-2 rounded-lg mr-2"
-            onPress={() => promoteMember(item.user.id)}
-          >
-            <View className="flex-row justify-center items-center">
-              <Ionicons name="arrow-up-outline" color="#FFF" />
-              {/* <Text className="text-white font-bold ml-2">Promote</Text> */}
-            </View>
-          </TouchableOpacity>
-        )}
-        {((item.role === 'COORDINATOR' && userRole === 'CREATOR')) && (
-          <TouchableOpacity
-            className="bg-red-600 px-4 py-2 rounded-lg mr-2"
-            onPress={() => demoteMember(item.user.id)}
-          >
-            <View className="flex-row justify-center items-center">
-              <Ionicons name="arrow-down-outline" color="#FFF" />
-              {/* <Text className="text-white font-bold ml-2">Demote</Text> */}
-            </View>
-          </TouchableOpacity>
-        )}
-        {item.role === 'MEMBER' && (userRole === 'CREATOR' || userRole === 'COORDINATOR') && (
-          <TouchableOpacity
-            className="bg-red-600 px-4 py-2 rounded-lg"
-            onPress={() => demoteMember(item.user.userId)}
-          >
-            <View className="flex-row justify-center items-center">
-              <Ionicons name="trash-outline" color="#FFF" />
-              {/* <Text className="text-white font-bold ml-2">Kick Out</Text> */}
-            </View>
-          </TouchableOpacity>
-        )}
-      </View>
-    </View>
-  );
+    )
+  };
 
   return (
     <View className="flex-1 bg-gray-100 p-4">

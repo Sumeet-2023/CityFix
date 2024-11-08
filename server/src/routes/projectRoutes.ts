@@ -13,6 +13,7 @@ import {
   getProjectByCommunityId,
   joinCommunityProject,
   getProjectsByCommunityWithFilter,
+  deleteCommunityProject,
 } from "../controller/projectController";
 
 const router = Router();
@@ -23,6 +24,8 @@ router.get("/:id", getProjectById);
 router.get("/byCommunity/:communityId", getProjectByCommunityId);
 router.post("/", createProject);
 router.put("/:id", updateProject);
+
+router.delete("/:projectId/delete", deleteCommunityProject);
 router.delete("/:userId/:projectId", deleteProject);
 
 // Project membership routes

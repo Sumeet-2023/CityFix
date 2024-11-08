@@ -4,6 +4,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import axios from 'axios';
 import { serverurl } from '../../firebaseConfig';
 import { useAuthStore } from '../store';
+import { router } from 'expo-router';
 
 const EditProject = () => {
   const { projectId, user } = useAuthStore();
@@ -52,6 +53,7 @@ const EditProject = () => {
   const handleSave = async () => {
     try {
       const response = await axios.put(`${serverurl}/project/${projectId}`, formData);
+      router.back();
       Alert.alert('Success', 'Project details updated successfully');
     } catch (error) {
       console.error('Error updating project details:', error);
