@@ -20,7 +20,7 @@ import FAB from '../../../../../components/FAB';
 
 export default function Feeds() {
   // const { communityId } = useLocalSearchParams();
-  const { user, communityId } = useAuthStore();
+  const { user, communityId, setProjectId } = useAuthStore();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,7 +57,8 @@ export default function Feeds() {
   }, [projects, searchQuery]);
 
   const handleCardPress = useCallback((item) => {
-    router.push(`/project/${item}`);
+    setProjectId(item.id);
+    router.push(`/project-details`);
   }, []);
 
   const handleFABPress = () => {
@@ -68,7 +69,7 @@ export default function Feeds() {
     () => [
       { id: 'all', title: 'All', icon: 'grid-outline' },
       { id: 'userCreatedProjects', title: 'Created', icon: 'create-outline' },
-      { id: 'userProjects', title: 'Voted', icon: 'thumbs-up-outline' },
+      { id: 'userProjects', title: 'Joined', icon: 'people-outline' },
       { id: 'nonMemberProjects', title: 'Available', icon: 'add-circle-outline' },
     ],
     []
@@ -151,7 +152,7 @@ export default function Feeds() {
             renderItem={({ item }) => (
               <ProjectCard
                 item={item}
-                onPress={() => handleCardPress(item.id)}
+                onPress={handleCardPress}
                 communityId={communityId}
                 userId={user?.id}
                 filterType={activeFilter}

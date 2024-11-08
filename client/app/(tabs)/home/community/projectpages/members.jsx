@@ -66,20 +66,21 @@ const CommunityMembersPage = () => {
     }
   };
 
-  const kickOutMember = async (memberId) => {
-    try {
-      setIsLoading(true);
-      await axios.delete(`${serverurl}/community/members/${communityId}`, {
-        data: { userId: memberId },
-      });
-      fetchCommunityMembers();
-    } catch (error) {
-      console.error('Error kicking out member:', error);
-      Alert.alert('Error', 'Failed to kick out member. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // no need for now, integrated automatic delete if user is member
+  // const kickOutMember = async (memberId) => {
+  //   try {
+  //     setIsLoading(true);
+  //     await axios.delete(`${serverurl}/community/${communityId}/members`, {
+  //       data: { userId: memberId },
+  //     });
+  //     fetchCommunityMembers();
+  //   } catch (error) {
+  //     console.error('Error kicking out member:', error);
+  //     Alert.alert('Error', 'Failed to kick out member. Please try again.');
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const renderMemberItem = ({ item }) => (
     <View className="flex-row justify-between items-center bg-white rounded-lg px-4 py-3 mb-3">

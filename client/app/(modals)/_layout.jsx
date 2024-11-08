@@ -30,6 +30,15 @@ const ChatLayout = () => {
           animation: 'slide_from_right'
         }}
       />
+      <Stack.Screen
+        name="editProject"
+        options={{
+          headerShown: false,
+          gestureEnabled: Platform.OS === 'ios',
+          gestureDirection: 'horizontal',
+          animation: 'slide_from_right'
+        }}
+      />
     </Stack>
   );
 };

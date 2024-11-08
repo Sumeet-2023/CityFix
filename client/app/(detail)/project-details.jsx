@@ -6,7 +6,7 @@ import { serverurl } from '../../firebaseConfig';
 import { useAuthStore } from '../store';
 
 const FeedDetails = () => {
-  const {projectId} = useAuthStore();
+  const { projectId, user } = useAuthStore();
   const [projectDetails, setProjectDetails] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +22,7 @@ const FeedDetails = () => {
       }
     };
     fetchDetails();
-  }, [id]);
+  }, [projectId]);
 
   if (loading) {
     return (
@@ -47,6 +47,16 @@ const FeedDetails = () => {
       Linking.openURL(`tel:${projectDetails.contactInfo.number}`);
     }
   };
+
+  // Determine if the user is the creator, a member, or neither
+  const isCreator = user.id === projectDetails.creatorID;
+  const isMember = projectDetails.members.some(member => member.id === user.id) && !isCreator;
+  // const hasVoted = projectDetails.votes.some(vote => vote.userId === user.id);
+  const isOngoingStatus = projectDetails.status === 'ONGOING';
+
+  const showJoinButton = !isCreator && !isMember;
+  const showEditButton = isCreator;
+  const showManageButton = isMember && isOngoingStatus;
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
@@ -119,10 +129,24 @@ const FeedDetails = () => {
 
           {/* Action Buttons */}
           <View className="flex-row justify-between">
-            <TouchableOpacity className="bg-blue-500 py-4 px-8 rounded-lg flex-row items-center shadow-lg">
-              <MaterialIcons name="group-add" size={20} color="#FFFFFF" />
-              <Text className="text-white font-bold ml-2">JOIN PROJECT</Text>
-            </TouchableOpacity>
+            {showJoinButton && (
+              <TouchableOpacity className="bg-blue-500 py-4 px-8 rounded-lg flex-row items-center shadow-lg">
+                <MaterialIcons name="group-add" size={20} color="#FFFFFF" />
+                <Text className="text-white font-bold ml-2">JOIN PROJECT</Text>
+              </TouchableOpacity>
+            )}
+            {showManageButton && (
+              <TouchableOpacity className="bg-blue-500 py-4 px-8 rounded-lg flex-row items-center shadow-lg">
+                <MaterialIcons name="settings" size={20} color="#FFFFFF" />
+                <Text className="text-white font-bold ml-2">Manage PROJECT</Text>
+              </TouchableOpacity>
+            )}
+            {showEditButton && (
+              <TouchableOpacity className="bg-green-500 py-4 px-8 rounded-lg flex-row items-center shadow-lg">
+                <MaterialIcons name="edit" size={20} color="#FFFFFF" />
+                <Text className="text-white font-bold ml-2">EDIT PROJECT</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity className="bg-gray-200 py-4 px-8 rounded-lg flex-row items-center shadow-lg">
               <MaterialIcons name="share" size={20} color="#4B5563" />
               <Text className="text-gray-800 font-bold ml-2">Share</Text>

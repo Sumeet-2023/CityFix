@@ -21,7 +21,8 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
     const project = await prisma.project.findUnique({
       where: { id: id },
       include: {
-        community: true
+        community: true,
+        members: true,
       }
     });
 
@@ -240,9 +241,9 @@ export const joinCommunityProject = async (req: Request, res: Response): Promise
 
   try {
     // Check if the number of members in the community is more than half
-    const communityMemberCount = await prisma.userProject.count({
+    const communityMemberCount = await prisma.userCommunities.count({
       where: {
-        projectId: projectId
+        communityId: communityId
       },
     });
 
@@ -256,7 +257,8 @@ export const joinCommunityProject = async (req: Request, res: Response): Promise
       }
     });
 
-    if ( project?.members &&(communityMemberCount > project?.members.length / 2) && project.status !== ProjectStatus.ACTIVE) {
+    if ( project?.members &&(project?.members.length + 2 > (communityMemberCount / 2)) && project.status !== ProjectStatus.ACTIVE) {
+      console.log(project.status)
       await prisma.project.update({
         where: {
           id: projectId,
@@ -274,7 +276,7 @@ export const joinCommunityProject = async (req: Request, res: Response): Promise
       },
     });
 
-    res.status(200).json({ message: 'Successfully joined the project' });
+    res.status(200).json({ message: 'Successfully joined the project', count: communityMemberCount, projectCount: project?.members.length});
   } catch (error: any) {
     res.status(500).json({ message: `Error joining the project: ${error.message}` });
   }
@@ -284,32 +286,34 @@ export const leaveProject = async (req: Request, res: Response): Promise<void> =
   const { userId, projectId } = req.body;
 
   try {
-    const communityMemberCount = await prisma.userProject.count({
-      where: {
-        projectId: projectId
-      },
-    });
+    // commented out logic for making projects inactive. 
+    // I think we should let the decision making for this to be done by coordinators or creator
+    // const communityMemberCount = await prisma.userProject.count({
+    //   where: {
+    //     projectId: projectId
+    //   },
+    // });
 
-    const project = await prisma.project.findUnique({
-      where: {
-        id: projectId,
-      },
-      select:{
-        members: true,
-        status: true
-      }
-    });
+    // const project = await prisma.project.findUnique({
+    //   where: {
+    //     id: projectId,
+    //   },
+    //   select:{
+    //     members: true,
+    //     status: true
+    //   }
+    // });
 
-    if ( project?.members && (communityMemberCount - 1 < project?.members.length / 2) && project.status !== ProjectStatus.INACTIVE) {
-      await prisma.project.update({
-        where: {
-          id: projectId,
-        },
-        data: {
-          status: 'INACTIVE',
-        },
-      });
-    }
+    // if ( project?.members && (communityMemberCount - 1 < project?.members.length / 2) && project.status !== ProjectStatus.INACTIVE) {
+    //   await prisma.project.update({
+    //     where: {
+    //       id: projectId,
+    //     },
+    //     data: {
+    //       status: 'INACTIVE',
+    //     },
+    //   });
+    // }
     await prisma.userProject.delete({
       where: {
         userId_projectId: {

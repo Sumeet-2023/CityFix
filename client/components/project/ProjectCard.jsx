@@ -95,117 +95,171 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
           </View>
         );
       }
-  
-      switch (filterType) {
-        case 'userCreatedProjects':
-          return (
-            <View className="flex-row justify-between">
-              <TouchableOpacity 
-                className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center flex-1 mr-3" 
-                onPress={() => onPress(item)}
-              >
-                <Ionicons name="settings-outline" size={18} color="white" />
-                <Text className="text-white font-bold ml-2">Manage</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                className="bg-red-100 px-6 py-3 rounded-xl flex-row items-center"
-                onPress={() => handleDeleteProject(item.id)}
-              >
-                <Ionicons name="trash-outline" size={18} color="#DC2626" />
-                <Text className="text-red-600 font-bold ml-2">Delete</Text>
-              </TouchableOpacity>
-            </View>
-          );
-  
-        case 'userProjects':
-          return (
-            <View className="flex-row justify-between">
-              <TouchableOpacity 
-                className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center" 
-                onPress={() => onPress(item)}
-              >
-                <Ionicons name="eye-outline" size={18} color="white" />
-                <Text className="text-white font-bold ml-2">View Details</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                className="bg-red-100 px-6 py-3 rounded-xl flex-row items-center"
-                onPress={() => handleLeaveProject(item.id)}
-              >
-                <Ionicons name="thumbs-down-outline" size={18} color="#DC2626" />
-                <Text className="text-red-600 font-bold ml-2">Down Vote</Text>
-              </TouchableOpacity>
-            </View>
-          );
-        
-        case 'nonMemberProjects':
-          var icon = "enter-outline";
-          var actionText = '';
-          if (item.status === 'ACTIVE') {
-            actionText = 'Join Project'
-          } else {
-            actionText = 'Vote Project';
-            icon = "thumbs-up-outline";
-          }
-          return (
-            <View className="flex-row justify-between">
-              <TouchableOpacity 
-                className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center flex-1 mr-3"
-                onPress={() => handleJoinProject(item.id)}
-              >
-                <Ionicons name={icon} size={18} color="white" />
-                <Text className="text-white font-bold ml-2">{actionText}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center"
-                onPress={() => onPress(item)}
-              >
-                <Ionicons name="information-circle-outline" size={18} color="#4B5563" />
-                <Text className="text-gray-700 font-bold ml-2">Info</Text>
-              </TouchableOpacity>
-            </View>
-        );
-        
-        default:
-          return (
-            <View className="flex-row justify-between">
-              <TouchableOpacity 
-                className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center flex-1 mr-3"
-                onPress={() => onPress(item)}
-              >
-                <Ionicons name="eye-outline" size={18} color="white" />
-                <Text className="text-white font-bold ml-2">View Details</Text>
-              </TouchableOpacity>
-              {isCreator ? (
-                <TouchableOpacity 
+    
+      switch (item.status) {
+        case 'ACTIVE':
+          if (isCreator) {
+            return (
+              <View className="flex-row justify-between">
+                <TouchableOpacity
+                  className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center flex-1 mr-3"
+                  onPress={() => onPress(item)}
+                >
+                  <Ionicons name="settings-outline" size={18} color="white" />
+                  <Text className="text-white font-bold ml-2">Manage</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
                   className="bg-red-100 px-6 py-3 rounded-xl flex-row items-center"
                   onPress={() => handleDeleteProject(item.id)}
                 >
                   <Ionicons name="trash-outline" size={18} color="#DC2626" />
                   <Text className="text-red-600 font-bold ml-2">Delete</Text>
                 </TouchableOpacity>
-              ) : !item.members?.some(member => member.userId === userId) ? (
+              </View>
+            );
+          } else if (item.members?.some((member) => member.userId === userId)) {
+            return (
+              <View className="flex-row justify-between gap-2">
+                <TouchableOpacity
+                  className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center flex-1 ml-3"
+                  onPress={() => handleLeaveProject(item.id)}
+                >
+                  <Ionicons name="eye-outline" size={18} color="white" />
+                  <Text className="text-white font-bold ml-2">View Details</Text> 
+                </TouchableOpacity>
                 <TouchableOpacity
                   className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center"
+                  onPress={() => onPress(item)}
+                >
+                  <Ionicons name="exit-outline" size={18} color="#DC2626" />
+                  <Text className="text-red-600 font-bold ml-2">Leave</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          } else {
+            return (
+              <View className="flex-row justify-between">
+                <TouchableOpacity
+                  className="bg-indigo-600 px-6 py-3 rounded-xl flex-row justify-center items-center flex-1 mr-3"
                   onPress={() => handleJoinProject(item.id)}
                 >
-                  <Ionicons name="thumbs-up-outline" size={18} color="#4B5563" />
-                  <View className="bg-indigo-600 rounded-full px-2 py-1 ml-2">
-                    <Text className="text-white text-xs font-bold">{item.members.length + 1}</Text>
-                  </View>
+                  <Ionicons name="enter-outline" size={18} color="white" />
+                  <Text className="text-white font-bold ml-2">Join</Text>
                 </TouchableOpacity>
-              ) : (
-                <TouchableOpacity 
+                <TouchableOpacity
+                  className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center"
+                  onPress={() => onPress(item)}
+                >
+                  <Ionicons name="information-circle-outline" size={18} color="#4B5563" />
+                  <Text className="text-gray-700 font-bold ml-2">View Details</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          }
+    
+        case 'VOTING':
+          if (isCreator) {
+            return (
+              <View className="flex-row justify-between">
+                <TouchableOpacity
+                  className="bg-indigo-600 px-6 py-3 rounded-xl flex-row justify-center items-center flex-1 mr-3"
+                  onPress={() => onPress(item)}
+                >
+                  <Ionicons name="settings-outline" size={18} color="white" />
+                  <Text className="text-white font-bold ml-2">Manage</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className="bg-red-100 px-6 py-3 rounded-xl flex-row items-center"
+                  onPress={() => handleDeleteProject(item.id)}
+                >
+                  <Ionicons name="trash-outline" size={18} color="#DC2626" />
+                  <Text className="text-red-600 font-bold ml-2">Delete</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          } else if (item.members?.some((member) => member.userId === userId)) {
+            return (
+              <View className="flex-row justify-between">
+                <TouchableOpacity
                   className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center"
                   onPress={() => handleLeaveProject(item.id)}
                 >
                   <Ionicons name="thumbs-down-outline" size={18} color="#4B5563" />
-                  <Text className="text-gray-700 font-bold ml-2"></Text>
+                  <Text className="text-gray-700 font-bold ml-2">Unvote</Text>
                 </TouchableOpacity>
-              )}
+                <TouchableOpacity
+                  className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center flex-1 ml-3"
+                  onPress={() => onPress(item)}
+                >
+                  <Ionicons name="eye-outline" size={18} color="white" />
+                  <Text className="text-white font-bold ml-2">View Details</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          } else {
+            return (
+              <View className="flex-row justify-between">
+                <TouchableOpacity
+                  className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center flex-1 mr-3"
+                  onPress={() => handleJoinProject(item.id)}
+                >
+                  <Ionicons name="thumbs-up-outline" size={18} color="white" />
+                  <Text className="text-white font-bold ml-2">Vote Project</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center"
+                  onPress={() => onPress(item)}
+                >
+                  <Ionicons name="information-circle-outline" size={18} color="#4B5563" />
+                  <Text className="text-gray-700 font-bold ml-2">View Details</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          }
+    
+        case 'ONGOING':
+          if (isCreator) {
+            return (
+              <View className="flex-row justify-between">
+                <TouchableOpacity
+                  className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center flex-1 mr-3"
+                  onPress={() => onPress(item)}
+                >
+                  <Ionicons name="settings-outline" size={18} color="white" />
+                  <Text className="text-white font-bold ml-2">Manage</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          } else if (item.members?.some((member) => member.userId === userId)) {
+            return (
+              <View className="flex-row justify-between">
+                <TouchableOpacity
+                  className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center"
+                  onPress={() => handleLeaveProject(item.id)}
+                >
+                  <Ionicons name="thumbs-down-outline" size={18} color="#4B5563" />
+                  <Text className="text-gray-700 font-bold ml-2">Leave Project</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          }
+          break;
+    
+        default:
+          return (
+            <View className="flex-row justify-center">
+              <TouchableOpacity
+                className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center"
+                onPress={() => onPress(item)}
+              >
+                <Ionicons name="eye-outline" size={18} color="white" />
+                <Text className="text-white font-bold ml-2">View Details</Text>
+              </TouchableOpacity>
             </View>
           );
       }
     };
+    
   
     return (
     <TouchableOpacity
@@ -235,7 +289,7 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
                 <Text className="text-white text-xs">Creator</Text>
               </View>
             )}
-            {filterType === 'userProjects' && (
+            {filterType === 'userProjects' && !isCreator && (
               <View className="bg-white/20 px-2 py-1 rounded-full">
                 <Text className="text-white text-xs">Member</Text>
               </View>
