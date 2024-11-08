@@ -103,6 +103,14 @@ export const createIssue = async (req: Request, res: Response): Promise<void> =>
         user: true,
       },
     });
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        points: { increment: 10 }, // Increase by 10 points for creating an issue
+      },
+    });
+
     res.status(201).json(newIssue);
   } catch (error: any) {
     res.status(500).json({ message: `Error creating an issue: ${error.message}` });
@@ -314,6 +322,27 @@ export const addProposalToIssue = async (req: Request, res: Response): Promise<v
       data: { status: Status.IN_PROGRESS },
     });
 
+    const issue = await prisma.issue.findUnique({
+      where: { id },
+      include: {
+        user: true,
+      },
+    });
+
+    // Ensure the issue exists and has a user associated
+    if (issue && issue.user) {
+      // Create a notification for the issue owner
+      await prisma.notification.create({
+        data: {
+          userId: issue.user.id, // The user who should receive the notification
+          type: 'PROPOSAL_SUBMITTED', // Enum value for notification type
+          message: `${proposal.user?.username} has submitted a proposal for your issue "${issue.issueName}".`,
+          proposalId: proposal.id, // Link to the proposal
+          createdAt: new Date(),
+        },
+      });
+    }
+
     res.status(201).json(proposal);
   } catch (error: any) {
     res.status(500).json({ message: `Error adding proposal: ${error.message}` });
@@ -416,6 +445,13 @@ export const acceptResolution = async (req: Request, res: Response): Promise<voi
       data: { 
         status: Status.CLOSED,
         lastUpdated: new Date(),
+      },
+    });
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        points: { increment: 20 }, // Increase by 20 points for resolving an issue
       },
     });
 

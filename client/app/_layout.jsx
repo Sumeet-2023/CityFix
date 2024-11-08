@@ -14,7 +14,8 @@ export default function RootLayout() {
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(modals)" options={{ headerShown: false }} />
-      <Stack.Screen name="leaderboard" options={{ headerShown: false }} />      
+      <Stack.Screen name="leaderboard" options={{ headerShown: false }} />   
+      <Stack.Screen name="data-dashboard" options={{ headerShown: false }} />   
     </Stack>
   );
 }

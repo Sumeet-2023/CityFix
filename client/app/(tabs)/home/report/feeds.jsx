@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, RefreshControl, Modal, Image, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useAuthStore } from '../../../store';
+import { useAuthStore, useFeedsStore, useMyIssuesStore } from '../../../store';
 import axios from 'axios';
 import { serverurl } from '../../../../firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
 
 const Feeds = () => {
   const { user } = useAuthStore();
+  const { feeds, isLoading, fetchFeeds } = useFeedsStore();
   const [searchIssue, setSearchIssue] = useState('');
-  const [issuesData, setIssuesData] = useState([]);
   const [filteredReports, setFilteredReports] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -18,24 +18,14 @@ const Feeds = () => {
   const [proposalDescription, setProposalDescription] = useState('');
   const [proposalImage, setProposalImage] = useState(null);
 
-  const fetchIssues = async () => {
-    try {
-      const response = await axios.get(`${serverurl}/issues/filter/condition?status=OPEN&status=IN_PROGRESS`);
-      setIssuesData(response.data);
-      setFilteredReports(response.data);
-    } catch (error) {
-      console.error("Error fetching issues:", error);
-    }
-  };
-
   useEffect(() => {
-    fetchIssues();
+    fetchFeeds();
   }, []);
 
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     try {
-      await fetchIssues();
+      await fetchFeeds();
     } finally {
       setRefreshing(false);
     }
@@ -44,9 +34,9 @@ const Feeds = () => {
   const handleSearchIssue = (reports) => {
     setSearchIssue(reports);
     if (reports.trim() === '') {
-      setFilteredReports(issuesData);
+      setFilteredReports(feeds);
     } else {
-      const filtered = issuesData.filter((issue) => 
+      const filtered = feeds.filter((issue) => 
         issue.id.toString().toLowerCase().includes(reports.toLowerCase()) ||
         issue.issueName.toLowerCase().includes(reports.toLowerCase())
       );
@@ -94,6 +84,9 @@ const Feeds = () => {
         Alert.alert("Success", "Proposal Submitted!");
         setShowModal(false);
         setProposalDescription('');
+        const { user } = useAuthStore.getState();
+        useFeedsStore.getState().fetchFeeds();
+        useMyIssuesStore.getState().fetchMyIssues(user.id);
       }
     } catch (error) {
       console.error("Error submitting proposal:", error);
@@ -124,8 +117,8 @@ const Feeds = () => {
         }
       >
         <View className="flex-1 px-5 py-3">
-          {filteredReports.length > 0 ? (
-            filteredReports.map((issue) => (
+          {feeds.length > 0 ? (
+            feeds.map((issue) => (
               <View key={issue.id} className="bg-white p-4 rounded-xl mb-4 shadow-md">
                 <TouchableOpacity onPress={() => handleCardPress(issue.id)}>
                   <View className="flex-row justify-between mb-2">

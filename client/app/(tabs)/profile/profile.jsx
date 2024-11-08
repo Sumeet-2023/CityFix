@@ -119,7 +119,7 @@ const ProfileBadges = ({ badges }) => (
         />
       ))
     ) : (
-      <Text className="text-gray-500">No badges yet</Text>
+      <Text className="text-gray-500">No badges earned yet</Text>
     )}
   </View>
 );
@@ -175,7 +175,7 @@ const Profile = () => {
         <ProfileHeader me={me} />
         <ProfileActions me={me} />
         <PointsSection points={me.points} />
-
+        <ProfileBadges badges={me.badges}/>
       </ScrollView>
     </SafeAreaView>
   );

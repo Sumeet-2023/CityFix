@@ -4,7 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import { useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { serverurl } from '../../../../firebaseConfig';
-import { useAuthStore } from '../../../store';
+import { useAuthStore, useMyIssuesStore, useSolvedIssuesStore } from '../../../store';
 
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -178,47 +178,18 @@ const IssueCard = ({ issue, onViewProposals, onEdit, onDelete }) => {
 };
 
 const MyIssue = () => {
-  const params = useLocalSearchParams();
-  const [myIssues, setMyIssues] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false); // State for refreshing
   const [error, setError] = useState(null);
-  const [update, setUpdate] = useState(params.update === 'true' || false);
   const { user } = useAuthStore();
+  const { myIssues, isLoading, fetchMyIssues } = useMyIssuesStore();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedProposals, setSelectedProposals] = useState([]);
-  const [proposalUser, setProposalUser] = useState(null);
-
-  const fetchIssues = async () => {
-    try {
-      setLoading(true);
-      setRefreshing(true); // Set refreshing to true when starting fetch
-      const response = await axios.get(`${serverurl}/issues/user/${user.id}`);
-      setMyIssues(response.data);
-      setError(null);
-      setUpdate(false);
-      params.update = false;
-    } catch (error) {
-      console.error("Error fetching issues:", error);
-      setError("Failed to fetch issues");
-      Alert.alert("Error", "Failed to fetch issues.");
-    } finally {
-      setLoading(false);
-      setRefreshing(false); // Reset refreshing when done
-    }
-  };
 
   useEffect(() => {
-    fetchIssues();
-  }, []);
+    if (user?.id) {
+      fetchMyIssues(user.id);
+    }
+  }, [user]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      if (params.update === 'true') {
-        fetchIssues();
-      }
-    }, [params.update])
-  );
 
   const handleViewProposals = async (issueId) => {
     try {
@@ -246,9 +217,9 @@ const MyIssue = () => {
         Alert.alert('Success', 'Proposal accepted successfully');
 
         // Remove the accepted issue from the list of myIssues
-        setMyIssues((prevIssues) =>
-          prevIssues.filter((issue) => issue.id !== proposal.issueId)
-        );
+        useMyIssuesStore.getState().removeIssueById(proposal.issueId);
+      
+        useSolvedIssuesStore.getState().fetchSolvedIssues();
 
         // Close the modal after acceptance
         setModalVisible(false);
@@ -280,7 +251,7 @@ const MyIssue = () => {
                 Alert.alert("Success", "Proposal denied successfully.");
                 
                 // Refresh the proposals list to reflect the changes
-                fetchIssues(); // Re-fetch issues to see the updated list of proposals and status
+                fetchMyIssues(); // Re-fetch issues to see the updated list of proposals and status
                 setModalVisible(false);
               }
             } catch (error) {
@@ -314,7 +285,7 @@ const MyIssue = () => {
             try {
               await axios.delete(`${serverurl}/issues/${id}`);
               Alert.alert("Success", "Issue deleted successfully");
-              fetchIssues();
+              fetchMyIssues();
             } catch (error) {
               console.error("Error deleting issue:", error);
               Alert.alert("Error", "Failed to delete issue");
@@ -447,7 +418,7 @@ const MyIssue = () => {
     </Modal>
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
       <View className="flex-1 justify-center items-center">
         <ActivityIndicator size="large" />
@@ -460,7 +431,7 @@ const MyIssue = () => {
       <View className="flex-1 justify-center items-center p-4">
         <Text className="text-red-500 text-center">{error}</Text>
         <TouchableOpacity 
-          onPress={fetchIssues}
+          onPress={fetchMyIssues}
           className="mt-4 bg-blue-500 px-4 py-2 rounded-md"
         >
           <Text className="text-white">Retry</Text>
@@ -472,9 +443,7 @@ const MyIssue = () => {
   return (
     <ScrollView 
       className="flex-1 bg-gray-100" 
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={fetchIssues} />
-      }
+      
     >
       <ProposalsModal />
       {myIssues && myIssues.length > 0 ? (
