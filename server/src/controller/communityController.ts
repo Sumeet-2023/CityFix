@@ -258,6 +258,37 @@ export const getCommunities = async (req: Request, res: Response): Promise<void>
   }
 };
 
+export const getNearbyCommunities = async (req: Request, res: Response): Promise<void> => {
+  // Using query parameters instead of body for GET request
+  const latitude = parseFloat(req.query.latitude as string);
+  const longitude = parseFloat(req.query.longitude as string);
+  const radius = parseFloat(req.query.radius as string) || 10;
+
+  if (isNaN(latitude) || isNaN(longitude)) {
+      res.status(400).json({ message: "Invalid latitude or longitude" });
+      return;
+  }
+  
+  try {
+      const users = await prisma.community.findRaw({
+          filter: {
+              location: {
+                  $geoWithin: {
+                      $centerSphere: [
+                          [longitude, latitude],
+                          radius / 6371,
+                      ]
+                  }
+              }
+          }
+      });
+      res.status(200).json(users);
+  } catch (error: any) {
+      res.status(500)
+          .json({ message: `Error retrieving nearby users: ${error.message}` });
+  }
+};
+
 export const getCommunityById = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
 

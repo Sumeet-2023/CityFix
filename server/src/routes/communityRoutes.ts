@@ -15,12 +15,14 @@ import {
     promoteMember,
     demoteMember,
     fetchUserRole,
-    getUserRole
+    getUserRole,
+    getNearbyCommunities
 } from "../controller/communityController";
 
 const router = Router();
 
 router.get("/", getCommunities);
+router.get("/nearbyCommunities", getNearbyCommunities);
 router.get("/:id", getCommunityById);
 router.get("/communityList/:creatorId", getUserOwnedCommunities);
 router.get("/communityJoined/:userId", getUserCommunities);

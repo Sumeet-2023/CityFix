@@ -19,7 +19,7 @@ async function main() {
     await prisma.userProject.deleteMany({}); // Delete project memberships
     await prisma.userClan.deleteMany({}); // Delete clan memberships
     await prisma.userNgo.deleteMany({});
-    
+    await prisma.notification.deleteMany({});
     await prisma.counter.deleteMany({});
     await prisma.issue.deleteMany({});
     await prisma.community.deleteMany({});

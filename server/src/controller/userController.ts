@@ -159,7 +159,7 @@ export const getNearbyUsers = async (req: Request, res: Response): Promise<void>
                     $geoWithin: {
                         $centerSphere: [
                             [longitude, latitude],
-                            radius / 6371, // Convert to radians (6371 is Earth's radius in km)
+                            radius / 6371,
                         ]
                     }
                 }
