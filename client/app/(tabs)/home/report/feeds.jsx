@@ -81,6 +81,7 @@ const Feeds = () => {
   
       const response = await axios.post(`${serverurl}/issues/proposals/${selectedIssue.id}`, proposalData);
       if (response.status === 201) {
+        console.log(response.data);
         Alert.alert("Success", "Proposal Submitted!");
         setShowModal(false);
         setProposalDescription('');

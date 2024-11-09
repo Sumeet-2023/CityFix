@@ -15,7 +15,7 @@ const router = Router();
 
 router.get("/", getClans);
 router.get("/:id", getClanById);
-router.get("/name/:name", getClanByName)
+router.get("/name/:name", getClanByName);
 router.get("/:id/members", getClanMembers);
 
 router.post("/", createClan);

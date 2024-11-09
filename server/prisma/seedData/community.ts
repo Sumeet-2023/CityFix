@@ -160,7 +160,38 @@ export const communities = [
     },
     creatorType: communityCreatorType.USER,
     creatorId: johnDoeId,
+  },
+  {
+    id: new ObjectId().toHexString(),
+    communityName: "Beach Cleaner",
+    communityNumber: 13,
+    description: "focused on keeping beaches clean and litter-free.",
+    location: {
+      type: "Point",
+      coordinates: [9.2100, 49.1400], // Heilbronn, Germany (random)
+      city: "Heilbronn",
+      state: "Baden-Württemberg",
+      country: "Germany"
+    },
+    creatorType: communityCreatorType.USER,
+    creatorId: johnDoeId
+  },
+  {
+    id: new ObjectId().toHexString(),
+    communityName: "United",
+    communityNumber: 6,
+    description: "clean and litter-free.",
+    location: {
+      type: "Point",
+      coordinates: [9.2072, 49.1359], // Heilbronn, Germany (random)
+      city: "Heilbronn",
+      state: "Baden-Württemberg",
+      country: "Germany"
+    },
+    creatorType: communityCreatorType.USER,
+    creatorId: johnDoeId
   }
+
 ];
 
 // Store the generated project IDs in dataStore for later reference (if needed)

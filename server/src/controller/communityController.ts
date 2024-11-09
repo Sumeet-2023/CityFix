@@ -258,34 +258,54 @@ export const getCommunities = async (req: Request, res: Response): Promise<void>
   }
 };
 
-export const getNearbyCommunities = async (req: Request, res: Response): Promise<void> => {
-  // Using query parameters instead of body for GET request
+export const getNearbyCommunities = async (req: Request, res: Response) => {
   const latitude = parseFloat(req.query.latitude as string);
   const longitude = parseFloat(req.query.longitude as string);
   const radius = parseFloat(req.query.radius as string) || 10;
 
   if (isNaN(latitude) || isNaN(longitude)) {
-      res.status(400).json({ message: "Invalid latitude or longitude" });
-      return;
+    res.status(400).json({ message: "Invalid latitude or longitude" });
+    return;
   }
-  
+
   try {
-      const users = await prisma.community.findRaw({
-          filter: {
-              location: {
-                  $geoWithin: {
-                      $centerSphere: [
-                          [longitude, latitude],
-                          radius / 6371,
-                      ]
-                  }
-              }
-          }
-      });
-      res.status(200).json(users);
+    const communities = await prisma.community.findRaw({
+      filter: {
+        location: {
+          $geoWithin: {
+            $centerSphere: [
+              [longitude, latitude],
+              radius / 6371,
+            ],
+          },
+        },
+      },
+    });
+
+    // Transforming the response to the expected format
+    // @ts-ignore
+    const formattedCommunities = communities.map((community) => {
+      return {
+        id: community._id.$oid,  // Converting `_id` to `id`
+        communityName: community.communityName,
+        communityNumber: community.communityNumber,
+        creatorId: community.creatorId.$oid,
+        creatorType: community.creatorType,
+        description: community.description,
+        location: {
+          city: community.location?.city,
+          state: community.location?.state,
+          country: community.location?.country,
+          coordinates: community.location?.coordinates,
+          type: community.location?.type,
+        },
+        // Add any other fields if needed, and format them accordingly
+      };
+    });
+
+    res.status(200).json(formattedCommunities);
   } catch (error: any) {
-      res.status(500)
-          .json({ message: `Error retrieving nearby users: ${error.message}` });
+    res.status(500).json({ message: `Error finding nearby communities: ${error.message}` });
   }
 };
 

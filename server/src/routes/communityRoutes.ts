@@ -32,7 +32,7 @@ router.get("/role/:communityId/:userId", getUserRole);
 router.post('/fetchUserRole/:id', fetchUserRole);
 router.post("/", createCommunity);
 
-router.put("/:id/members", joinCommunity);
+router.post("/:id/members", joinCommunity);
 router.put("/:id/ngo", joinCommunityNGO);
 
 router.patch("/:id", patchCommunity);

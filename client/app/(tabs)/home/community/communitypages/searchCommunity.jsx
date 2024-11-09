@@ -5,17 +5,16 @@ import axios from 'axios';
 import { serverurl } from '../../../../../firebaseConfig';
 import { styled } from 'nativewind';
 import { MaterialIcons } from '@expo/vector-icons'; // Importing icons
+import { useAuthStore } from '../../../../store';
+import { router } from 'expo-router';
 
-const StyledSafeAreaView = styled(SafeAreaView);
-const StyledView = styled(View);
-const StyledText = styled(Text);
-const StyledTouchableOpacity = styled(TouchableOpacity);
 
 const SearchCommunity = () => {
   const [communities, setCommunities] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const { user } = useAuthStore();
 
   const fetchNearbyCommunities = async (latitude, longitude) => {
     try {
@@ -58,15 +57,15 @@ const SearchCommunity = () => {
 
   const handleJoinCommunity = async (communityId) => {
     try {
-      const response = await axios.put(`${serverurl}/community/${communityId}/members`, {
-        userId: 'YOUR_USER_ID', // Replace this with actual logged-in user ID from the store or context
+      const response = await axios.post(`${serverurl}/community/${communityId}/members`, {
+        userId: user.id,
       });
       Alert.alert("Success", "You have successfully joined the community!");
     } catch (error) {
       console.error('Error joining community:', error);
       Alert.alert("Error", "Unable to join the community. Please try again later.");
     }
-  };
+  };  
 
   useEffect(() => {
     getLocationAndFetchCommunities();
@@ -77,9 +76,9 @@ const SearchCommunity = () => {
   );
 
   return (
-    <StyledSafeAreaView className="flex-1 m-4">
+    <SafeAreaView className="flex-1 m-4">
       {/* Search Bar */}
-      <StyledView className="flex-row items-center h-10 border border-gray-300 rounded-lg px-2 mb-4 bg-white">
+      <View className="flex-row items-center h-10 border border-gray-300 rounded-lg px-2 mb-4 bg-white">
         <MaterialIcons name="search" size={20} color="#999" />
         <TextInput
           className="flex-1 ml-2"
@@ -88,60 +87,60 @@ const SearchCommunity = () => {
           onChangeText={text => setSearchTerm(text)}
           placeholderTextColor="#999"
         />
-      </StyledView>
+      </View>
 
       {/* ScrollView for Communities */}
-      <StyledText className="text-2xl font-bold mb-4">Nearby Communities</StyledText>
+      <Text className="text-2xl font-bold mb-4">Nearby Communities</Text>
       <ScrollView>
         {loading && <ActivityIndicator size="large" color="#0000ff" />}
-        {error && <StyledText className="text-red-500 mb-4">{error}</StyledText>}
+        {error && <Text className="text-red-500 mb-4">{error}</Text>}
         
-        {filteredCommunities.length > 0 ? (
-          filteredCommunities.map((community) => (
-            <StyledView key={community._id} className="mb-4 p-4 bg-gray-100 rounded-lg shadow-md">
+        {communities.length > 0 ? (
+          communities.map((community) => (
+            <View key={community.id} className="mb-4 p-4 bg-gray-100 rounded-lg shadow-md">
               {/* Community Name with Icon */}
-              <StyledView className="flex-row items-center mb-2">
+              <View className="flex-row items-center mb-2">
                 <MaterialIcons name="group" size={24} color="#4b5563" />
-                <StyledText className="text-xl font-bold ml-2">{community.communityName}</StyledText>
-              </StyledView>
+                <Text className="text-xl font-bold ml-2">{community.communityName}</Text>
+              </View>
 
               {/* Community Description */}
-              <StyledText className="text-gray-700 mb-2">{community.description}</StyledText>
+              <Text className="text-gray-700 mb-2">{community.description}</Text>
 
               {/* Additional Info (Location and Members) */}
-              <StyledView className="flex-row justify-between items-center mb-4">
+              <View className="flex-row justify-between items-center mb-4">
                 {/* Location Icon and Info */}
-                <StyledView className="flex-row items-center">
+                <View className="flex-row items-center">
                   <MaterialIcons name="location-on" size={18} color="#4b5563" />
-                  <StyledText className="ml-1 text-sm text-gray-500">{community.location ? 
+                  <Text className="ml-1 text-sm text-gray-500">{community.location ? 
                     `${community.location.city}, ${community.location.country}` : 
                      'Location not available'}
-                  </StyledText>
-                </StyledView>
+                  </Text>
+                </View>
 
                 {/* Members Count Icon and Info */}
-                <StyledView className="flex-row items-center">
+                <View className="flex-row items-center">
                   <MaterialIcons name="people" size={18} color="#4b5563" />
-                  <StyledText className="ml-1 text-sm text-gray-500">
+                  <Text className="ml-1 text-sm text-gray-500">
                     {community.membersCount ? `${community.membersCount} members` : '1 member'}
-                  </StyledText>
-                </StyledView>
-              </StyledView>
+                  </Text>
+                </View>
+              </View>
 
               {/* Join Button */}
-              <StyledTouchableOpacity
+              <TouchableOpacity
                 className="bg-blue-500 rounded-lg p-2"
-                onPress={() => handleJoinCommunity(community._id)}
+                onPress={() => handleJoinCommunity(community.id)}
               >
-                <StyledText className="text-white text-center font-semibold">Join</StyledText>
-              </StyledTouchableOpacity>
-            </StyledView>
+                <Text className="text-white text-center font-semibold">Join</Text>
+              </TouchableOpacity>
+            </View>
           ))
         ) : (
-          !loading && <StyledText>No communities found nearby.</StyledText>
+          !loading && <Text>No communities found nearby.</Text>
         )}
       </ScrollView>
-    </StyledSafeAreaView>
+    </SafeAreaView>
   );
 };
 
