@@ -75,7 +75,7 @@ const CommunityChannels = () => {
   // }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
+    <View style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
       <View style={{ padding: 16 }}>
         {/* Header */}
         <View style={{ marginBottom: 16 }}>
@@ -107,6 +107,7 @@ const CommunityChannels = () => {
             value={searchQuery}
             onChangeText={setSearchQuery}
             style={{ marginLeft: 8, flex: 1, fontSize: 16 }}
+            placeholderTextColor="#999"
           />
         </View>
 
@@ -228,7 +229,7 @@ const CommunityChannels = () => {
           </View>
         )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
