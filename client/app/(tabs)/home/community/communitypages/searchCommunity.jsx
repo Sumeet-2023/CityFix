@@ -12,6 +12,7 @@ const StyledSafeAreaView = styled(SafeAreaView);
 const StyledView = styled(View);
 const StyledText = styled(Text);
 const StyledTouchableOpacity = styled(TouchableOpacity);
+const StyledTextInput = styled(TextInput);
 
 const SearchCommunity = () => {
   const [communities, setCommunities] = useState([]);
@@ -96,11 +97,11 @@ const SearchCommunity = () => {
   return (
     <StyledSafeAreaView className="flex-1 m-4">
       {/* Search Bar */}
-      <StyledView className="flex-row items-center h-10 border border-gray-300 rounded-lg px-2 mb-4 bg-white">
-        <MaterialIcons name="search" size={20} color="#999" />
-        <TextInput
-          className="flex-1 ml-2"
-          placeholder="Search for communities..."
+      <StyledView className="flex-row items-center h-12 border border-gray-400 rounded-lg px-3 mb-4 bg-white shadow-md">
+        <MaterialIcons name="search" size={24} color="#555" />
+        <StyledTextInput
+          className="flex-1 ml-2 text-lg"
+          placeholder="Search nearby communities..."
           value={searchTerm}
           onChangeText={text => setSearchTerm(text)}
           placeholderTextColor="#999"
@@ -108,39 +109,40 @@ const SearchCommunity = () => {
       </StyledView>
 
       {/* ScrollView for Communities */}
-      <StyledText className="text-2xl font-bold mb-4">Nearby Communities</StyledText>
+      <StyledText className="text-2xl font-bold mb-4 text-gray-800">Nearby Communities</StyledText>
       <ScrollView>
-        {loading && <ActivityIndicator size="large" color="#0000ff" />}
+        {loading && <ActivityIndicator size="large" color="#0066CC" />}
         {error && <StyledText className="text-red-500 mb-4">{error}</StyledText>}
         
         {filteredCommunities.length > 0 ? (
           filteredCommunities.map((community) => (
-            <StyledView key={community.id} className="mb-4 p-4 bg-gray-100 rounded-lg shadow-md">
+            <StyledView key={community.id} className="mb-6 p-5 bg-white rounded-xl shadow-lg border border-gray-200">
               {/* Community Name with Icon */}
               <StyledView className="flex-row items-center mb-2">
-                <MaterialIcons name="group" size={24} color="#4b5563" />
-                <StyledText className="text-xl font-bold ml-2">{community.communityName}</StyledText>
+                <MaterialIcons name="group" size={28} color="#4b5563" />
+                <StyledText className="text-xl font-bold ml-3 text-gray-800">{community.communityName}</StyledText>
               </StyledView>
 
               {/* Community Description */}
-              <StyledText className="text-gray-700 mb-2">{community.description}</StyledText>
+              <StyledText className="text-gray-600 mb-3">{community.description}</StyledText>
 
               {/* Additional Info (Location and Members) */}
               <StyledView className="flex-row justify-between items-center mb-4">
                 {/* Location Icon and Info */}
                 <StyledView className="flex-row items-center">
-                  <MaterialIcons name="location-on" size={18} color="#4b5563" />
-                  <StyledText className="ml-1 text-sm text-gray-500">{community.location ? 
-                    `${community.location.city}, ${community.location.country}` : 
-                     'Location not available'}
+                  <MaterialIcons name="location-on" size={20} color="#4b5563" />
+                  <StyledText className="ml-1 text-sm text-gray-500">
+                    {community.location ? 
+                      `${community.location.city}, ${community.location.country}` : 
+                      'Location not available'}
                   </StyledText>
                 </StyledView>
 
                 {/* Members Count Icon and Info */}
                 <StyledView className="flex-row items-center">
-                  <MaterialIcons name="people" size={18} color="#4b5563" />
+                  <MaterialIcons name="people" size={20} color="#4b5563" />
                   <StyledText className="ml-1 text-sm text-gray-500">
-                    {community.members?.length  ? `${community.members?.length } members` : '1 member'}
+                    {community.members?.length ? `${community.members.length} members` : '1 member'}
                   </StyledText>
                 </StyledView>
               </StyledView>
@@ -148,8 +150,8 @@ const SearchCommunity = () => {
               {/* Join Button */}
               <StyledTouchableOpacity
                 className={`${
-                  joinedCommunities.has(community.id) ? 'bg-gray-300' : 'bg-blue-500'
-                } rounded-lg p-2`}
+                  joinedCommunities.has(community.id) ? 'bg-gray-400' : 'bg-blue-500'
+                } rounded-lg p-3 shadow-md`}
                 onPress={() => handleJoinCommunity(community.id)}
                 disabled={joinedCommunities.has(community.id)}
               >
@@ -160,7 +162,18 @@ const SearchCommunity = () => {
             </StyledView>
           ))
         ) : (
-          !loading && <StyledText>No communities found nearby.</StyledText>
+          !loading && (
+            <StyledView className="flex-1 items-center justify-center mt-20">
+              <MaterialIcons name="groups" size={100} color="#bbb" />
+              <StyledText className="text-lg font-bold text-gray-500 mt-5">No Communities Found Nearby</StyledText>
+              <StyledText className="text-base text-gray-400 mt-2 text-center">
+                It seems there are no active communities nearby your location at the moment.
+              </StyledText>
+              <StyledText className="text-base text-gray-400 mt-1 text-center">
+                Try adjusting your search or creating your own community!
+              </StyledText>
+            </StyledView>
+          )
         )}
       </ScrollView>
     </StyledSafeAreaView>

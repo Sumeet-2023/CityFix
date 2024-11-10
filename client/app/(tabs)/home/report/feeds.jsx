@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, RefreshControl, Modal, Image, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, RefreshControl, Modal, Image, Alert, Share } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useAuthStore, useFeedsStore, useMyIssuesStore } from '../../../store';
@@ -94,6 +94,16 @@ const Feeds = () => {
       Alert.alert("Error", "Failed to submit the proposal");
     }
   };
+
+  const handleShare = async (issue) => {
+    try {
+      const result = await Share.share({
+        message: `Check out ${issue.username}'s profile on our platform!`,
+      });
+    } catch (error) {
+      alert(error.message);
+    }
+  };
   
 
   return (
@@ -151,7 +161,7 @@ const Feeds = () => {
                 {/* Share and Solve buttons */}
                 <View className="flex-row justify-between mt-4">
                   <TouchableOpacity
-                    onPress={() => Alert.alert('Share', `Sharing Issue: ${issue.issueName}`)}
+                    onPress={handleShare}
                     className="flex-1 bg-blue-500 rounded-lg py-3 mr-2 items-center"
                   >
                     <Text className="text-white font-bold">Share</Text>
