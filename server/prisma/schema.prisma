@@ -21,6 +21,9 @@ model User {
   profession          String?
   notifications       Notification[]   @relation("UserNotifications")
 
+  following           String[]         @db.ObjectId // IDs of users being followed
+  followers           String[]         @db.ObjectId // IDs of users following this user
+
   // issue
   issuesCreated       Issue[]          @relation("UserIssues")
   //comments
