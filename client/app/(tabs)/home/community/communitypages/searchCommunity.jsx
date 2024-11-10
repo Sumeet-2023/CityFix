@@ -8,31 +8,47 @@ import { MaterialIcons } from '@expo/vector-icons'; // Importing icons
 import { useAuthStore } from '../../../../store';
 import { router } from 'expo-router';
 
+const StyledSafeAreaView = styled(SafeAreaView);
+const StyledView = styled(View);
+const StyledText = styled(Text);
+const StyledTouchableOpacity = styled(TouchableOpacity);
 
 const SearchCommunity = () => {
   const [communities, setCommunities] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [joinedCommunities, setJoinedCommunities] = useState(new Set()); // To track joined communities
   const { user } = useAuthStore();
 
+  // Fetch nearby communities based on user's location
   const fetchNearbyCommunities = async (latitude, longitude) => {
     try {
       setLoading(true);
       const response = await axios.get(`${serverurl}/community/nearbyCommunities`, {
-        params: {
-          latitude,
-          longitude,
-        },
+        params: { latitude, longitude },
       });
       setCommunities(response.data);
-      setLoading(false);
     } catch (err) {
       console.error('Error:', err);
+      setError('Unable to retrieve nearby communities.');
+    } finally {
       setLoading(false);
     }
   };
 
+  // Fetch communities joined by the user
+  const fetchJoinedCommunities = async () => {
+    try {
+      const response = await axios.get(`${serverurl}/community/communityJoined/${user.id}`);
+      const joinedIds = response.data.map((community) => community.id);
+      setJoinedCommunities(new Set(joinedIds)); // Store joined community IDs in a Set for quick lookup
+    } catch (err) {
+      console.error('Error fetching joined communities:', err);
+    }
+  };
+
+  // Fetch user's location and nearby communities
   const getLocationAndFetchCommunities = async () => {
     setLoading(true);
     try {
@@ -40,32 +56,34 @@ const SearchCommunity = () => {
       if (status !== 'granted') {
         setError('Permission to access location was denied');
         Alert.alert('Permission denied', 'Please enable location services to find nearby communities.');
-        setLoading(false);
         return;
       }
-
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
 
-      fetchNearbyCommunities(latitude, longitude);
+      await fetchNearbyCommunities(latitude, longitude);
+      await fetchJoinedCommunities(); // Fetch joined communities after fetching nearby communities
     } catch (error) {
       console.error(error);
       setError('Unable to retrieve location');
+    } finally {
       setLoading(false);
     }
   };
 
+  // Handle user joining a community
   const handleJoinCommunity = async (communityId) => {
     try {
-      const response = await axios.post(`${serverurl}/community/${communityId}/members`, {
+      await axios.post(`${serverurl}/community/${communityId}/members`, {
         userId: user.id,
       });
+      setJoinedCommunities((prev) => new Set(prev).add(communityId)); // Add the communityId to the joined set
       Alert.alert("Success", "You have successfully joined the community!");
     } catch (error) {
       console.error('Error joining community:', error);
       Alert.alert("Error", "Unable to join the community. Please try again later.");
     }
-  };  
+  };
 
   useEffect(() => {
     getLocationAndFetchCommunities();
@@ -76,9 +94,9 @@ const SearchCommunity = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 m-4">
+    <StyledSafeAreaView className="flex-1 m-4">
       {/* Search Bar */}
-      <View className="flex-row items-center h-10 border border-gray-300 rounded-lg px-2 mb-4 bg-white">
+      <StyledView className="flex-row items-center h-10 border border-gray-300 rounded-lg px-2 mb-4 bg-white">
         <MaterialIcons name="search" size={20} color="#999" />
         <TextInput
           className="flex-1 ml-2"
@@ -87,60 +105,65 @@ const SearchCommunity = () => {
           onChangeText={text => setSearchTerm(text)}
           placeholderTextColor="#999"
         />
-      </View>
+      </StyledView>
 
       {/* ScrollView for Communities */}
-      <Text className="text-2xl font-bold mb-4">Nearby Communities</Text>
+      <StyledText className="text-2xl font-bold mb-4">Nearby Communities</StyledText>
       <ScrollView>
         {loading && <ActivityIndicator size="large" color="#0000ff" />}
-        {error && <Text className="text-red-500 mb-4">{error}</Text>}
+        {error && <StyledText className="text-red-500 mb-4">{error}</StyledText>}
         
-        {communities.length > 0 ? (
-          communities.map((community) => (
-            <View key={community.id} className="mb-4 p-4 bg-gray-100 rounded-lg shadow-md">
+        {filteredCommunities.length > 0 ? (
+          filteredCommunities.map((community) => (
+            <StyledView key={community.id} className="mb-4 p-4 bg-gray-100 rounded-lg shadow-md">
               {/* Community Name with Icon */}
-              <View className="flex-row items-center mb-2">
+              <StyledView className="flex-row items-center mb-2">
                 <MaterialIcons name="group" size={24} color="#4b5563" />
-                <Text className="text-xl font-bold ml-2">{community.communityName}</Text>
-              </View>
+                <StyledText className="text-xl font-bold ml-2">{community.communityName}</StyledText>
+              </StyledView>
 
               {/* Community Description */}
-              <Text className="text-gray-700 mb-2">{community.description}</Text>
+              <StyledText className="text-gray-700 mb-2">{community.description}</StyledText>
 
               {/* Additional Info (Location and Members) */}
-              <View className="flex-row justify-between items-center mb-4">
+              <StyledView className="flex-row justify-between items-center mb-4">
                 {/* Location Icon and Info */}
-                <View className="flex-row items-center">
+                <StyledView className="flex-row items-center">
                   <MaterialIcons name="location-on" size={18} color="#4b5563" />
-                  <Text className="ml-1 text-sm text-gray-500">{community.location ? 
+                  <StyledText className="ml-1 text-sm text-gray-500">{community.location ? 
                     `${community.location.city}, ${community.location.country}` : 
                      'Location not available'}
-                  </Text>
-                </View>
+                  </StyledText>
+                </StyledView>
 
                 {/* Members Count Icon and Info */}
-                <View className="flex-row items-center">
+                <StyledView className="flex-row items-center">
                   <MaterialIcons name="people" size={18} color="#4b5563" />
-                  <Text className="ml-1 text-sm text-gray-500">
-                    {community.membersCount ? `${community.membersCount} members` : '1 member'}
-                  </Text>
-                </View>
-              </View>
+                  <StyledText className="ml-1 text-sm text-gray-500">
+                    {community.members?.length  ? `${community.members?.length } members` : '1 member'}
+                  </StyledText>
+                </StyledView>
+              </StyledView>
 
               {/* Join Button */}
-              <TouchableOpacity
-                className="bg-blue-500 rounded-lg p-2"
+              <StyledTouchableOpacity
+                className={`${
+                  joinedCommunities.has(community.id) ? 'bg-gray-300' : 'bg-blue-500'
+                } rounded-lg p-2`}
                 onPress={() => handleJoinCommunity(community.id)}
+                disabled={joinedCommunities.has(community.id)}
               >
-                <Text className="text-white text-center font-semibold">Join</Text>
-              </TouchableOpacity>
-            </View>
+                <StyledText className="text-white text-center font-semibold">
+                  {joinedCommunities.has(community.id) ? 'Joined' : 'Join'}
+                </StyledText>
+              </StyledTouchableOpacity>
+            </StyledView>
           ))
         ) : (
-          !loading && <Text>No communities found nearby.</Text>
+          !loading && <StyledText>No communities found nearby.</StyledText>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </StyledSafeAreaView>
   );
 };
 
