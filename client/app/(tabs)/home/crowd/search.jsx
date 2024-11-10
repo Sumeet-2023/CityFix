@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { styled } from 'nativewind';
+import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons'; // Importing icons
+
+const StyledSafeAreaView = styled(SafeAreaView);
+const StyledView = styled(View);
+const StyledText = styled(Text);
+const StyledTouchableOpacity = styled(TouchableOpacity);
+const StyledTextInput = styled(TextInput);
 
 // Sample Clan Data to Mimic Searching (for now, hardcoded)
 const clanData = [
@@ -27,32 +35,63 @@ const Search = () => {
   };
 
   return (
-    <View className="flex-1 bg-white p-5">
-      <Text className="text-2xl font-bold text-center mb-5">Search Clan</Text>
-      <TextInput
-        className="w-full border border-gray-300 rounded-lg p-3 mb-5"
-        placeholder="Enter Clan Tag to search"
-        value={searchQuery}
-        onChangeText={handleSearch}
-        placeholderTextColor="#999"
-      />
+    <StyledView className="flex-1 bg-gray-100 p-5">
+      <StyledText className="text-3xl font-bold text-center mb-5 text-blue-600">Search Clan</StyledText>
+
+      {/* Search Bar */}
+      <StyledView className="flex-row items-center bg-white border border-gray-300 rounded-lg px-4 py-3 mb-5">
+        <MaterialIcons name="search" size={24} color="#999" />
+        <StyledTextInput
+          className="flex-1 ml-3 text-lg"
+          placeholder="Enter Clan Tag to search"
+          value={searchQuery}
+          onChangeText={handleSearch}
+          placeholderTextColor="#999"
+        />
+      </StyledView>
 
       <ScrollView>
         {filteredClans.length > 0 ? (
           filteredClans.map((clan) => (
-            <View key={clan.id} className="bg-gray-100 p-4 rounded-xl mb-4 shadow-md">
-              <Text className="text-lg font-bold">{clan.name}</Text>
-              <Text className="text-base text-gray-700">Clan Tag: {clan.id}</Text>
-              <Text className="text-base text-gray-700">Type: {clan.type}</Text>
-              <Text className="text-base text-gray-700">Members: {clan.members}</Text>
-              <Text className="text-base text-gray-700">Location: {clan.location}</Text>
-            </View>
+            <StyledView key={clan.id} className="bg-white p-5 rounded-lg mb-4 shadow-md">
+              <StyledView className="flex-row items-center mb-3">
+                <FontAwesome5 name="shield-alt" size={24} color="#4b5563" className="mr-3" />
+                <StyledText className="text-xl font-bold text-blue-600">{clan.name}</StyledText>
+              </StyledView>
+
+              <StyledView className="flex-row justify-between items-center mb-2">
+                <StyledText className="text-base text-gray-600">Clan Tag:</StyledText>
+                <StyledText className="text-base text-gray-800">{clan.id}</StyledText>
+              </StyledView>
+
+              <StyledView className="flex-row justify-between items-center mb-2">
+                <StyledText className="text-base text-gray-600">Type:</StyledText>
+                <StyledText className="text-base text-gray-800">{clan.type}</StyledText>
+              </StyledView>
+
+              <StyledView className="flex-row justify-between items-center mb-2">
+                <StyledText className="text-base text-gray-600">Members:</StyledText>
+                <StyledText className="text-base text-gray-800">{clan.members} / 100</StyledText>
+              </StyledView>
+
+              <StyledView className="flex-row justify-between items-center mb-4">
+                <StyledText className="text-base text-gray-600">Location:</StyledText>
+                <StyledText className="text-base text-gray-800">{clan.location}</StyledText>
+              </StyledView>
+
+              {/* Action Button */}
+              <StyledTouchableOpacity className="bg-blue-500 py-3 rounded-lg">
+                <StyledText className="text-center text-white font-semibold">Request to Join</StyledText>
+              </StyledTouchableOpacity>
+            </StyledView>
           ))
         ) : (
-          <Text className="text-center text-gray-500 mt-5">No clans found with that tag</Text>
+          <StyledText className="text-center text-gray-500 mt-10 text-lg">
+            No clans found with that tag. Please try another search.
+          </StyledText>
         )}
       </ScrollView>
-    </View>
+    </StyledView>
   );
 };
 
