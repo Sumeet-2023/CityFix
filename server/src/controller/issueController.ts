@@ -451,7 +451,7 @@ export const acceptResolution = async (req: Request, res: Response): Promise<voi
     await prisma.user.update({
       where: { id: userId },
       data: {
-        points: { increment: 20 }, // Increase by 20 points for resolving an issue
+        points: { increment: 40 }, // Increase by 40 points for resolving an issue
       },
     });
 

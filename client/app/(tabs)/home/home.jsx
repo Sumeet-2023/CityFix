@@ -17,7 +17,7 @@ import { useAuthStore } from "../../store";
 
 const Home = () => {
   const setUser = useAuthStore((state) => state.setUser);
-  const [suggestedUsers, setSuggestedUsers] = useState([]);
+  const [suggestedUsers, setSuggestedUsers] = useState([]); // Initialize with an empty array
   const [followedUsers, setFollowedUsers] = useState([]); // State to track followed users
   const { user } = useAuthStore();
 
@@ -39,22 +39,25 @@ const Home = () => {
 
     const fetchSuggestedUsers = async () => {
       try {
-        const response = await axios.get(`${serverurl}/user/suggested/${user?.id}`);
+        if (!user?.id) return; // Only fetch if user ID is available
+        const response = await axios.get(`${serverurl}/user/suggested/${user.id}`);
         setSuggestedUsers(response.data);
       } catch (error) {
         console.error("Error fetching suggested users:", error);
       }
     };
 
-    // Delay the fetch call by 2-3 seconds
-    const timer = setTimeout(() => {
-      getUser();
-      fetchSuggestedUsers();
-    }, 2000); // 2000 milliseconds = 2 seconds
+    // Call getUser first, then fetch suggested users if user is available
+    const timer = setTimeout(async () => {
+      await getUser();
+      if (user?.id) {
+        fetchSuggestedUsers();
+      }
+    }, 2000); // Delay fetching user data by 2 seconds
 
-    // Cleanup the timer on component unmount
+    // Cleanup timer on component unmount
     return () => clearTimeout(timer);
-  }, []);
+  }, [user?.id]); // Add dependency on user.id
 
   const handleFollow = async (userIdToFollow) => {
     try {
@@ -64,8 +67,6 @@ const Home = () => {
       alert("Followed successfully!");
       // Update the state to indicate that the user has been followed
       setFollowedUsers((prev) => [...prev, userIdToFollow]);
-      // Optionally, remove the user from suggestions
-      setSuggestedUsers((prev) => prev.filter((item) => item.id !== userIdToFollow));
     } catch (error) {
       console.error("Error following user:", error);
     }
@@ -133,48 +134,52 @@ const Home = () => {
 
         <Text className="text-xl font-bold m-4">Suggested for You</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-5">
-          {suggestedUsers.map((suggestedUser) => (
-            <View
-              key={suggestedUser.id}
-              className="mr-4 bg-white rounded-lg p-3 shadow-lg w-48"
-            >
-              {/* User Profile Image */}
-              <Image
-                source={{ uri: suggestedUser.profileUrl || "https://via.placeholder.com/150" }}
-                style={{ width: 80, height: 80, borderRadius: 40, alignSelf: "center" }}
-              />
-
-              {/* Username */}
-              <Text className="text-lg font-bold mt-3 text-center">
-                {suggestedUser.username}
-              </Text>
-
-              {/* Follow Button */}
-              {followedUsers.includes(suggestedUser.id) ? (
-                <TouchableOpacity
-                  className="bg-gray-500 mt-4 rounded-lg py-2"
-                  disabled
-                >
-                  <Text className="text-white text-center font-semibold">Followed</Text>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  className="bg-blue-500 mt-4 rounded-lg py-2"
-                  onPress={() => handleFollow(suggestedUser.id)}
-                >
-                  <Text className="text-white text-center font-semibold">Follow</Text>
-                </TouchableOpacity>
-              )}
-
-              {/* Close Button */}
-              <TouchableOpacity
-                className="absolute top-2 right-2"
-                onPress={() => handleCloseSuggestion(suggestedUser.id)}
+          {suggestedUsers && suggestedUsers.length > 0 ? (
+            suggestedUsers.map((suggestedUser) => (
+              <View
+                key={suggestedUser.id}
+                className="mr-4 bg-white rounded-lg p-3 shadow-lg w-48"
               >
-                <AntDesign name="close" size={20} color="gray" />
-              </TouchableOpacity>
-            </View>
-          ))}
+                {/* User Profile Image */}
+                <Image
+                  source={{ uri: suggestedUser.profileUrl || "https://via.placeholder.com/150" }}
+                  style={{ width: 80, height: 80, borderRadius: 40, alignSelf: "center" }}
+                />
+
+                {/* Username */}
+                <Text className="text-lg font-bold mt-3 text-center">
+                  {suggestedUser.username}
+                </Text>
+
+                {/* Follow Button */}
+                {followedUsers.includes(suggestedUser.id) ? (
+                  <TouchableOpacity
+                    className="bg-gray-500 mt-4 rounded-lg py-2"
+                    disabled
+                  >
+                    <Text className="text-white text-center font-semibold">Followed</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    className="bg-blue-500 mt-4 rounded-lg py-2"
+                    onPress={() => handleFollow(suggestedUser.id)}
+                  >
+                    <Text className="text-white text-center font-semibold">Follow</Text>
+                  </TouchableOpacity>
+                )}
+
+                {/* Close Button */}
+                <TouchableOpacity
+                  className="absolute top-2 right-2"
+                  onPress={() => handleCloseSuggestion(suggestedUser.id)}
+                >
+                  <AntDesign name="close" size={20} color="gray" />
+                </TouchableOpacity>
+              </View>
+            ))
+          ) : (
+            <Text className="text-center text-gray-500 mt-5">No suggested users found</Text>
+          )}
         </ScrollView>
       </ScrollView>
     </SafeAreaView>
