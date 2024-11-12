@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, Linking, Image } from 'react-native';
-import MapView, { Marker, Circle } from 'react-native-maps'; // Import Circle
+import MapView, { Marker, Circle, PROVIDER_GOOGLE } from 'react-native-maps'; // Import Circle
 import * as Location from 'expo-location';
 import { LocationAccuracy } from 'expo-location';
 import { Button, FAB, useTheme } from 'react-native-paper';
@@ -77,7 +77,7 @@ export default function ExploreProjectsScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <MapView style={{ flex: 1 }} region={mapRegion}>
+      <MapView style={{ flex: 1 }} region={mapRegion} provider={PROVIDER_GOOGLE}>
         {/* Display the circular region around the user's location */}
         <Circle
           center={{ latitude: mapRegion.latitude, longitude: mapRegion.longitude }}

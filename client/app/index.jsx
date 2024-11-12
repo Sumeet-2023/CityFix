@@ -29,7 +29,7 @@ export default function Index() {
 
   return (
     <ImageBackground
-      source={require('../assets/images/SDG-11.webp')}
+      source={require('../assets/images/SDG-11.png')}
       className="flex-1 w-full h-full justify-center"
     >
       <SafeAreaView className="flex-1 justify-end items-center p-5">

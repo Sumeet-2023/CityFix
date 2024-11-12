@@ -1,7 +1,7 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useState } from 'react';
 import { View, Linking } from 'react-native';
-import MapView, { Marker, Circle } from 'react-native-maps';
+import MapView, { Marker, Circle, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { LocationAccuracy } from 'expo-location';
 import { 
@@ -180,6 +180,7 @@ export default function Explore() {
     <SafeAreaView className="flex-1">
       <ClanSearch onClanSelect={handleClanSelect} />
       <MapView 
+        provider={PROVIDER_GOOGLE}
         className="flex-1" 
         region={mapRegion}
         customMapStyle={mapStyle}

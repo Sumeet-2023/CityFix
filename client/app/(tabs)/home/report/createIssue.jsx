@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, Modal, FlatList, Alert, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import axios from 'axios';
@@ -418,6 +418,7 @@ const CreateIssue = () => {
                 latitudeDelta: 0.01,
                 longitudeDelta: 0.01,
               }}
+              provider={PROVIDER_GOOGLE}
               onPress={handleMapPress}
             >
               <Marker

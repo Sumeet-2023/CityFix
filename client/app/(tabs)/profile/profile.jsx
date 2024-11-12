@@ -58,12 +58,6 @@ const ProfileActions = ({ me }) => {
       const result = await Share.share({
         message: `Check out ${me.username}'s profile on our platform!`,
       });
-
-      if (result.action === Share.sharedAction) {
-        console.log("Shared successfully!");
-      } else if (result.action === Share.dismissedAction) {
-        console.log("Share dismissed");
-      }
     } catch (error) {
       alert(error.message);
     }
