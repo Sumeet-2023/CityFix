@@ -34,10 +34,10 @@ export default function Index() {
     >
       <SafeAreaView className="flex-1 justify-end items-center p-5">
         <StatusBar barStyle={'dark-content'} />
-        <Text className="text-4xl font-bold text-center mb-2 text-black">
+        <Text className="text-4xl font-bold text-center text-slate-950">
           Welcome to CityFix!
         </Text>
-        <Text className="text-lg font-bold text-center text-[#0E0E0E] mb-8">
+        <Text className="text-lg font-bold text-center text-[#0E0E0E] mb-4">
           Your journey towards a better community starts here.
         </Text>
         
