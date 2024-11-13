@@ -33,7 +33,7 @@ export default {
       package: "com.sumeettt69.client",
       config: {
         googleMaps: {
-          apiKey: process.env.GOOGLE_MAPS_API_KEY
+          apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
         }
       }
     },
@@ -55,7 +55,21 @@ export default {
       },
       eas: {
         projectId: "32616bc5-514a-406b-83de-5e7d4115e284"
-      }
+      },
+      firebase: {
+        apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+        authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+        projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+        storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+        appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+        measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID
+      },
+      openRouterApiKey: process.env.EXPO_PUBLIC_OPEN_ROUTER_API_KEY,
+      geoDbApiKey: process.env.EXPO_PUBLIC_GEO_DB_API_KEY,
+      openWeatherApiKey: process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY,
+      aqicnApiKey: process.env.EXPO_PUBLIC_AQICN_API_KEY,
+      googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
     }
   }
 };

@@ -10,29 +10,18 @@ import { getReactNativePersistence } from '@firebase/auth/dist/rn/index.js';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getFirestore } from "firebase/firestore";
 
-// Environment variables for Firebase configuration
-const {
-  EXPO_PUBLIC_FIREBASE_API_KEY: apiKey,
-  EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN: authDomain,
-  EXPO_PUBLIC_FIREBASE_PROJECT_ID: projectId,
-  EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET: storageBucket,
-  EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: messagingSenderId,
-  EXPO_PUBLIC_FIREBASE_APP_ID: appId,
-  EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID: measurementId,
-} = process.env;
-
 export const openroutekey = process.env.EXPO_PUBLIC_OPEN_ROUTER_API_KEY;
 export const serverurl = process.env.EXPO_PUBLIC_SERVER_URL;
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey,
-  authDomain,
-  projectId,
-  storageBucket,
-  messagingSenderId,
-  appId,
-  measurementId,
+  apiKey : "AIzaSyDU4BqoEEoB66yHp0nUmGf4E7--tlZqiiE",
+  authDomain: "cityfix-6bb77.firebaseapp.com",
+  projectId: "cityfix-6bb77",
+  storageBucket: "cityfix-6bb77.appspot.com",
+  messagingSenderId: "977982530617",
+  appId: "1:977982530617:web:e1e63d88c64539ede359e8",
+  measurementId: "G-8JFBFH65NJ",
 };
 
 // Initialize Firebase

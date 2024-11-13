@@ -47,7 +47,7 @@ const NotificationScreen = () => {
                 <Text className="text-xl font-bold mb-2">New</Text>
                 {newNotifications.map(notification => (
                   <List.Item
-                    key={notification._id}
+                    key={notification.id}
                     title={
                       <View className="flex-row flex-wrap">
                         <Text className="font-bold">{user.username} </Text>
@@ -84,7 +84,7 @@ const NotificationScreen = () => {
                 <Text className="text-xl font-bold mb-2">Today</Text>
                 {oldNotifications.map(notification => (
                   <List.Item
-                    key={notification._id}
+                    key={notification.id}
                     title={
                       <View className="flex-row flex-wrap">
                         <Text className="font-bold">{user.username} </Text>
