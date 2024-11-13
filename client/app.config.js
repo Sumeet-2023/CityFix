@@ -69,7 +69,8 @@ export default {
       geoDbApiKey: process.env.EXPO_PUBLIC_GEO_DB_API_KEY,
       openWeatherApiKey: process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY,
       aqicnApiKey: process.env.EXPO_PUBLIC_AQICN_API_KEY,
-      googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
+      googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+      serverUrl: process.env.EXPO_PUBLIC_SERVER_URL
     }
   }
 };

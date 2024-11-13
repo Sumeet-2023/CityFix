@@ -22,7 +22,8 @@
         "EXPO_PUBLIC_GEO_DB_API_KEY": "@env:EXPO_PUBLIC_GEO_DB_API_KEY",
         "EXPO_PUBLIC_OPENWEATHER_API_KEY": "@env:EXPO_PUBLIC_OPENWEATHER_API_KEY",
         "EXPO_PUBLIC_AQICN_API_KEY": "@env:EXPO_PUBLIC_AQICN_API_KEY",
-        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "@env:GOOGLE_MAPS_API_KEY"
+        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "@env:GOOGLE_MAPS_API_KEY",
+        "EXPO_PUBLIC_SERVER_URL": "https://authentic-elegance-production.up.railway.app"
       }
     },
     "production": {
@@ -39,7 +40,8 @@
         "EXPO_PUBLIC_GEO_DB_API_KEY": "@env:EXPO_PUBLIC_GEO_DB_API_KEY",
         "EXPO_PUBLIC_OPENWEATHER_API_KEY": "@env:EXPO_PUBLIC_OPENWEATHER_API_KEY",
         "EXPO_PUBLIC_AQICN_API_KEY": "@env:EXPO_PUBLIC_AQICN_API_KEY",
-        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "@env:GOOGLE_MAPS_API_KEY"
+        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "@env:GOOGLE_MAPS_API_KEY",
+        "EXPO_PUBLIC_SERVER_URL": "https://authentic-elegance-production.up.railway.app"
       }
     }
   },
