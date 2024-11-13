@@ -42,7 +42,13 @@ app.use("/notification", notificationRoutes);
 app.use("/dashboard", dashboardRoutes);
 
 /* SERVER */
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server running on part ${port}`);
+const port = Number(process.env.PORT) || 3000;
+
+if (!port) {
+  console.error("ERROR: No PORT environment variable set.");
+  process.exit(1);
+}
+
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Server running on port ${port}`);
 });
