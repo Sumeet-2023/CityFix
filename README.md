@@ -63,36 +63,54 @@ CityFix offers a solution by creating a collaborative platform where citizens ca
 ### Installation
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/your-repo/CityFix.git
+    git clone https://github.com/Sumeet-2023/CityFix.git
     cd CityFix
     ```
 2. **Install dependencies**:
     ```bash
+    cd client
+    npm install
+    cd ../server
     npm install
     ```
 
 3. **Set up environment variables**:  
    Create a `.env` file in the root directory of client and add your API keys and database URI:
     ```plaintext
-        EXPO_PUBLIC_FIREBASE_API_KEY=
-        EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=
-        EXPO_PUBLIC_FIREBASE_PROJECT_ID=
-        EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
-        EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
-        EXPO_PUBLIC_FIREBASE_APP_ID=
-        EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=
-        EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=
-        EXPO_PUBLIC_OPEN_ROUTER_API_KEY=
-        EXPO_PUBLIC_SERVER_URL=
+    EXPO_PUBLIC_FIREBASE_API_KEY=
+    EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=
+    EXPO_PUBLIC_FIREBASE_PROJECT_ID=
+    EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
+    EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+    EXPO_PUBLIC_FIREBASE_APP_ID=
+    EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=
+    EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=
+    EXPO_PUBLIC_OPEN_ROUTER_API_KEY=
+    EXPO_PUBLIC_SERVER_URL=
     ```
-    For just development purpose, enter the github forwarded port url inside EXPO_PUBLIC_SERVER_URL
+    For just development purpose, enter the github forwarded port url inside EXPO_PUBLIC_SERVER_URL.
+   
     Create a `.env` file in the root directory of server and add your API keys and database URI:
     ```plaintext
         DATABASE_URL=
 
 4. **Run the application**:
+    first run these commands:
     ```bash
-    npm start
+    npx prisma generate
+    npm run seed
+    ```
+
+    For running fronted:
+    ```bash
+    cd client
+    npx expo start
+    ```
+
+    For running server:
+    ```bash
+    cd server
+    npm run dev
     ```
 
 ### Usage
@@ -118,4 +136,4 @@ Our project is inspired by **SDG 11: Sustainable Cities and Communities** and de
 
 ---
 
-With CityFix, citizens have a platform to actively contribute to the betterment of their cities and build a sustainable community. We are committed to making our cities better, one report at a time!
+With CityFix, citizens have a platform to actively contribute to the betterment of their cities and build a sustainable community. We are committed to making our cities better, one report at a time!the betterment of their cities and build a sustainable community. We are committed to making our cities better, one report at a time!
