@@ -18,6 +18,7 @@ export default {
       supportsTablet: true
     },
     android: {
+      usesCleartextTraffic: true,
       adaptiveIcon: {
         foregroundImage: "./assets/images/play_store_512.png",
         backgroundColor: "#ffffff"
