@@ -29,7 +29,7 @@ const SignUp = () => {
       console.log('User profile updated with name:', fullName);
       
       const currentUserData = {
-        email: email,
+        email: email.toLowerCase(),
         username: fullName
       };
   

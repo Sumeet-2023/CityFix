@@ -9,11 +9,13 @@ import {
   updateClan,
   deleteClan,
   getClanMembers,
+  getUserClan,
 } from "../controller/clanController";
 
 const router = Router();
 
 router.get("/", getClans);
+router.get("/joinedClan/:userId", getUserClan);
 router.get("/:id", getClanById);
 router.get("/name/:name", getClanByName);
 router.get("/:id/members", getClanMembers);

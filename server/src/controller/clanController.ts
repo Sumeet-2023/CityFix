@@ -62,10 +62,15 @@ export const createClan = async (req: Request, res: Response): Promise<void> => 
     description,
     location,
     clanTag,
+    members,
+    type,
+    badge
   } = req.body;
 
   try {
+
     const statusCheck = await checkUserClanStatus(creatorId);
+    console.log(req.body);
 
     if (statusCheck.code !== 200) {
       res.status(statusCheck.code).json(statusCheck);
@@ -89,8 +94,18 @@ export const createClan = async (req: Request, res: Response): Promise<void> => 
         description,
         location,
         clanTag,
+        members,
+        type,
+        badge 
       },
     });
+
+    await prisma.userClan.create({
+      data: {
+        userId: creatorId,
+        clanId: newClan.id
+      }
+    })
     res.status(201).json(newClan);
   } catch (error: any) {
     res.status(500).json({ message: `Error creating a clan: ${error.message}` });
@@ -149,6 +164,32 @@ export const getClans = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: `Error retrieving clans: ${error.message}` });
   }
 };
+
+export const getUserClan = async (req: Request, res: Response): Promise<void> => {
+  const {userId} = req.params;
+  try {
+    const clanRel = await prisma.userClan.findUnique({
+      where: {
+        userId: userId
+      },
+      select: {
+        clan: true
+      }
+    });
+
+    const members = await prisma.userClan.findMany({
+      where: {
+        clanId: clanRel?.clan.id
+      },
+      select: {
+        user: true
+      }
+    })
+    res.status(200).json({...clanRel?.clan, members: members});
+  } catch (error:any) {
+    res.status(404).json({message: `Error fetching user clan: ${error}`});
+  }
+}
 
 export const getClanByName = async (req: Request, res: Response): Promise<void> => {
   const clanName = req.params.clanName ? String(req.params.clanName) : "";

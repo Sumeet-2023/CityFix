@@ -246,8 +246,8 @@ model Clan {
   description         String
   location            Json?            @db.Json
   clanTag             String
-  badge               String?
-  
+  badge               Json?
+  type                String           @default("basic") 
   // creator
   creatorId           String           @db.ObjectId @unique
   creator             User             @relation("ClanCreated", fields: [creatorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
