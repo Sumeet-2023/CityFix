@@ -20,7 +20,7 @@ CityFix offers a solution by creating a collaborative platform where citizens ca
 ## Features
 
 ### Core Features
-- **Issue Reporting:** Citizens can report local problems like overflowing bins, potholes, pollution, or unsafe conditions. Reports are tagged with geolocation and tracked in real-time, providing status updates and notifications.
+- **Issue Reporting:** Citizens can report local problems like overflowing bins, potholes, pollution, or unsafe conditions and work with others to resolve them if problem requires official intervention, local authorities connected to the platform can view the report and take action. Reports are tagged with geolocation and tracked in real-time, providing status updates and notifications.
   
 - **Community Projects:** Users can propose or join projects like tree planting drives, beach cleanups, or recycling initiatives, empowering them to contribute directly to their community’s sustainability.
 
@@ -30,10 +30,10 @@ CityFix offers a solution by creating a collaborative platform where citizens ca
 
 - **Government Accountability Dashboard:** Publicly displays reported issues and their resolution status to promote transparency and accountability.
 
-- **Clan System:** Users can create or join local "Clans," which are community groups centered around specific sustainability goals. Clans offer collaborative planning tools, including radius-based locale selection, member roles, payment tracking, and membership limits.
+- **Clan System:** Users can create or join local "Clans" where creator can manage the record of fundraising for support in financing initiatives like projects, events etc., which are community groups centered around specific sustainability goals. Clans offer collaborative planning tools, including radius-based locale selection, member roles, payment tracking, and membership limits.
 
 ### Additional Features
-- **Data Dashboard:** Provides city-level metrics on sustainability, such as air quality, recycling rates, water usage, and renewable energy adoption.
+- **Data Dashboard:** Provides city-level metrics on sustainability, such as weather, air quality, recycling rates, water usage, and renewable energy adoption.
 
 - **Rewards System:** Active participants in reporting or sustainability projects can earn points redeemable for local benefits or recognition.
 
@@ -42,10 +42,12 @@ CityFix offers a solution by creating a collaborative platform where citizens ca
 ---
 
 ## Technologies Used
-
+- **Frontend**: React Native (Expo Framework), Nativewind, Javascript
+- **Backend**: Node.js, Express.js, Typescript 
 - **Database**: MongoDB
 - **Authentication**: Firebase Authentication
 - **ORM**: Prisma
+- **Deployment**: Railway, MongoDb Atlas
 - **Geocoding and Map Services**:
   - **Geocode Autocomplete**: OpenRoute Service
   - **Map Integration**: Google Maps via `react-native-maps`
@@ -59,6 +61,8 @@ CityFix offers a solution by creating a collaborative platform where citizens ca
 - **Firebase** project for authentication.
 - **OpenRoute Service API** key for geolocation and geocoding features.
 - **Google Maps API** key for mapping capabilities.
+- **AQICN API** key for air quality data.
+- **OpenWeather API** key for real-time weather data.
 
 ### Installation
 1. **Clone the repository**:
@@ -84,24 +88,30 @@ CityFix offers a solution by creating a collaborative platform where citizens ca
     EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
     EXPO_PUBLIC_FIREBASE_APP_ID=
     EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=
-    EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=
     EXPO_PUBLIC_OPEN_ROUTER_API_KEY=
     EXPO_PUBLIC_SERVER_URL=
+    EXPO_PUBLIC_OPENWEATHER_API_KEY =
+    EXPO_PUBLIC_AQICN_API_KEY=
+    EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=
+    EXPO_PUBLIC_SERVER_URL=https://authentic-elegance-production.up.railway.app
     ```
     For just development purpose, enter the github forwarded port url inside EXPO_PUBLIC_SERVER_URL.
    
     Create a `.env` file in the root directory of server and add your API keys and database URI:
     ```plaintext
+        PORT=8000
         DATABASE_URL=
+        OPENWEATHER_API_KEY =
+        AQICN_API_KEY=
 
 4. **Run the application**:
-    first run these commands:
+    first run these commands in server dir:
     ```bash
     npx prisma generate
     npm run seed
     ```
 
-    For running fronted:
+    For running fronted i.e in client dir:
     ```bash
     cd client
     npx expo start
