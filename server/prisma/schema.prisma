@@ -40,6 +40,8 @@ model User {
   // ngosJoined          Ngo[]           @relation("ngoMembers", fields: [ngoIDs], references: [id])
   ngosJoined          UserNgo[]
   
+  transactions        Transcation[]
+
   // events
   eventsCreated       Event[]          @relation("UserEvents")
   // eventsIDs           String[]         @db.ObjectId
@@ -52,7 +54,7 @@ model User {
   
   // communities
   communitiesJoined   UserCommunities[]
-  communitiesCreated  Community[]      @relation("UserProjects")
+  communitiesCreated  Community[]
 
   // proposed issue resolutions
   proposedRes         ResolutionProposal[]  @relation("UserProposals")
@@ -148,7 +150,7 @@ model Community {
   
   // creator
   creatorId           String?           @db.ObjectId
-  creator             User?             @relation("UserProjects", fields: [creatorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  creator             User?             @relation(fields: [creatorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   // members
   members             UserCommunities[]
@@ -214,12 +216,12 @@ model Ngo {
 
 model Event {
   id                  String           @id @default(auto()) @map("_id") @db.ObjectId
-  eventName                String
+eventName             String
   description         String
   startDateTime       DateTime
   endDateTime         DateTime
   location            Json?            @db.Json
-  status              EventStatus
+  status              EventStatus      @default(SCHEDULED)
 
   // creator
   creatorId           String           @db.ObjectId
@@ -248,7 +250,7 @@ model Clan {
   clanTag             String
   badge               Json?
   type                String           @default("basic") 
-   requiredMembers     Int 
+  requiredMembers     Int?             @default(50) 
   // creator
   creatorId           String           @db.ObjectId @unique
   creator             User             @relation("ClanCreated", fields: [creatorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -268,17 +270,31 @@ model CrowdsourceFunding {
   type                FundingType
   amountRaised        Int
   amountRequired      Int
+  currency            String          @default("USD")
   dateCreated         DateTime        @default(now())
   lastUpdated         DateTime        @default(now())
-
-  // creator type
-  creatorType         FundingType
 
   // project/clan
   clanId              String?           @db.ObjectId
   clan                Clan?             @relation(fields: [clanId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  transaction         Transcation[]
+  goalDescription     String?
+  
   projectId           String?           @db.ObjectId
   project             Project?          @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model Transcation {
+  id                  String              @id @default(auto()) @map("_id") @db.ObjectId
+  amount              Int
+  fundId              String              @db.ObjectId
+  fund                CrowdsourceFunding  @relation(fields: [fundId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId              String              @db.ObjectId
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+            
+  externalTxId        String?             // Payment gateway's transaction ID
+  date                DateTime            @default(now())
+  paymentMethod       String?
 }
 
 model UserProject {
