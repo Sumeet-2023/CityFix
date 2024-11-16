@@ -22,6 +22,7 @@ export const clans = [
     },
     clanTag: "GOTHEARTH",
     creatorId: frankJohnson,
+    requiredMembers: 50
   },
   {
     id: new ObjectId().toHexString(),
@@ -37,6 +38,7 @@ export const clans = [
     },
     clanTag: "COMMUNITYHEROES",
     creatorId: graceDavis,
+    requiredMembers: 50
   }
 ];
 

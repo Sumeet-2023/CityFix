@@ -10,6 +10,7 @@ import {
   deleteClan,
   getClanMembers,
   getUserClan,
+  getUserClanStatus
 } from "../controller/clanController";
 
 const router = Router();
@@ -19,6 +20,7 @@ router.get("/joinedClan/:userId", getUserClan);
 router.get("/:id", getClanById);
 router.get("/name/:name", getClanByName);
 router.get("/:id/members", getClanMembers);
+router.get('/status/:userId', getUserClanStatus);
 
 router.post("/", createClan);
 router.post("/:id/join", joinClan);

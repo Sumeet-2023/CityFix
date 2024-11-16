@@ -62,7 +62,7 @@ export const createClan = async (req: Request, res: Response): Promise<void> => 
     description,
     location,
     clanTag,
-    members,
+    requiredMembers,
     type,
     badge
   } = req.body;
@@ -94,7 +94,7 @@ export const createClan = async (req: Request, res: Response): Promise<void> => 
         description,
         location,
         clanTag,
-        members,
+        requiredMembers,
         type,
         badge 
       },
@@ -166,30 +166,47 @@ export const getClans = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const getUserClan = async (req: Request, res: Response): Promise<void> => {
-  const {userId} = req.params;
+  const { userId } = req.params;
+
   try {
+    // Check if user is part of any clan
     const clanRel = await prisma.userClan.findUnique({
       where: {
-        userId: userId
+        userId: userId,
       },
       select: {
-        clan: true
-      }
+        clan: true,
+      },
     });
 
+    if (!clanRel) {
+      // If no clan relationship exists for the user
+      res.status(200).json(null); // Return null if user has no clan
+      return;
+    }
+
+    // Fetch members only if the user is in a clan
     const members = await prisma.userClan.findMany({
       where: {
-        clanId: clanRel?.clan.id
+        clanId: clanRel?.clan.id,
       },
       select: {
-        user: true
-      }
-    })
-    res.status(200).json({...clanRel?.clan, members: members});
-  } catch (error:any) {
-    res.status(404).json({message: `Error fetching user clan: ${error}`});
+        user: {
+          select: {
+            id: true,
+            username: true, // Include username in the response
+            profileUrl: true, // Include profile image if available
+          },
+        },
+      },
+    });
+
+    res.status(200).json({ ...clanRel.clan, members });
+  } catch (error: any) {
+    res.status(500).json({ message: `Error fetching user clan: ${error.message}` });
   }
-}
+};
+
 
 export const getClanByName = async (req: Request, res: Response): Promise<void> => {
   const clanName = req.params.clanName ? String(req.params.clanName) : "";
@@ -281,6 +298,7 @@ export const leaveClan = async (req: Request, res: Response): Promise<void> => {
   const { userId } = req.body;
 
   try {
+    // Find the userClan relationship and include clan details and members
     const userClan = await prisma.userClan.findUnique({
       where: {
         userId_clanId: {
@@ -289,7 +307,11 @@ export const leaveClan = async (req: Request, res: Response): Promise<void> => {
         }
       },
       include: {
-        clan: true
+        clan: {
+          include: {
+            members: true // Fetch all members of the clan
+          }
+        }
       }
     });
 
@@ -298,21 +320,45 @@ export const leaveClan = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    // If the user is the creator of the clan
     if (userClan.clan.creatorId === userId) {
-      res.status(400).json({ message: 'Clan creator cannot leave the clan. Transfer ownership or delete the clan instead.' });
-      return;
-    }
+      // Check if there are other members in the clan
+      const otherMembers = userClan.clan.members.filter(member => member.userId !== userId);
 
-    await prisma.userClan.delete({
-      where: {
-        userId_clanId: {
-          userId,
-          clanId
-        }
+      if (otherMembers.length > 0) {
+        // Transfer leadership to the first available member
+        const newCreator = otherMembers[0];
+
+        await prisma.clan.update({
+          where: {
+            id: clanId
+          },
+          data: {
+            creatorId: newCreator.userId // Transfer leadership
+          }
+        });
+        res.status(200).json({ message: 'Leadership transferred to another member. You have successfully left the clan.' });
+      } else {
+        // No other members, delete the clan
+        await prisma.clan.delete({
+          where: {
+            id: clanId
+          }
+        });
+        res.status(200).json({ message: 'You were the only member. Clan has been deleted.' });
       }
-    });
-
-    res.status(200).json({ message: 'Successfully left the clan' });
+    } else {
+      // If the user is not the creator, simply remove them from the clan
+      await prisma.userClan.delete({
+        where: {
+          userId_clanId: {
+            userId,
+            clanId
+          }
+        }
+      });
+      res.status(200).json({ message: 'Successfully left the clan' });
+    }
   } catch (error: any) {
     res.status(500).json({ message: 'Internal server error.' });
   }
@@ -425,5 +471,23 @@ export const getClanMembers = async (req: Request, res: Response): Promise<void>
     });
   } catch (error: any) {
     res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+
+export const getUserClanStatus = async (req: Request, res: Response): Promise<void> => {
+  const { userId } = req.params;
+
+  try {
+    const userClan = await prisma.userClan.findUnique({
+      where: { userId },
+    });
+
+    if (userClan) {
+      res.status(200).json({ canCreateClan: false }); // User cannot create another clan
+    } else {
+      res.status(200).json({ canCreateClan: true }); // User can create a clan
+    }
+  } catch (error: any) {
+    res.status(500).json({ message: `Error fetching user clan status: ${error.message}` });
   }
 };

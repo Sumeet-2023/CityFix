@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Modal, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {   MaterialIcons, Feather, FontAwesome5  } from '@expo/vector-icons';
@@ -17,6 +17,7 @@ import {
   List,
   Card,
   Surface,
+  ActivityIndicator,
 } from 'react-native-paper';
 
 const enhancedTheme = {
@@ -94,6 +95,8 @@ const CreateClan = () => {
   const [locationQuery, setLocationQuery] = useState('');
   const [locationSuggestions, setLocationSuggestions] = useState([]);
   const [showMap, setShowMap] = useState(false);
+  const [canCreateClan, setCanCreateClan] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [location, setLocation] = useState({
     type: 'Point',
     coordinates: [-118.2437, 34.0522],
@@ -101,6 +104,29 @@ const CreateClan = () => {
     country: 'USA'
   });
 
+  useEffect(() => {
+    const fetchClanStatus = async () => {
+      try {
+        const response = await axios.get(`${serverurl}/clan/status/${user.id}`);
+        setCanCreateClan(response.data.canCreateClan);
+      } catch (error) {
+        console.error('Error fetching clan status:', error.message);
+        Alert.alert('Error', 'Unable to verify clan status');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchClanStatus();
+  }, [user.id]);
+
+  if (loading) {
+    return (
+      <StyledSafeAreaView className="flex-1 p-4 bg-gray-100">
+        <ActivityIndicator size="large" color="#0000ff" />
+      </StyledSafeAreaView>
+    );
+  }
 
   const handleSelect = (selectedBadge) => {
     setBadge(selectedBadge);
@@ -386,8 +412,17 @@ const CreateClan = () => {
             <StyledTouchableOpacity
               className="w-full bg-blue-600 p-4 rounded-lg items-center mt-6"
               onPress={handleCreateClan}
+              disabled={!canCreateClan}
+              style={{
+                backgroundColor: canCreateClan ? '#4F46E5' : '#9CA3AF', // Grey out if disabled
+                padding: 15,
+                borderRadius: 10,
+                alignItems: 'center',
+              }}
             >
-              <StyledText className="text-white font-bold text-lg">Create Clan</StyledText>
+              <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>
+                {canCreateClan ? 'Create Clan' : 'You Already Have a Clan'}
+             </Text>
             </StyledTouchableOpacity>
           </StyledView>
         </ScrollView>

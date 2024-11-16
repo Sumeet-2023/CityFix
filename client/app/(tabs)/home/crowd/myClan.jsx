@@ -3,8 +3,8 @@ import { View, Text, ScrollView, Image, TouchableOpacity, SafeAreaView, Switch, 
 import { styled } from 'nativewind';
 import { serverurl } from '../../../../firebaseConfig';
 import { useAuthStore } from '../../../store';
-import axios from 'axios'
-import { isArray } from 'lodash';
+import axios from 'axios';
+import { FontAwesome5 } from '@expo/vector-icons'; 
 
 const StyledSafeAreaView = styled(SafeAreaView);
 const StyledView = styled(View);
@@ -30,19 +30,37 @@ const MyClan = () => {
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const {user} = useAuthStore();
+  const [memberStatus, setMemberStatus] = useState({});
 
   const fetchClan = async () => {
     try {
       setLoading(true);
       const response = await axios.get(`${serverurl}/clan/joinedClan/${user?.id}`);
-      console.log(response.data);
-      setMyClan(response.data);
+      setMyClan(response.data); // Will be null if the user has no clan
+
+      // Initialize toggle state for each member
+      if (response.data?.members) {
+        const initialStatus = {};
+        response.data.members.forEach((member) => {
+          initialStatus[member.user.id] = false; // Default to "Unpaid"
+        });
+        setMemberStatus(initialStatus);
+      }
+
       setError(null);
     } catch (err) {
       setError('Failed to load Clan');
+      setMyClan(null); // Ensure state is cleared on error
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleToggle = (memberId) => {
+    setMemberStatus((prevStatus) => ({
+      ...prevStatus,
+      [memberId]: !prevStatus[memberId], // Toggle the value
+    }));
   };
 
   const handleRefresh = async () => {
@@ -58,13 +76,15 @@ const MyClan = () => {
   //delete  a clan
   const handleLeave = async (clanId) => {
     try {
-      console.log(clanId)
       const data = {
         userId: user?.id,
       };
-      console.log(data);
+  
+      // Call the leave clan API
       await axios.post(`${serverurl}/clan/${clanId}/leave`, data);
-      setMyClan((prevClans) => prevClans.filter((clan) => clan.id !== clanId));
+  
+      // Clear the myClan state, since the user is leaving the clan
+      setMyClan(null);
     } catch (error) {
       console.error('Failed to Leave clan:', error);
     }
@@ -94,6 +114,29 @@ const MyClan = () => {
     );
   }
 
+  
+if (!myClan) {
+  return (
+    <StyledSafeAreaView className="flex-1 p-4 bg-gray-100">
+    <ScrollView showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}>
+      <StyledView className="flex-1 justify-center items-center">
+        <StyledView className="mb-4">
+          <FontAwesome5 name="users" size={80} color="#4A5568" />
+        </StyledView>
+
+        <StyledText className="text-gray-800 text-2xl font-bold text-center mb-2">
+          No Clan Found!
+        </StyledText>
+        <StyledText className="text-gray-600 text-base text-center px-4">
+          It seems like you haven't joined or created any clan yet. Join a clan to connect with others or create your own to lead!
+        </StyledText>
+
+      </StyledView>
+    </ScrollView>
+    </StyledSafeAreaView>
+  );
+}
+
   return (
     <StyledSafeAreaView className="flex-1 p-4 bg-gray-100 m-2">
       <ScrollView showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />} >
@@ -115,7 +158,7 @@ const MyClan = () => {
           <StyledText className="text-white text-base">Type: {myClan.type}</StyledText>
           <StyledText className="text-white text-base">Location: {myClan.location?.city}, {myClan.location?.country}</StyledText>
           <StyledText className="text-white text-base">Clan Tag: {myClan.clanTag}</StyledText>
-          <StyledText className="text-white text-base">Members: {myClan.members?.length}/50</StyledText>
+          <StyledText className="text-white text-base">Members: {myClan.members?.length}/{myClan.requiredMembers}</StyledText>
 
           {/* Buttons Section */}
           <StyledView className="flex-row justify-between mt-4">
@@ -134,8 +177,8 @@ const MyClan = () => {
         </StyledTouchableOpacity>
 
         {/* Members Section */}
-        <StyledText className="text-xl font-bold mb-2">Members ({myClan.members?.length}/50)</StyledText>
-        <StyledView className="bg-white rounded-lg shadow-sm p-4">
+        <StyledText className="text-xl font-bold mb-2">Members ({myClan.members?.length}/{myClan.requiredMembers})</StyledText>
+        <StyledView className="bg-white rounded-lg shadow-sm p-1">
           {Array.isArray(myClan.members) ? (myClan.members.map((member, index) => (
             <StyledView key={index} className="flex-row items-center justify-between py-3 border-b border-gray-200">
               <StyledView className="flex-row items-center">
@@ -143,19 +186,20 @@ const MyClan = () => {
                   source={{ uri: 'https://via.placeholder.com/40' }} // Replace with member profile image
                   className="w-10 h-10 rounded-full mr-4"
                 />
-                <StyledText className="text-lg font-medium">{member.name}</StyledText>
+                <StyledText className="text-lg font-medium">{member.user.username}</StyledText>
               </StyledView>
 
-              {/* Toggle Paid/Unpaid Switch */}
-              {/* <StyledView className="flex-row items-center">
-                <StyledText className="text-base mr-2">{memberStatus[member.id] ? 'Paid' : 'Unpaid'}</StyledText>
+              <StyledView className="flex-row items-center">
+                <StyledText className="text-base mr-2">
+                  {memberStatus[member.user.id] ? 'Paid' : 'Unpaid'}
+                </StyledText>
                 <Switch
-                  value={memberStatus[member.id]}
-                  onValueChange={() => togglePaidStatus(member.id)}
-                  thumbColor={memberStatus[member.id] ? "#34D399" : "#D1D5DB"}
-                  trackColor={{ false: "#D1D5DB", true: "#34D399" }}
+                  value={memberStatus[member.user.id]}
+                  onValueChange={() => handleToggle(member.user.id)}
+                  thumbColor={memberStatus[member.user.id] ? '#34D399' : '#D1D5DB'}
+                  trackColor={{ false: '#D1D5DB', true: '#34D399' }}
                 />
-              </StyledView> */}
+              </StyledView>
             </StyledView>
           ))) : (
             <Text>
