@@ -1,48 +1,50 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, SafeAreaView, Switch, ActivityIndicator, RefreshControl } from 'react-native';
+import { ScrollView, Image, SafeAreaView, RefreshControl } from 'react-native';
 import { styled } from 'nativewind';
 import { serverurl } from '../../../../firebaseConfig';
 import { useAuthStore } from '../../../store';
 import axios from 'axios';
-import { FontAwesome5 } from '@expo/vector-icons'; 
+import { 
+  Card, 
+  Avatar, 
+  Switch, 
+  Text,
+  Button, 
+  Divider,
+  Portal,
+  Dialog,
+  Surface,
+  ActivityIndicator,
+  FAB,
+  List,
+  IconButton,
+  Badge
+} from 'react-native-paper';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 const StyledSafeAreaView = styled(SafeAreaView);
-const StyledView = styled(View);
-const StyledText = styled(Text);
-const StyledTouchableOpacity = styled(TouchableOpacity);
+const StyledScrollView = styled(ScrollView);
+const StyledSurface = styled(Surface);
 
 const MyClan = () => {
-  // // Sample data, replace with your state or API response data
-  // const clanData = {
-  //   name: "#1 Team USA Yes",
-  //   description: "Hello welcome to our Clan",
-  //   type: "Invite Only",
-  //   YBOJ",
-  //   members: [location: "United States",
-  //   clanTag: "#LOG
-  //     { id: '1', name: 'kingofthenorth', role: 'Member', paid: false },
-  //     { id: '2', name: 'Th0RR', role: 'Co-leader', paid: false },
-  //     // Add more members here
-  //   ]
-  // };
-  const [myClan, setMyClan] = useState([]);
+  const [myClan, setMyClan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
-  const {user} = useAuthStore();
+  const [leaveDialogVisible, setLeaveDialogVisible] = useState(false);
+  const { user } = useAuthStore();
   const [memberStatus, setMemberStatus] = useState({});
 
   const fetchClan = async () => {
     try {
       setLoading(true);
       const response = await axios.get(`${serverurl}/clan/joinedClan/${user?.id}`);
-      setMyClan(response.data); // Will be null if the user has no clan
+      setMyClan(response.data);
 
-      // Initialize toggle state for each member
       if (response.data?.members) {
         const initialStatus = {};
         response.data.members.forEach((member) => {
-          initialStatus[member.user.id] = false; // Default to "Unpaid"
+          initialStatus[member.user.id] = false;
         });
         setMemberStatus(initialStatus);
       }
@@ -50,7 +52,7 @@ const MyClan = () => {
       setError(null);
     } catch (err) {
       setError('Failed to load Clan');
-      setMyClan(null); // Ensure state is cleared on error
+      setMyClan(null);
     } finally {
       setLoading(false);
     }
@@ -59,7 +61,7 @@ const MyClan = () => {
   const handleToggle = (memberId) => {
     setMemberStatus((prevStatus) => ({
       ...prevStatus,
-      [memberId]: !prevStatus[memberId], // Toggle the value
+      [memberId]: !prevStatus[memberId],
     }));
   };
 
@@ -69,147 +71,180 @@ const MyClan = () => {
     setRefreshing(false);
   };
 
-  useEffect(() => {
-    fetchClan();
-  }, [])
-
-  //delete  a clan
   const handleLeave = async (clanId) => {
     try {
-      const data = {
-        userId: user?.id,
-      };
-  
-      // Call the leave clan API
-      await axios.post(`${serverurl}/clan/${clanId}/leave`, data);
-  
-      // Clear the myClan state, since the user is leaving the clan
+      await axios.post(`${serverurl}/clan/${clanId}/leave`, { userId: user?.id });
       setMyClan(null);
+      setLeaveDialogVisible(false);
     } catch (error) {
       console.error('Failed to Leave clan:', error);
     }
   };
 
-  // State to manage toggle status for each member
-  // const [memberStatus, setMemberStatus] = useState(
-  //   myClan.members?.reduce((acc, member) => {
-  //     acc[member.id] = member.paid; // Initialize with existing paid status
-  //     return acc;
-  //   }, {})
-  // );
-
-  // Toggle the paid status of a member
-  // const togglePaidStatus = (memberId) => {
-  //   setMemberStatus((prevStatus) => ({
-  //     ...prevStatus,
-  //     [memberId]: !prevStatus[memberId],
-  //   }));
-  // };
+  useEffect(() => {
+    fetchClan();
+  }, []);
 
   if (loading) {
     return (
-      <StyledSafeAreaView className="flex-1 p-4 bg-gray-100">
-        <ActivityIndicator size="large" color="#0000ff" />
+      <StyledSafeAreaView className="flex-1 items-center justify-center bg-gray-50">
+        <ActivityIndicator size="large" />
       </StyledSafeAreaView>
     );
   }
 
-  
-if (!myClan) {
-  return (
-    <StyledSafeAreaView className="flex-1 p-4 bg-gray-100">
-    <ScrollView showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}>
-      <StyledView className="flex-1 justify-center items-center">
-        <StyledView className="mb-4">
-          <FontAwesome5 name="users" size={80} color="#4A5568" />
-        </StyledView>
-
-        <StyledText className="text-gray-800 text-2xl font-bold text-center mb-2">
-          No Clan Found!
-        </StyledText>
-        <StyledText className="text-gray-600 text-base text-center px-4">
-          It seems like you haven't joined or created any clan yet. Join a clan to connect with others or create your own to lead!
-        </StyledText>
-
-      </StyledView>
-    </ScrollView>
-    </StyledSafeAreaView>
-  );
-}
-
-  return (
-    <StyledSafeAreaView className="flex-1 p-4 bg-gray-100 m-2">
-      <ScrollView showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />} >
-        {/* Clan Info Section */}
-        { myClan && (
-        <>
-        <StyledView className="bg-blue-500 p-2 rounded-lg mb-4">
-          <StyledView className="flex-row items-center mb-4 space-x-2">
-          <StyledText className="px-2">
-            {myClan?.badge?.icon ? (
-              <Image source={{ uri: myClan.badge.icon }} style={{ width: 32, height: 32 }} />
-            ) : (
-              <Image source={{ uri: 'https://via.placeholder.com/40' }} style={{ width: 32, height: 32 }} />
-            )}
-          </StyledText>
-            <StyledText className="text-white text-3xl font-bold">{myClan.clanName}</StyledText>
-          </StyledView>
-          <StyledText className="text-white text-base">Clan Description: {myClan.description}</StyledText>
-          <StyledText className="text-white text-base">Type: {myClan.type}</StyledText>
-          <StyledText className="text-white text-base">Location: {myClan.location?.city}, {myClan.location?.country}</StyledText>
-          <StyledText className="text-white text-base">Clan Tag: {myClan.clanTag}</StyledText>
-          <StyledText className="text-white text-base">Members: {myClan.members?.length}/{myClan.requiredMembers}</StyledText>
-
-          {/* Buttons Section */}
-          <StyledView className="flex-row justify-between mt-4">
-            <StyledTouchableOpacity className="flex-1 bg-white py-2 mr-2 rounded-md">
-              <StyledText className="text-center text-blue-600 font-semibold">Message</StyledText>
-            </StyledTouchableOpacity>
-            <StyledTouchableOpacity onPress={() => handleLeave(myClan.id)} className="flex-1 bg-red-500 py-2 ml-2 rounded-md">
-              <StyledText className="text-center text-white font-semibold">Leave</StyledText>
-            </StyledTouchableOpacity>
-          </StyledView>
-        </StyledView>
-
-        {/* Invite to Clan Button */}
-        <StyledTouchableOpacity className="bg-yellow-400 py-3 rounded-lg mb-4">
-          <StyledText className="text-center text-black font-semibold text-lg">Invite to Clan</StyledText>
-        </StyledTouchableOpacity>
-
-        {/* Members Section */}
-        <StyledText className="text-xl font-bold mb-2">Members ({myClan.members?.length}/{myClan.requiredMembers})</StyledText>
-        <StyledView className="bg-white rounded-lg shadow-sm p-1">
-          {Array.isArray(myClan.members) ? (myClan.members.map((member, index) => (
-            <StyledView key={index} className="flex-row items-center justify-between py-3 border-b border-gray-200">
-              <StyledView className="flex-row items-center">
-                <Image
-                  source={{ uri: 'https://via.placeholder.com/40' }} // Replace with member profile image
-                  className="w-10 h-10 rounded-full mr-4"
-                />
-                <StyledText className="text-lg font-medium">{member.user.username}</StyledText>
-              </StyledView>
-
-              <StyledView className="flex-row items-center">
-                <StyledText className="text-base mr-2">
-                  {memberStatus[member.user.id] ? 'Paid' : 'Unpaid'}
-                </StyledText>
-                <Switch
-                  value={memberStatus[member.user.id]}
-                  onValueChange={() => handleToggle(member.user.id)}
-                  thumbColor={memberStatus[member.user.id] ? '#34D399' : '#D1D5DB'}
-                  trackColor={{ false: '#D1D5DB', true: '#34D399' }}
-                />
-              </StyledView>
-            </StyledView>
-          ))) : (
-            <Text>
-              Members not found
+  if (!myClan) {
+    return (
+      <StyledSafeAreaView className="flex-1 bg-gray-50 p-4">
+        <StyledScrollView 
+          className="flex-1"
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
+        >
+          <StyledSurface className="items-center justify-center p-8 rounded-xl bg-white shadow-sm">
+            <FontAwesome5 name="users" size={80} color="#6B7280" />
+            <Text className="text-2xl font-bold text-gray-800 mt-6 mb-2 text-center">
+              No Clan Found
             </Text>
-          )  }
-        </StyledView>
-        </>
-        )}
-      </ScrollView>
+            <Text className="text-base text-gray-600 text-center mb-6">
+              Join a clan to connect with others or create your own to lead!
+            </Text>
+            <Button mode="contained" className="w-full">
+              Browse Clans
+            </Button>
+          </StyledSurface>
+        </StyledScrollView>
+      </StyledSafeAreaView>
+    );
+  }
+
+  return (
+    <StyledSafeAreaView className="flex-1 bg-gray-50">
+      <StyledScrollView
+        className="flex-1"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
+        <Card className="m-4 bg-white shadow-lg">
+          <Card.Content>
+            <Surface className="flex-row items-center mb-4 p-2 rounded-lg bg-blue-50">
+              {myClan?.badge?.icon ? (
+                <Avatar.Icon size={48} icon={myClan.badge.icon}/>
+              ) : (
+                <Avatar.Icon size={48} icon="shield" />
+              )}
+              <Text className="text-2xl font-bold ml-3 text-blue-900">{myClan.clanName}</Text>
+              <Badge className="ml-auto" size={24}>{myClan.members?.length}/{myClan.requiredMembers}</Badge>
+            </Surface>
+
+            <List.Section>
+              <List.Item
+                title="Description"
+                description={myClan.description}
+                titleStyle={{color: 'black'}}
+                descriptionStyle={{color: 'black'}}
+                left={props => <List.Icon {...props} icon="information" color='black' />}
+              />
+              <List.Item
+                title="Type"
+                description={myClan.type}
+                titleStyle={{color: 'black'}}
+                descriptionStyle={{color: 'black'}}
+                left={props => <List.Icon {...props} icon="lock" color='black' />}
+              />
+              <List.Item
+                title="Location"
+                description={`${myClan.location?.city}, ${myClan.location?.country}`}
+                titleStyle={{color: 'black'}}
+                descriptionStyle={{color: 'black'}}
+                left={props => <List.Icon {...props} icon="map-marker" color='black' />}
+              />
+              <List.Item
+                title="Clan Tag"
+                description={myClan.clanTag}
+                titleStyle={{color: 'black'}}
+                descriptionStyle={{color: 'black'}}
+                left={props => <List.Icon {...props} icon="tag" color='black' />}
+              />
+            </List.Section>
+
+            <Divider className="my-4" />
+
+            <Surface className="flex-row justify-between mt-2" style={{backgroundColor: 'white', shadowColor: 'white'}}>
+              <Button 
+                mode="contained" 
+                className="flex-1 mr-2"
+                icon="message"
+              >
+                Message
+              </Button>
+              <Button 
+                mode="contained"
+                buttonColor="red"
+                className="flex-1 ml-2"
+                icon="logout"
+                onPress={() => setLeaveDialogVisible(true)}
+              >
+                Leave
+              </Button>
+            </Surface>
+          </Card.Content>
+        </Card>
+
+        <Card className="mx-4 mb-4 bg-white">
+          <Card.Title 
+            title="Members" 
+            subtitle={`${myClan.members?.length} of ${myClan.requiredMembers} members`}
+            titleStyle={{color: 'black'}}
+            subtitleStyle={{color: 'black'}}
+            left={(props) => <Avatar.Icon {...props} icon="account-group" />}
+          />
+          <Card.Content style={{backgroundColor: 'white', paddingBottom: 40}}>
+            {Array.isArray(myClan.members) && myClan.members.map((member, index) => (
+              <Surface key={index} className="flex-row items-center justify-between py-3 bg-white" style={{shadowColor: 'white'}}>
+                <Surface className="flex-row items-center flex-1 bg-white" style={{shadowColor: 'white'}}>
+                  <Avatar.Image
+                    size={40}
+                    source={{ uri: member.user.profileUrl ?? 'https://via.placeholder.com/40' }}
+                  />
+                  <Text className="ml-3 text-base font-medium text-black">{member.user.username}</Text>
+                </Surface>
+                <Surface className="flex-row items-center bg-white" style={{shadowColor: 'white'}}>
+                  <Switch
+                    value={memberStatus[member.user.id]}
+                    style={{backgroundColor: 'white'}}
+                    onValueChange={() => handleToggle(member.user.id)}
+                  />
+                  <Text className="mr-2 text-sm text-black bg-white">
+                    {memberStatus[member.user.id] ? 'Paid' : 'Unpaid'}
+                  </Text>
+                </Surface>
+              </Surface>
+            ))}
+          </Card.Content>
+        </Card>
+      </StyledScrollView>
+
+      <FAB
+        icon="account-plus"
+        label="Invite"
+        className="absolute bottom-2 right-4"
+      />
+
+      <Portal>
+        <Dialog visible={leaveDialogVisible} onDismiss={() => setLeaveDialogVisible(false)}>
+          <Dialog.Title>Leave Clan</Dialog.Title>
+          <Dialog.Content>
+            <Text>Are you sure you want to leave this clan? This action cannot be undone.</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setLeaveDialogVisible(false)}>Cancel</Button>
+            <Button onPress={() => handleLeave(myClan.id)} textColor="red">Leave</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </StyledSafeAreaView>
   );
 };
