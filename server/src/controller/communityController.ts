@@ -170,10 +170,6 @@ export const promoteMember = async (req: Request, res: Response): Promise<void> 
           }
         })
     }
-    if (currentRole?.role === CommunityRoles.COORDINATOR ){
-    } else {
-      
-    }
   } catch (error: any) {
     res.status(500).json({message: `failed to promote the user: ${error}`});
   }
@@ -289,7 +285,8 @@ export const getNearbyCommunities = async (req: Request, res: Response) => {
         id: community._id.$oid,  // Converting `_id` to `id`
         communityName: community.communityName,
         communityNumber: community.communityNumber,
-        creatorId: community.creatorId.$oid,
+        creatorId: community.creatorId,
+        ngoId: community.ngoId,
         creatorType: community.creatorType,
         description: community.description,
         location: {
@@ -305,6 +302,7 @@ export const getNearbyCommunities = async (req: Request, res: Response) => {
 
     res.status(200).json(formattedCommunities);
   } catch (error: any) {
+    console.error('Error finding nearby communities:', error);
     res.status(500).json({ message: `Error finding nearby communities: ${error.message}` });
   }
 };
@@ -535,16 +533,11 @@ export const getUserCommunities = async (req: Request, res: Response): Promise<v
 
     const communities = await prisma.community.findMany({
       where: {
-        OR: [
-          { creatorId: userId },
-          {
-            members: {
-              some: {
-                userId: userId
-              }
-            }
+        members: {
+          some: {
+            userId: userId
           }
-        ]
+        }
       },
       include: {
         creator: {

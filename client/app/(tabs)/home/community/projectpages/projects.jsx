@@ -1,46 +1,45 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, RefreshControl, Switch, Share } from 'react-native';
-import { Card, Title, Paragraph, Button, Badge, Divider, Dialog, Portal, IconButton, Menu } from 'react-native-paper';
+import { Card, Title, Paragraph, Button, Badge, Divider, Dialog, Portal, IconButton } from 'react-native-paper';
 import { serverurl } from '../../../../../firebaseConfig';
 import { useAuthStore } from '../../../../store';
 import axios from 'axios';
 import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
-const MyProject = ({ navigation }) => {
+const MyProject = () => {
   const [myProjects, setMyProjects] = useState([]);
-  const { user, communityId, setProjectId } = useAuthStore();
   const [role, setRole] = useState(null);
-  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
-  const [projectToDelete, setProjectToDelete] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [filterType, setFilterType] = useState('activeProjects');
+  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
+  const { user, communityId, setProjectId } = useAuthStore();
 
   useEffect(() => {
-    const fetchProjects = async () => {
+    const fetchProjectsAndRole = async () => {
       try {
-        const response = await axios.get(
-          `${serverurl}/project/byCommunityWithFilter/${communityId}?filterType=${filterType}&userId=${user?.id}`
-        );
-        const rel = await axios.get(
-          `${serverurl}/community/role/${communityId}/${user?.id}`
-        );
-        setMyProjects(response.data);
-        setRole(rel.data.role);
+        const [projectsResponse, roleResponse] = await Promise.all([
+          axios.get(`${serverurl}/project/byCommunityWithFilter/${communityId}?filterType=${filterType}&userId=${user?.id}`),
+          axios.get(`${serverurl}/community/role/${communityId}/${user?.id}`)
+        ]);
+        setMyProjects(projectsResponse.data);
+        setRole(roleResponse.data.role);
       } catch (error) {
-        console.error('Failed to fetch projects:', error);
+        console.error('Failed to fetch projects or role:', error);
       }
     };
-    fetchProjects();
+    fetchProjectsAndRole();
   }, [communityId, user?.id, filterType]);
 
   const handleProjectClick = (project) => {
-    setProjectId(item.id);
+    setProjectId(project.id);
     router.push('/(modals)/editProject');
   };
 
   const handleStatusChange = async (projectId, newStatus) => {
     try {
-      await axios.put(`${serverurl}/project/${projectId}`, { status: newStatus });
+      await axios.put(`${serverurl}/project/${projectId}`, { status: newStatus, userId: user?.id, communityId: communityId });
       setMyProjects((prevProjects) =>
         prevProjects.map((project) =>
           project.id === projectId ? { ...project, status: newStatus } : project
@@ -54,10 +53,7 @@ const MyProject = ({ navigation }) => {
   const handleDelete = async () => {
     if (projectToDelete) {
       try {
-        const data = {
-          userId: user?.id,
-          communityId: communityId,
-        };
+        const data = { userId: user?.id, communityId: communityId };
         await axios.delete(`${serverurl}/project/${projectToDelete}/delete`, { data });
         setMyProjects((prevProjects) => prevProjects.filter((project) => project.id !== projectToDelete));
         setDeleteDialogVisible(false);
@@ -67,31 +63,22 @@ const MyProject = ({ navigation }) => {
     }
   };
 
-  const handleProjectDetail = useCallback((item) => {
-    setProjectId(item.id);
+  const handleProjectDetail = useCallback((project) => {
+    setProjectId(project.id);
     router.push(`/project-details`);
   }, []);
 
-  const handleEditProject = useCallback((item) => {
-    setProjectId(item.id);
-    router.push('/(modals)/editProject');
-  });
+  const handleManageProject = useCallback((project) => {
+    setProjectId(project.id);
+    router.push(`../manageproject/events`);
+  }, []);
 
   const handleShare = async (project) => {
     try {
       const result = await Share.share({
         message: `Check out this project: ${project.projectName}\n\nDescription: ${project.description}`,
       });
-  
-      if (result.action === Share.sharedAction) {
-        if (result.activityType) {
-          console.log(`Shared with activity type: ${result.activityType}`);
-        } else {
-          console.log('Project shared successfully');
-        }
-      } else if (result.action === Share.dismissedAction) {
-        console.log('Share dismissed');
-      }
+      console.log(result.action === Share.sharedAction ? 'Project shared successfully' : 'Share dismissed');
     } catch (error) {
       console.error('Error sharing the project:', error);
     }
@@ -121,38 +108,67 @@ const MyProject = ({ navigation }) => {
   };
 
   const toggleFilter = () => {
-    setFilterType((prevFilterType) =>
-      prevFilterType === 'activeProjects' ? 'ongoingProjects' : 'activeProjects'
-    );
+    setFilterType(prevFilterType => (prevFilterType === 'activeProjects' ? 'ongoingProjects' : 'activeProjects'));
   };
 
+  const renderNoProjectsMessage = () => {
+    const data = {};
+    if (filterType === 'activeProjects'){
+      data.title = role === 'MEMBER' ? 'No Active Projects' : 'No Projects To Be Reviewed';
+      data.desc = 'You can join or vote projects that need attention.';
+      data.btn = 'Join Or Vote Projects';
+    } else {
+      data.title = 'No Ongoing Projects';
+      data.desc = role === 'MEMBER' ? 'No projects marked as ongoing yet' : 'You can review and mark an active project as ongoing';
+      data.btn = role === 'MEMBER' ? 'Join Or Vote Projects' : 'Review Projects'
+    }
+
+    if (myProjects.length === 0) {
+      return (
+        <View className="self-center flex-col items-center justify-center space-y-4 p-6">
+          <Ionicons name="alert-circle" size={40} color="#FF6347" />
+          <Text className="text-xl font-semibold text-gray-800">
+            {data.title}
+          </Text>
+          <Text className="text-sm text-gray-600">
+            {data.desc}
+          </Text>
+          <Button
+            mode="contained"
+            onPress={() => router.push('./feeds')}
+            className="bg-blue-500"
+            labelStyle={{ color: '#fff' }}
+          >
+            {data.btn}
+          </Button>
+        </View>
+      );
+    }
+    return null;
+  };
+  
   return (
     <ScrollView
       className="bg-gray-100 flex-1 pt-4"
       showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <View className="px-4 space-y-4 mb-8">
         <View className="flex-row justify-between items-center">
           <Text className="text-black">
             {filterType === 'activeProjects' ? 'Active Projects' : 'Ongoing Projects'}
           </Text>
-          <Switch
-            value={filterType === 'ongoingProjects'}
-            onValueChange={toggleFilter}
-          />
+          <Switch value={filterType === 'ongoingProjects'} onValueChange={toggleFilter} />
         </View>
 
+        {renderNoProjectsMessage()}
+
         {myProjects.map((project, index) => (
-          <Card key={index + 1} onPress={() => handleProjectClick(project)} className="bg-purple-50">
+          <Card key={index} onPress={() => handleProjectClick(project)} className="bg-purple-50">
             <Card.Content>
               <View className="flex-row justify-between items-center">
                 <Title className="text-black">#{index + 1} - {project.projectName}</Title>
-                <Badge className="text-white px-2 bg-green-400">
-                  {project.status}
-                </Badge>
+                <Badge className="text-white px-2 bg-green-400">{project.status}</Badge>
               </View>
               <Paragraph className="text-black">{project.description}</Paragraph>
               <Divider style={{ marginVertical: 8 }} />
@@ -161,34 +177,63 @@ const MyProject = ({ navigation }) => {
                 <Text>Updated on: {new Date(project.updatedAt).toDateString()}</Text>
               </View>
             </Card.Content>
-            {role !== 'MEMBER' && (
-              <Card.Actions>
-                <Button
-                  icon={project.status === 'ONGOING' ? 'check' : 'update'}
-                  mode="contained"
-                  onPress={() => handleStatusChange(project.id, project.status === 'ONGOING' ? 'COMPLETED' : 'ONGOING')}
-                  className={`${project.status === 'ONGOING' ? 'bg-green-500 mr-8' : 'bg-purple-400 mr-14'}`}
-                  labelStyle={{ color: '#fff' }}
-                >
-                  {project.status === 'ONGOING' ? 'Mark Completed' : 'Mark Ongoing'}
-                </Button>
+
+            {role !== 'MEMBER' ? (
+            <Card.Actions
+              className="flex flex-wrap justify-between items-center space-x-2 mt-4 sm:justify-start"
+            >
+              <Button
+                mode="contained"
+                onPress={() =>
+                  handleStatusChange(
+                    project.id,
+                    project.status === 'ONGOING' ? 'COMPLETED' : 'ONGOING'
+                  )
+                }
+                className={`${
+                  project.status === 'ONGOING'
+                    ? 'bg-green-500'
+                    : 'bg-purple-400'
+                } flex-grow sm:flex-none`}
+                labelStyle={{ color: '#fff', fontSize: 12 }}
+              >
+                {project.status === 'ONGOING' ? 'Mark Completed' : 'Mark Ongoing'}
+              </Button>
+
+              {project.status === 'ONGOING' && (
                 <IconButton
-                  icon="pen"
+                  icon="folder-eye"
                   iconColor={'#FFF'}
-                  containerColor="#00F"
+                  containerColor="#42A5F5"
                   size={20}
-                  onPress={() => handleEditProject(project)}
+                  onPress={() => handleManageProject(project)}
+                  className="sm:ml-2"
                 />
-                <IconButton
-                  icon="delete"
-                  iconColor={'#FFF'}
-                  containerColor="#F00"
-                  size={20}
-                  onPress={() => showDeleteDialog(project.id)}
-                />
-              </Card.Actions>
-            )}
-            {role === 'MEMBER' && (
+              )}
+            
+              <IconButton
+                icon="pen"
+                iconColor={'#FFF'}
+                containerColor="#FFA726"
+                size={20}
+                onPress={() =>
+                  project.status === 'ONGOING'
+                    ? handleProjectClick(project)
+                    : handleEditProject(project)
+                }
+                className="sm:ml-2"
+              />
+            
+              <IconButton
+                icon="delete"
+                iconColor={'#FFF'}
+                containerColor="#F44336"
+                size={20}
+                onPress={() => showDeleteDialog(project.id)}
+                className="sm:ml-2"
+              />
+            </Card.Actions>
+            ) : (
               <Card.Actions>
                 <Button
                   icon="eye"
@@ -199,15 +244,24 @@ const MyProject = ({ navigation }) => {
                 >
                   View Details
                 </Button>
-                <Button
-                  icon="share"
-                  mode="contained"
-                  onPress={() => handleShare(project)}
-                  className="bg-green-500"
-                  labelStyle={{ color: '#fff' }}
-                >
-                  Share
-                </Button>
+                <IconButton
+                  icon="share-variant"
+                  iconColor={'#FFF'}
+                  containerColor="#0F0"
+                  size={20}
+                  onPress={() => handleProjectClick(project)}
+                  className="sm:ml-2"
+                />
+                {project.status === 'ONGOING' && (
+                  <IconButton
+                    icon="folder-eye"
+                    iconColor={'#FFF'}
+                    containerColor="#00F"
+                    size={20}
+                    onPress={handleManageProject(project)}
+                    className="sm:ml-2"
+                  />
+                )}
               </Card.Actions>
             )}
           </Card>
@@ -218,17 +272,11 @@ const MyProject = ({ navigation }) => {
         <Dialog visible={deleteDialogVisible} onDismiss={hideDeleteDialog} className="bg-white">
           <Dialog.Title className="text-black">Confirm Deletion</Dialog.Title>
           <Dialog.Content>
-            <Paragraph className="text-black">
-              Are you sure you want to delete this project? This action cannot be undone.
-            </Paragraph>
+            <Paragraph className="text-black">Are you sure you want to delete this project? This action cannot be undone.</Paragraph>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={hideDeleteDialog} labelStyle={{ color: 'black' }}>
-              Cancel
-            </Button>
-            <Button onPress={handleDelete} labelStyle={{ color: 'red' }}>
-              Delete
-            </Button>
+            <Button onPress={hideDeleteDialog} labelStyle={{ color: 'black' }}>Cancel</Button>
+            <Button onPress={handleDelete} className="text-red-500">Delete</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>

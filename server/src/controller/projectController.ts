@@ -39,6 +39,48 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
   }
 };
 
+export const getProjectMembers = async (req: Request, res: Response): Promise<void> => {
+  const { projectId } = req.params;
+
+  try {
+    const members = await prisma.userProject.findMany({
+      where: {
+        id: projectId
+      },
+      include: {
+        User: {
+          select: {
+            id: true, 
+            email: true,
+            username: true
+          }
+        }
+      }
+    });
+    res.status(200).json(members);
+  } catch (error: any) {
+    res.status(500).json({ message: `Error fetching project members: ${error.message}` });
+  }
+};
+
+export const getUserProjects = async (req: Request, res: Response): Promise<void> => {
+  const { userId } = req.params;
+
+  try {
+    const projects = await prisma.user.findMany({
+      where: {
+        id: userId
+      },
+      include: {
+        projectsJoined: true
+      }
+    });
+    res.status(200).json(projects);
+  } catch (error: any) {
+    res.status(500).json({ message: `Error fetching user's projects: ${error.message}` });
+  }
+};
+
 export const getProjectByCommunityId = async (req: Request, res: Response): Promise<void> => {
   const {communityId} = req.params;
 
@@ -409,48 +451,6 @@ export const leaveProject = async (req: Request, res: Response): Promise<void> =
       return;
     }
     res.status(500).json({ message: `Error leaving the project: ${error.message}` });
-  }
-};
-
-export const getProjectMembers = async (req: Request, res: Response): Promise<void> => {
-  const { projectId } = req.params;
-
-  try {
-    const members = await prisma.userProject.findMany({
-      where: {
-        id: projectId
-      },
-      include: {
-        User: {
-          select: {
-            id: true, 
-            email: true,
-            username: true
-          }
-        }
-      }
-    });
-    res.status(200).json(members);
-  } catch (error: any) {
-    res.status(500).json({ message: `Error fetching project members: ${error.message}` });
-  }
-};
-
-export const getUserProjects = async (req: Request, res: Response): Promise<void> => {
-  const { userId } = req.params;
-
-  try {
-    const projects = await prisma.user.findMany({
-      where: {
-        id: userId
-      },
-      include: {
-        projectsJoined: true
-      }
-    });
-    res.status(200).json(projects);
-  } catch (error: any) {
-    res.status(500).json({ message: `Error fetching user's projects: ${error.message}` });
   }
 };
 

@@ -5,11 +5,14 @@ import axios from 'axios';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
+import { useAuthStore } from '../../app/store';
+import { router } from 'expo-router';
 
-const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshProjects }) => {
+const ProjectCard = ({ item, role, onPress, communityId, userId, filterType, refreshProjects }) => {
     const formattedDate = format(new Date(item.createdAt), 'MMMM dd, yyyy');
     const [isLoading, setIsLoading] = useState(false);
     const isCreator = item.creatorID === userId;
+    const {setProjectId} = useAuthStore();
   
     const handleJoinProject = async (projectId) => {
       try {
@@ -86,6 +89,16 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
         ]
       );
     }
+
+    const handleEditProject = (item) => {
+      setProjectId(item.id);
+      router.push('/(modals)/editProject');
+    };
+
+    const handleManageProject = (item) => {
+      setProjectId(item.id);
+      router.push('../manageproject/events');
+    }
     
     const renderActionButtons = () => {
       if (isLoading) {
@@ -103,10 +116,10 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
               <View className="flex-row justify-between">
                 <TouchableOpacity
                   className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center flex-1 mr-3"
-                  onPress={() => onPress(item)}
+                  onPress={() => handleEditProject(item)}
                 >
                   <Ionicons name="settings-outline" size={18} color="white" />
-                  <Text className="text-white font-bold ml-2">Manage</Text>
+                  <Text className="text-white font-bold ml-2">Edit</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   className="bg-red-100 px-6 py-3 rounded-xl flex-row items-center"
@@ -163,10 +176,10 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
               <View className="flex-row justify-between">
                 <TouchableOpacity
                   className="bg-indigo-600 px-6 py-3 rounded-xl flex-row justify-center items-center flex-1 mr-3"
-                  onPress={() => onPress(item)}
+                  onPress={() => handleEditProject(item)}
                 >
-                  <Ionicons name="settings-outline" size={18} color="white" />
-                  <Text className="text-white font-bold ml-2">Manage</Text>
+                  <Ionicons name="create-outline" size={18} color="white" />
+                  <Text className="text-white font-bold ml-2">Edit</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   className="bg-red-100 px-6 py-3 rounded-xl flex-row items-center justify-center"
@@ -218,19 +231,26 @@ const ProjectCard = ({ item, onPress, communityId, userId, filterType, refreshPr
           }
     
         case 'ONGOING':
-          if (isCreator) {
+          if (role !== 'MEMBER') {
             return (
               <View className="flex-row justify-between">
                 <TouchableOpacity
                   className="bg-indigo-600 px-6 py-3 rounded-xl flex-row items-center justify-center flex-1 mr-3"
-                  onPress={() => onPress(item)}
+                  onPress={() => handleManageProject(item)}
                 >
                   <Ionicons name="settings-outline" size={18} color="white" />
-                  <Text className="text-white font-bold ml-2">Manage</Text>
+                  <Text className="text-white font-bold ml-2">Manage Project</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className="bg-gray-100 px-6 py-3 rounded-xl flex-row items-center justify-center"
+                  onPress={() => handleEditProject(item)}
+                >
+                  <Ionicons name="create-outline" size={18} color="#4B5563" />
+                  <Text className="text-gray-700 font-bold ml-2">Edit</Text>
                 </TouchableOpacity>
               </View>
             );
-          } else if (item.members?.some((member) => member.userId === userId)) {
+          } else {
             return (
               <View className="flex-row justify-between">
                 <TouchableOpacity

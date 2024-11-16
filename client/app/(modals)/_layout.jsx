@@ -40,6 +40,33 @@ const ChatLayout = () => {
           animation: 'slide_from_right'
         }}
       />
+      <Stack.Screen
+        name="createEvent"
+        options={{
+          headerShown: false,
+          gestureEnabled: Platform.OS === 'ios',
+          gestureDirection: 'horizontal',
+          animation: 'slide_from_right'
+        }}
+      />
+      <Stack.Screen
+        name="viewFund"
+        options={{
+          headerShown: false,
+          gestureEnabled: Platform.OS === 'ios',
+          gestureDirection: 'horizontal',
+          animation: 'slide_from_right',
+        }}
+      />
+      <Stack.Screen
+        name="createFund"
+        options={{
+          headerShown: false,
+          gestureEnabled: Platform.OS === 'ios',
+          gestureDirection: 'horizontal',
+          animation: 'slide_from_right'
+        }}
+      />
     </Stack>
   );
 };

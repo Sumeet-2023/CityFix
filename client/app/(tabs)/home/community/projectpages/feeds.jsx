@@ -20,6 +20,7 @@ import FAB from '../../../../../components/FAB';
 
 export default function Feeds() {
   // const { communityId } = useLocalSearchParams();
+  const [role, setRole] = useState(null);
   const { user, communityId, setProjectId } = useAuthStore();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +33,11 @@ export default function Feeds() {
       const response = await axios.get(
         `${serverurl}/project/byCommunityWithFilter/${communityId}?filterType=${filterType}&userId=${user?.id}`
       );
+      const rel = await axios.get(
+        `${serverurl}/community/role/${communityId}/${user?.id}`
+      );
       setProjects(response.data);
+      setRole(rel.data.role);
     } catch (error) {
       console.error('Error fetching projects:', error);
       Alert.alert('Error', 'Failed to fetch projects. Please try again.');
@@ -157,6 +162,7 @@ export default function Feeds() {
                 userId={user?.id}
                 filterType={activeFilter}
                 refreshProjects={() => fetchProjects(activeFilter)}
+                role={role}
               />
             )}
             keyExtractor={(item) => item.id}

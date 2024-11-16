@@ -14,6 +14,8 @@ import userRoutes from "./routes/userRoutes";
 import exploreRoutes from "./routes/exploreRoutes";
 import communityRoutes from "./routes/communityRoutes";
 import notificationRoutes from "./routes/notificationRoutes";
+import eventRoutes from "./routes/eventRoutes";
+import fundingRoutes from "./routes/crowdFundingRoutes";
 import { dashboardRoutes } from "./routes/dashboardRoutes";
 
 /* CONFIGURATIONS */
@@ -39,6 +41,8 @@ app.use("/user", userRoutes);
 app.use("/explore", exploreRoutes);
 app.use("/community", communityRoutes);
 app.use("/notification", notificationRoutes);
+app.use("/event", eventRoutes);
+app.use("/funding", fundingRoutes);
 app.use("/dashboard", dashboardRoutes);
 
 /* SERVER */

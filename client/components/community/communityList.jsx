@@ -2,18 +2,16 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  Image,
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl
 } from 'react-native';
-import { router } from "expo-router";
-import axios from 'axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import axios from 'axios';
 import CommunityCard from './communityCard';
 
-const CommunityList = ({ userId, serverUrl }) => {
+const CommunityList = ({ userId, serverUrl }) => {  // Ensure userId is correctly passed as a prop
   const [communities, setCommunities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -65,7 +63,7 @@ const CommunityList = ({ userId, serverUrl }) => {
     );
   }
 
-  if (communities[0]?.id === undefined) {
+  if (communities.length === 0) {
     return (
       <View className="flex-1 justify-center items-center px-5">
         <MaterialCommunityIcons name="account-group" size={48} color="#666" />
@@ -82,7 +80,7 @@ const CommunityList = ({ userId, serverUrl }) => {
   return (
     <FlatList
       data={communities}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item.id.toString()}  // Ensure the ID is a string for the key
       renderItem={({ item }) => <CommunityCard community={item} />}
       contentContainerStyle={{ padding: 16 }}
       showsVerticalScrollIndicator={false}

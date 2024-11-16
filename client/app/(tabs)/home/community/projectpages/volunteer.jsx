@@ -55,13 +55,13 @@ const Volunteers = () => {
                 <Text className="text-xl font-bold mb-2">{event.ngoName}</Text>
               </View>
               <Text className=" text-sm font-semibold mb-2"># {event.tag}</Text>
-              <Text className="text-lg font-bold mb-2 text-black mb-2">Title: {event.title}</Text>
-              <Text className="text-base font-bold mb-2 text-black mb-2">Description: {event.description}</Text>
-              <Text className="text-base font-bold mb-2 text-black mb-2">Date: {event.date}</Text>
-              <Text className="text-base font-bold mb-2 text-black mb-2">Time: {event.time}</Text>
-              <Text className="text-base font-bold mb-2 text-black mb-2">Location: {event.location}</Text>
+              <Text className="text-lg font-bold text-black mb-2">Title: {event.title}</Text>
+              <Text className="text-base font-bold text-black mb-2">Description: {event.description}</Text>
+              <Text className="text-base font-bold text-black mb-2">Date: {event.date}</Text>
+              <Text className="text-base font-bold text-black mb-2">Time: {event.time}</Text>
+              <Text className="text-base font-bold text-black mb-2">Location: {event.location}</Text>
 
-              <Text className="text-xl font-bold mb-2 text-black mb-2">
+              <Text className="text-xl font-bold text-black mb-2">
                 Volunteer Needed: {event.volunteers.current}/{event.volunteers.needed}
               </Text>
 

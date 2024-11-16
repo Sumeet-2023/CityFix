@@ -11,6 +11,7 @@ const useAuthStore = create(
       isLoading: true,
       communityId: null,
       projectId: null,
+      currency: null,
 
       setUser: (userData) => set({ user: userData }),
       clearUser: () => set({ user: null }),
@@ -25,6 +26,8 @@ const useAuthStore = create(
       clearCommunityId: () => set({ communityId: null }),
       setProjectId: (id) => set({ projectId: id }),
       clearProjectId: () => set({ projectId: null }),
+      setCurrency: (currency) => set({currency: currency}),
+      clearCurrency: () => set({currency: null}),
     }),
     {
       name: 'auth-storage',
